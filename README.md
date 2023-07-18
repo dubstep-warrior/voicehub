@@ -1,5 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Repo Size](https://img.shields.io/github/repo-size/username/repo-name.svg)](https://github.com/dubstep-warrior/voicehub-frontend)
+[![Repo Size](https://img.shields.io/github/repo-size/dubstep-warrior/voicehub-frontend.svg)](https://github.com/dubstep-warrior/voicehub-frontend)
 
 ## Description
 
