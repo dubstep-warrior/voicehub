@@ -10,23 +10,23 @@ A voice-chat platform that allows users to communicate with each other through v
 
 To clone the project, run the following command:
 
-bash
+```bash
 git clone https://github.com/dubstep-warrior/voicehub-frontend.git
-
+```
 
 To install the project dependencies, navigate to the project directory and run:
 
-bash
+```bash
 npm install
-
+```
 
 ## Usage
 
 To start the development server, run the following command:
 
-bash
+```bash
 npm start
-
+```
 
 ## Technologies Used
 
@@ -42,6 +42,6 @@ npm start
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+<!-- This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details. -->
 
 For more information, please refer to the [GitHub repository](https://github.com/dubstep-warrior/voicehub-frontend.git).
