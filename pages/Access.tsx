@@ -4,51 +4,59 @@ import { useState } from "react";
 import {
   Image,
   StyleSheet,
-  Text,
-  TextInput,
+  Text, 
   TouchableOpacity,
   View,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { NavigationProps } from "../interfaces/NavigationProps.interface";
-import { useForm, Controller } from "react-hook-form";
+import { NavigationProps } from "../interfaces/NavigationProps.interface"; 
 import Input from "../shared/Input";
-import Form from "react-native-form";
+import * as SecureStore from "expo-secure-store";
 import { FormData } from "../shared/FormData";
+import routeConfig from './../config/route-config.json'
+import {REACT_APP_BACKEND_URL} from "@env"
 
-export default function Access({ route, navigation }: NavigationProps) {
-  const formObj: any = {
-    email: "",
-    password: "",
-  };
+export default function Access({ route, navigation }: NavigationProps) { 
+  const current = route.name.toLowerCase();
+  // console.log(JSON.parse(routeConfig as any))
+  const messageLink: any = routeConfig;
 
   const [invalid, setFormInvalid] = useState(false);
-
-  if (route.name == "Register") formObj["confirmpassword"] = "";
+ 
   const [formValues, handleFormValueChange, setFormValues] = FormData(
-    formObj,
+    messageLink[current].form,
     setFormInvalid
   );
 
-  const resolveAccess = (data?: any) => {
+  const resolveAccess = async (data?: any) => {
     console.log("submitted:", formValues);
-    console.log(data);
 
     if (Object.keys(formValues).some((key) => !Boolean(formValues[key]))) {
+      console.log("Form values is not valid");
       setFormInvalid(true);
+      return;
     }
-  };
 
-  const messageLink: any = {
-    login: {
-      message: "No account? Sign up here!",
-      navigateTo: "Register",
-    },
-    register: {
-      message: "Have an existing account? Login here!",
-      navigateTo: "Login",
-    },
+    console.log(`${process.env.REACT_APP_BACKEND_URL}/api/v1/auth/${current}`)
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/v1/auth/${current}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formValues),
+      }
+    ).then((response) => response.json());
+
+    if (res && res.success) {
+      await Promise.all([
+        SecureStore.setItemAsync("token", res.data.token),
+        SecureStore.setItemAsync("res.data.token", res.data.user),
+      ]);
+    }
   };
 
   return (
@@ -57,7 +65,7 @@ export default function Access({ route, navigation }: NavigationProps) {
         <View>
           <Image style={styles.logo} source={require("./../assets/logo.png")} />
         </View>
-        <View style={styles.row}> 
+        <View style={styles.row}>
           <Input
             name="Email"
             formKey="email"
@@ -72,10 +80,10 @@ export default function Access({ route, navigation }: NavigationProps) {
           {route.name == "Register" && (
             <Input
               name="Confirm Password"
-              formKey="confirmpassword"
+              formKey="confirmPassword"
               handleFormValueChange={handleFormValueChange}
             ></Input>
-          )} 
+          )}
         </View>
         <View style={styles.row}>
           <TouchableOpacity
@@ -102,7 +110,7 @@ export default function Access({ route, navigation }: NavigationProps) {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate(
-                messageLink[route.name.toLowerCase()].navigateTo
+                messageLink[current].navigateTo
               )
             }
           >
@@ -112,15 +120,15 @@ export default function Access({ route, navigation }: NavigationProps) {
                 textDecorationLine: "underline",
               }}
             >
-              {messageLink[route.name.toLowerCase()].message}
+              {messageLink[current].message}
             </Text>
           </TouchableOpacity>
         </View>
         {invalid && (
-        <View>
-          <Text>Please fill up all fields</Text>
-        </View>
-      )}
+          <View>
+            <Text>Please fill up all fields</Text>
+          </View>
+        )}
         <StatusBar style="auto" />
       </View>
     </TouchableWithoutFeedback>

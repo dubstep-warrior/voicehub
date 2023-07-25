@@ -1,4 +1,3 @@
-import { Controller } from "react-hook-form";
 import { Props } from "../interfaces/Props.interface";
 import { TextInput } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native";

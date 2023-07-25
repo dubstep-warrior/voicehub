@@ -1,0 +1,19 @@
+{
+    "login": {
+      "message": "No account? Sign up here!",
+      "navigateTo": "Register",
+      "form": {
+        "email": "",
+        "password": ""
+      }
+    },
+    "register": {
+      "message": "Have an existing account? Login here!",
+      "navigateTo": "Login",
+      "form": {
+        "email": "",
+        "password": "",
+        "confirmPassword": ""
+      }
+    }
+  }
