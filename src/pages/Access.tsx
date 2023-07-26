@@ -4,32 +4,36 @@ import { useState } from "react";
 import {
   Image,
   StyleSheet,
-  Text, 
+  Text,
   TouchableOpacity,
   View,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { NavigationProps } from "../interfaces/NavigationProps.interface"; 
+import { NavigationProps } from "../interfaces/NavigationProps.interface";
 import Input from "../shared/Input";
 import * as SecureStore from "expo-secure-store";
 import { FormData } from "../shared/FormData";
-import routeConfig from './../config/route-config.json'
-import {REACT_APP_BACKEND_URL} from "@env"
+import routeConfig from "../../config/route-config.json";
+import ApiConfig from "../../config/api-config.json";
+import { REACT_APP_BACKEND_URL } from "@env";
+import { useAppDispatch } from "./../store/hooks";
+import { assign } from "../store/auth/auth.slice";
+import { resolveAccess } from "../store/auth/auth.actions";
 
-export default function Access({ route, navigation }: NavigationProps) { 
+export default function Access({ route, navigation }: NavigationProps) {
   const current = route.name.toLowerCase();
-  // console.log(JSON.parse(routeConfig as any))
+  const dispatch = useAppDispatch();
   const messageLink: any = routeConfig;
 
   const [invalid, setFormInvalid] = useState(false);
- 
+
   const [formValues, handleFormValueChange, setFormValues] = FormData(
     messageLink[current].form,
     setFormInvalid
   );
 
-  const resolveAccess = async (data?: any) => {
+  const submitForm = (data?: any) => {
     console.log("submitted:", formValues);
 
     if (Object.keys(formValues).some((key) => !Boolean(formValues[key]))) {
@@ -38,32 +42,17 @@ export default function Access({ route, navigation }: NavigationProps) {
       return;
     }
 
-    console.log(`${process.env.REACT_APP_BACKEND_URL}/api/v1/auth/${current}`)
-    const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/v1/auth/${current}`,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formValues),
-      }
-    ).then((response) => response.json());
-
-    if (res && res.success) {
-      await Promise.all([
-        SecureStore.setItemAsync("token", res.data.token),
-        SecureStore.setItemAsync("res.data.token", res.data.user),
-      ]);
-    }
+    dispatch(resolveAccess(formValues, current)); 
   };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
         <View>
-          <Image style={styles.logo} source={require("./../assets/logo.png")} />
+          <Image
+            style={styles.logo}
+            source={require("./../../assets/logo.png")}
+          />
         </View>
         <View style={styles.row}>
           <Input
@@ -97,7 +86,7 @@ export default function Access({ route, navigation }: NavigationProps) {
               backgroundColor: "#F99C9C",
               marginBottom: 12,
             }}
-            onPress={() => resolveAccess()}
+            onPress={() => submitForm()}
           >
             <Text
               style={{
@@ -108,11 +97,7 @@ export default function Access({ route, navigation }: NavigationProps) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate(
-                messageLink[current].navigateTo
-              )
-            }
+            onPress={() => navigation.navigate(messageLink[current].navigateTo)}
           >
             <Text
               style={{

@@ -1,21 +1,11 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import Access from "./pages/Access";
-import { RootStackParamList } from "./interfaces/RootStackParamList.interface";
+import { store } from "./src/store/store";
+import { Provider } from "react-redux";
+import VoiceHub from "./src/VoiceHub";
 
-export default function App() {
-  const Stack = createStackNavigator<RootStackParamList>();
-
+export default function App() { 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="Login" component={Access} />
-        <Stack.Screen name="Register" component={Access} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <VoiceHub></VoiceHub>
+    </Provider>
   );
 }
