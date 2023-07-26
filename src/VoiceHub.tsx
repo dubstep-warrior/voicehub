@@ -9,14 +9,13 @@ import { RootStackParamList } from "./interfaces/RootStackParamList.interface";
 import { useAppSelector, useAppDispatch } from "./store/hooks";
 import * as SecureStore from "expo-secure-store";
 import { assign, selectAuth } from "./store/auth/auth.slice";
-import Home from "./pages/Home";
+import Main from "./pages/Main";
 import { AuthOnRender } from "./store/auth/auth.actions";
 // import { useNavigation } from '@react-navigation/native';
 
 export default function VoiceHub() {
   const Stack = createStackNavigator<RootStackParamList>();
-  const authState = useAppSelector(selectAuth);
-  const [route, setRoute] = useState("Login");
+  const authState = useAppSelector(selectAuth); 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -26,14 +25,13 @@ export default function VoiceHub() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={route as keyof RootStackParamList}
         screenOptions={{
           headerShown: false,
         }}
       >
         {authState.token && authState.user ? (
           <Stack.Group>
-            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Main" component={Main} />
           </Stack.Group>
         ) : (
           <Stack.Group>

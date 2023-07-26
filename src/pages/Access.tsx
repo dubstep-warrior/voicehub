@@ -11,15 +11,12 @@ import {
   Keyboard,
 } from "react-native";
 import { NavigationProps } from "../interfaces/NavigationProps.interface";
-import Input from "../shared/Input";
-import * as SecureStore from "expo-secure-store";
+import Input from "../shared/Input"; 
 import { FormData } from "../shared/FormData";
-import routeConfig from "../../config/route-config.json";
-import ApiConfig from "../../config/api-config.json";
-import { REACT_APP_BACKEND_URL } from "@env";
-import { useAppDispatch } from "./../store/hooks";
-import { assign } from "../store/auth/auth.slice";
+import routeConfig from "../../config/route-config.json"; 
+import { useAppDispatch } from "./../store/hooks"; 
 import { resolveAccess } from "../store/auth/auth.actions";
+import theme from './../../config/theme.config.json'
 
 export default function Access({ route, navigation }: NavigationProps) {
   const current = route.name.toLowerCase();
@@ -51,7 +48,7 @@ export default function Access({ route, navigation }: NavigationProps) {
         <View>
           <Image
             style={styles.logo}
-            source={require("./../../assets/logo.png")}
+            source={require("./../../assets/logo-white.png")}
           />
         </View>
         <View style={styles.row}>
@@ -83,7 +80,7 @@ export default function Access({ route, navigation }: NavigationProps) {
               justifyContent: "center",
               padding: 12,
               borderRadius: 12,
-              backgroundColor: "#F99C9C",
+              backgroundColor: theme.khaki,
               marginBottom: 12,
             }}
             onPress={() => submitForm()}
@@ -103,6 +100,7 @@ export default function Access({ route, navigation }: NavigationProps) {
               style={{
                 fontSize: 16,
                 textDecorationLine: "underline",
+                color: "white"
               }}
             >
               {messageLink[current].message}
@@ -124,7 +122,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "#6A6A6A",
+    backgroundColor: theme.gunmetal,
     alignItems: "center",
     justifyContent: "center",
     gap: 24,
