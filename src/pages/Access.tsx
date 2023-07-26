@@ -24,12 +24,12 @@ export default function Access({ route, navigation }: NavigationProps) {
   const messageLink: any = routeConfig;
 
   const [invalid, setFormInvalid] = useState(false);
-
+  console.log('1')
   const [formValues, handleFormValueChange, setFormValues] = FormData(
     messageLink[current].form,
     setFormInvalid
   );
-
+  console.log('2')
   const submitForm = (data?: any) => {
     console.log("submitted:", formValues);
 
