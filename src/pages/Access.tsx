@@ -17,29 +17,37 @@ import routeConfig from "../../config/route-config.json";
 import { useAppDispatch } from "./../store/hooks"; 
 import { resolveAccess } from "../store/auth/auth.actions";
 import theme from './../../config/theme.config.json'
+import { unwrapResult } from "@reduxjs/toolkit";
 
 export default function Access({ route, navigation }: NavigationProps) {
   const current = route.name.toLowerCase();
   const dispatch = useAppDispatch();
   const messageLink: any = routeConfig;
 
-  const [invalid, setFormInvalid] = useState(false);
-  console.log('1')
+  const [invalid, setFormInvalid] = useState(''); 
   const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
     messageLink[current].form,
     setFormInvalid
-  );
-  console.log('2')
-  const submitForm = (data?: any) => {
+  ); 
+
+  const submitForm = async (data?: any) => {
     console.log("submitted:", formValues);
 
     if (Object.keys(formValues).some((key) => !Boolean(formValues[key]))) {
       console.log("Form values is not valid");
-      setFormInvalid(true);
+      setFormInvalid("Please fill up all fields");
       return;
     }
+    if(current == 'register' && formValues['password'] !== formValues['confirmPassword']) {
+      setFormInvalid("Passwords are not the same")
+      return
+    }
 
-    dispatch(resolveAccess(formValues, current)); 
+    const res = await dispatch(resolveAccess(formValues, current)); 
+    console.log('response returned:', res)
+    if(res && !res.success) {
+      setFormInvalid("User credentials are invalid");
+    }
   };
 
   return (
@@ -54,19 +62,21 @@ export default function Access({ route, navigation }: NavigationProps) {
         <View style={styles.row}>
           <Input
             name="Email"
-            formKey="email"
+            formKey="email" 
             handleFormValueChange={handleFormValueChange}
           ></Input>
 
           <Input
             name="Password"
             formKey="password"
+            secureTextEntry={true}
             handleFormValueChange={handleFormValueChange}
           ></Input>
           {route.name == "Register" && (
             <Input
               name="Confirm Password"
               formKey="confirmPassword"
+              secureTextEntry={true}
               handleFormValueChange={handleFormValueChange}
             ></Input>
           )}
@@ -107,9 +117,9 @@ export default function Access({ route, navigation }: NavigationProps) {
             </Text>
           </TouchableOpacity>
         </View>
-        {invalid && (
+        {Boolean(invalid) && (
           <View>
-            <Text>Please fill up all fields</Text>
+            <Text>{invalid}</Text>
           </View>
         )}
         <StatusBar style="auto" />

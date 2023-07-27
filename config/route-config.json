@@ -18,8 +18,8 @@
   },
   "profile": {  
     "form": {
-      "email": "",
-      "profile_img": null,
+      "displayName": "",
+      "photoURL": null,
       "status": ""
     }
   }

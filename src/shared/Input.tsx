@@ -11,7 +11,8 @@ interface IInput {
   value?: string,
   style?: keyof typeof styles
   multiline?: boolean
-  numberOfLines?: number
+  numberOfLines?: number,
+  secureTextEntry?: boolean
 }
 
 export default function Input({ style = 'input' ,...props}: IInput) {
@@ -26,6 +27,7 @@ export default function Input({ style = 'input' ,...props}: IInput) {
           handleFormValueChange(formKey, event.nativeEvent.text)
         }
         {...textInputProps}
+        {...props}
         defaultValue={props.value ?? ''}
         multiline={props.multiline ?? false}
         numberOfLines={props.numberOfLines ?? 1}

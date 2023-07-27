@@ -11,17 +11,23 @@ import * as SecureStore from "expo-secure-store";
 import { assign, selectAuth } from "./store/auth/auth.slice";
 import Main from "./pages/Main";
 import { AuthOnRender } from "./store/auth/auth.actions";
+import { auth } from "../firebase";
+import { User, onAuthStateChanged } from "firebase/auth";
 // import { useNavigation } from '@react-navigation/native';
 
 export default function VoiceHub() {
   const Stack = createStackNavigator<RootStackParamList>();
-  const authState = useAppSelector(selectAuth); 
-  const dispatch = useAppDispatch();
+  // const authState = useAppSelector(selectAuth); 
+  const [user, setUser] = useState<User | null>(null)
 
-  useEffect(() => {
-    dispatch(AuthOnRender())
-  }, [])
- 
+  onAuthStateChanged(auth, (user) => {
+    if (user) { 
+      setUser(user)
+    } else {
+      setUser(null)
+    } 
+  });
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -29,7 +35,7 @@ export default function VoiceHub() {
           headerShown: false,
         }}
       >
-        {authState.token ? (
+        {user ? (
           <Stack.Group>
             <Stack.Screen name="Main" component={Main} />
           </Stack.Group>

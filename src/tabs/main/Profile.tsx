@@ -22,9 +22,23 @@ import routeConfig from "./../../../config/route-config.json";
 import Input from "../../shared/Input";
 import { FormData } from "../../shared/FormData";
 import { UserUpdate } from "../../store/user/user.actions";
+import { User, onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../../firebase";
+import { VHUser } from "../../interfaces/VHUser";
 
 export default function Profile({ route }: NavigationProps) {
   // console.log(route.name);
+  const [user, setUser] = useState<VHUser | null>(null)
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {  
+      setUser(user)
+    }  else {
+      setUser(null)
+    } 
+  });
+
+
   const [editMode, setEditMode] = useState(false);
   const authState = useAppSelector(selectAuth);
   const userState = useAppSelector(selectUser); 
@@ -41,7 +55,7 @@ export default function Profile({ route }: NavigationProps) {
   const actionSheetProps = {
     ref: actionSheetRef,
     options: (actionSheetConfig as any)[route.name.toLowerCase()][
-      "profile_img"
+      "photoURL"
     ] as (string | React.ReactNode)[],
     cancelButtonIndex: 2,
     onPress: async (index: number): Promise<void> => {
@@ -54,7 +68,7 @@ export default function Profile({ route }: NavigationProps) {
         });
 
         if (!result.canceled) {
-          handleFormValueChange("profile_img", result.assets[0]);
+          handleFormValueChange("photoURL", result.assets[0]);
           console.log(formValues);
           // dispatch(update({ profile_img: result.assets[0].uri }));
         }
@@ -68,7 +82,7 @@ export default function Profile({ route }: NavigationProps) {
   const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
     messageLink[current].form,
     setFormInvalid,
-    Object(userState)
+    user
   );
 
   useEffect(() => {
@@ -81,11 +95,11 @@ export default function Profile({ route }: NavigationProps) {
   const submitProfileForm = async () => {
     if(invalid) return
     console.log('clear invalid check, time to run dispatch', Object(userState))
-    dispatch(UserUpdate(formValues, Object(userState), Object(authState), setEditMode)) 
+    dispatch(UserUpdate(formValues, user, setEditMode)) 
   }
 
   return (
-    authState.token && (
+    user && (
       <SafeAreaView style={styles.safeAreaContainer}>
         <View style={styles.container}>
           <View style={styles.profileBanner}>
@@ -102,8 +116,8 @@ export default function Profile({ route }: NavigationProps) {
                 <Image
                   style={styles.image}
                   source={
-                    userState.profile_img || formValues.profile_img
-                      ? { uri: formValues.profile_img.uri ?? userState.profile_img }
+                    user.photoURL || formValues.photoURL
+                      ? { uri: formValues.photoURL.uri ?? user.photoURL }
                       : config["profile-white"]
                   }
                 ></Image>
@@ -135,10 +149,10 @@ export default function Profile({ route }: NavigationProps) {
                 {editMode ? (
                   <>
                     <Input
-                      name="Email"
-                      formKey="email"
+                      name="Display Name"
+                      formKey="displayName"
                       handleFormValueChange={handleFormValueChange}
-                      value={formValues["email"]}
+                      value={formValues["displayName"]}
                       style="minimal"
                     />
                     <Input
@@ -159,10 +173,10 @@ export default function Profile({ route }: NavigationProps) {
                         { fontSize: 24, fontWeight: "bold" },
                       ]}
                     >
-                      {userState.email}
+                      {user.displayName}
                     </Text>
                     <Text style={[styles.text, { fontSize: 16 }]}>
-                      {userState.status ?? ""}
+                      {user.status ?? ""}
                     </Text>
                   </>
                 )}

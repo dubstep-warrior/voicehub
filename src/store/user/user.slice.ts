@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
+import { User, UserCredential } from 'firebase/auth'
 
 // Define a type for the slice state
-interface UserState {
-  email: string
+interface UserState extends User { 
   profile_img: any,
   username: string,
   display_name: string,
@@ -12,12 +12,11 @@ interface UserState {
 }
 
 // Define the initial state using that type
-const initialState: UserState = {
-  email: '',
+const initialState: UserState = {  
   profile_img: null,
   username: '',
   display_name: ''
-}
+} as UserState
 
 export const userSlice = createSlice({
   name: 'user',
@@ -26,15 +25,11 @@ export const userSlice = createSlice({
   reducers: {
     assign: (state, actions) => {
       console.log('redux store has been updated in user slice: ', actions.payload)
-      state.email = actions.payload.user.email ?? ''
-      state.profile_img = actions.payload.user.profile_img ?? null
-      state.username = actions.payload.user.username ?? ''
-      state.display_name = actions.payload.user.display_name ?? ''
-      console.log('assigned store,', state)
+      state = actions.payload.user
     },
-    update: (state, actions) => {
+    update: (state: UserState, actions) => {
       Object.keys(actions.payload).forEach(key => {
-        state[key as keyof UserState] = actions.payload[key]
+        (state[key as keyof UserState] as any) = actions.payload[key]
       })
       console.log('updated store', state)
     }

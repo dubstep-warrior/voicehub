@@ -2,11 +2,12 @@ import { REACT_APP_BACKEND_URL } from "@env";
 import ApiConfig from "../../../config/api-config.json";
 import { update } from "./user.slice";
 import { Platform } from "react-native/Libraries/Utilities/Platform";
+import { updateProfile } from "firebase/auth";
+import { auth } from "../../../firebase";
 
 export const UserUpdate = (
   changes: any,
   currentUser: any,
-  auth: any,
   setEditMode: any
 ) => {
   return async (dispatch: any) => {
@@ -38,29 +39,38 @@ export const UserUpdate = (
     });
     console.log("user action being run");
 
-    const data = new FormData();
+    console.log("new changes ", newChanges);
 
-    // TODO fix and ensure all change data is sent to backend
-    Object.keys(newChanges).forEach((key) => {
-      if (key == "profile_img") {
-        data.append(key, newChanges[key]);
-      } else {
-        data.append(key, JSON.stringify(newChanges[key]));
-      }
-    });
+    const res = await updateProfile(auth.currentUser!, {
+      ...newChanges,
+    })
+      .then((response) => {
+        return {
+          success: true,
+          data: response,
+        };
+      })
+      .catch((error) => {
+        return {
+          success: false,
+          error: error,
+        };
+      });
 
-    console.log('new changes ', newChanges)
-    const res = await fetch(`${REACT_APP_BACKEND_URL}/api/v1/user`, {
-      ...ApiConfig["PUT"],
-      headers: {
-        Authorization: `Token ${auth.token}`,
-      },
-      body: { changes: data } as any,
-    }).then((response) => response.json());
-
-    dispatch(update(newChanges));
-    // setEdit(false)
-
+    console.log('response',res);
     setEditMode(false);
+
+    return res;
+
+    // const res = await fetch(`${REACT_APP_BACKEND_URL}/api/v1/user`, {
+    //   ...ApiConfig["PUT"],
+    //   headers: {
+    //     Authorization: `Token ${auth.token}`,
+    //   },
+    //   body: { changes: data } as any,
+    // }).then((response) => response.json());
+
+    // dispatch(update(newChanges));
+    // setEdit(false)
   };
 };
