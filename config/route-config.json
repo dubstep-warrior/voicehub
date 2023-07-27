@@ -15,5 +15,12 @@
       "password": "",
       "confirmPassword": ""
     }
+  },
+  "profile": {  
+    "form": {
+      "email": "",
+      "profile_img": null,
+      "status": ""
+    }
   }
 }

@@ -5,5 +5,8 @@
       "Accept": "application/json",
       "Content-Type": "application/json"
     } 
+  },
+  "PUT": {
+    "method": "PUT" 
   }
 }

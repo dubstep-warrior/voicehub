@@ -10,7 +10,9 @@ const config = {
   "profile-grey": require("./assets/profile-grey.png"),
   "profile-white": require("./assets/profile-white.png"),
   "edit": require("./assets/edit.png"),
-  "add": require("./assets/add.png")
+  "add": require("./assets/add.png"),
+  "close": require("./assets/close.png"),
+  "green-tick": require("./assets/green-tick.png")
 };
 
 export default config;

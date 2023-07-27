@@ -4,14 +4,12 @@ import type { RootState } from '../store'
 
 // Define a type for the slice state
 interface AuthState {
-  token: string
-  user: any
+  token: string 
 }
 
 // Define the initial state using that type
 const initialState: AuthState = {
-  token: '',
-  user: null
+  token: '' 
 }
 
 export const authSlice = createSlice({
@@ -22,8 +20,7 @@ export const authSlice = createSlice({
     assign: (state, actions) => {
         console.log('redux store has been updated: ', actions.payload)
     //   state = actions.payload
-      state.token = actions.payload.token
-      state.user = actions.payload.user
+      state.token = actions.payload.token 
     }
   },
 })

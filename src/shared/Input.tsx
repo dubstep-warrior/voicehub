@@ -8,20 +8,27 @@ interface IInput {
   handleFormValueChange: any; 
   textInputProps?: any;
   formKey: string
+  value?: string,
+  style?: keyof typeof styles
+  multiline?: boolean
+  numberOfLines?: number
 }
 
-export default function Input(props: IInput) {
+export default function Input({ style = 'input' ,...props}: IInput) {
   const { name, handleFormValueChange, formKey, ...textInputProps } = props;
 
   return (
     <View style={{ width: "100%" }}>
       <TextInput
         placeholder={name}
-        style={styles.input}
+        style={styles[style]}
         onChange={(event) =>
           handleFormValueChange(formKey, event.nativeEvent.text)
         }
         {...textInputProps}
+        defaultValue={props.value ?? ''}
+        multiline={props.multiline ?? false}
+        numberOfLines={props.numberOfLines ?? 1}
       />
     </View>
   );
@@ -36,4 +43,19 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
   },
+  minimal: {
+    width: "100%", 
+    backgroundColor: "white",
+    borderRadius: 12,
+    fontSize: 16,
+    padding: 4
+  },
+  minimalTextarea: {
+    width: "100%", 
+    height: 100,
+    backgroundColor: "white",
+    borderRadius: 12,
+    fontSize: 16,
+    padding: 4
+  }
 });

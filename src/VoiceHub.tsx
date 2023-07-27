@@ -29,7 +29,7 @@ export default function VoiceHub() {
           headerShown: false,
         }}
       >
-        {authState.token && authState.user ? (
+        {authState.token ? (
           <Stack.Group>
             <Stack.Screen name="Main" component={Main} />
           </Stack.Group>

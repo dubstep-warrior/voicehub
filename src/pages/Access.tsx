@@ -25,7 +25,7 @@ export default function Access({ route, navigation }: NavigationProps) {
 
   const [invalid, setFormInvalid] = useState(false);
   console.log('1')
-  const [formValues, handleFormValueChange, setFormValues] = FormData(
+  const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
     messageLink[current].form,
     setFormInvalid
   );

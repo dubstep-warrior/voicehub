@@ -1,8 +1,9 @@
 import { REACT_APP_BACKEND_URL } from "@env";
 import ApiConfig from "../../../config/api-config.json";
 import { useAppDispatch } from "../hooks";
-import { assign } from "./auth.slice";
-import * as SecureStore from "expo-secure-store";
+import { assign as assignAuth } from "./auth.slice";
+import { assign as assignUser } from "./../user/user.slice";
+import * as SecureStore from "expo-secure-store"; 
 
 export const resolveAccess = (data: any, current: string) => {
   //   const dispatch = useAppDispatch();
@@ -20,8 +21,10 @@ export const resolveAccess = (data: any, current: string) => {
         SecureStore.setItemAsync(res.data.token, JSON.stringify(res.data.user)),
       ]).then(() => {
         dispatch(
-          assign({
+          assignAuth({
             token: res.data.token,
+          }),
+          assignUser({
             user: res.data.user,
           })
         );
@@ -41,8 +44,12 @@ export const AuthOnRender = () => {
             .then((user) => {
               if (user) {
                 dispatch(
-                  assign({
+                  assignAuth({
                     token: token,
+                  })
+                );
+                dispatch(
+                  assignUser({
                     user: JSON.parse(user),
                   })
                 );
@@ -70,9 +77,11 @@ export const AuthRemove = (token: string) => {
 
     if (res) {
       dispatch(
-        assign({
+        assignAuth({
           token: "",
-          user: null,
+        }),
+        assignUser({
+          user: {},
         })
       );
     }
