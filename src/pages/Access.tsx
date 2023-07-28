@@ -11,24 +11,25 @@ import {
   Keyboard,
 } from "react-native";
 import { NavigationProps } from "../interfaces/NavigationProps.interface";
-import Input from "../shared/Input"; 
+import Input from "../shared/Input";
 import { FormData } from "../shared/FormData";
-import routeConfig from "../../config/route-config.json"; 
-import { useAppDispatch } from "./../store/hooks"; 
+import routeConfig from "../../config/route-config.json";
+import { useAppDispatch } from "./../store/hooks";
 import { resolveAccess } from "../store/actions/auth.actions";
-import theme from './../../config/theme.config.json'
-import {styles as globalStyles} from "../../Styles.config";
+import theme from "./../../config/theme.config.json";
+import { styles as globalStyles } from "../../Styles.config";
+import Error from "../shared/Error";
 
 export default function Access({ route, navigation }: NavigationProps) {
   const current = route.name.toLowerCase();
   const dispatch = useAppDispatch();
   const messageLink: any = routeConfig;
-
-  const [invalid, setFormInvalid] = useState(''); 
+  console.log(route)
+  const [invalid, setFormInvalid] = useState("");
   const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
     messageLink[current].form,
     setFormInvalid
-  ); 
+  );
 
   const submitForm = async (data?: any) => {
     console.log("submitted:", formValues);
@@ -38,14 +39,17 @@ export default function Access({ route, navigation }: NavigationProps) {
       setFormInvalid("Please fill up all fields");
       return;
     }
-    if(current == 'register' && formValues['password'] !== formValues['confirmPassword']) {
-      setFormInvalid("Passwords are not the same")
-      return
+    if (
+      current == "register" &&
+      formValues["password"] !== formValues["confirmPassword"]
+    ) {
+      setFormInvalid("Passwords are not the same");
+      return;
     }
 
-    const res = await dispatch(resolveAccess(formValues, current)); 
-    console.log('response returned:', res)
-    if(res && !res.success) {
+    const res = await dispatch(resolveAccess(formValues, current));
+    console.log("response returned:", res);
+    if (res && !res.success) {
       setFormInvalid("User credentials are invalid");
     }
   };
@@ -62,7 +66,7 @@ export default function Access({ route, navigation }: NavigationProps) {
         <View style={styles.row}>
           <Input
             name="Email"
-            formKey="email" 
+            formKey="email"
             handleFormValueChange={handleFormValueChange}
           ></Input>
 
@@ -101,18 +105,14 @@ export default function Access({ route, navigation }: NavigationProps) {
               style={{
                 fontSize: 16,
                 textDecorationLine: "underline",
-                color: "white"
+                color: "white",
               }}
             >
               {messageLink[current].message}
             </Text>
           </TouchableOpacity>
         </View>
-        {Boolean(invalid) && (
-          <View>
-            <Text>{invalid}</Text>
-          </View>
-        )}
+        {Boolean(invalid) && <Error message={invalid}></Error>}
         <StatusBar style="auto" />
       </View>
     </TouchableWithoutFeedback>
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: theme.gunmetal,
+    backgroundColor: theme.background,
     alignItems: "center",
     justifyContent: "center",
     gap: 24,

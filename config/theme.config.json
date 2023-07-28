@@ -1,7 +1,13 @@
 {
   "black": "#0a0908",
+  "smoothGrey": "#262C38",
+  "lightSmoothGrey": "#3D3D3D",
+  "background": "#1B1D29",
+  "background2": "#6d7787",
   "gunmetal": "#22333b",
   "almond": "#eae0d5",
   "khaki": "#c6ac8f",
-  "walnut": "#5e503f"
+  "walnut": "#5e503f",
+  "button": "#A6A0EA",
+  "heading": "#838893"
 }

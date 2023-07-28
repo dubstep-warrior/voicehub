@@ -9,8 +9,7 @@ import { RootStackParamList } from "../interfaces/RootStackParamList.interface";
 import UpdateField from "./UpdateField";
 
 export default function Main({ route, navigation }: NavigationProps) {
-  const Tab = createBottomTabNavigator();
-  const dispatch = useAppDispatch();
+  const Tab = createBottomTabNavigator(); 
 
   return (
     <Tab.Navigator

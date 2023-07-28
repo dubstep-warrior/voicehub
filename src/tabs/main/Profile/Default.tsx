@@ -21,20 +21,24 @@ import { selectUser } from "../../../store/slices/user.slice";
 import routeConfig from "../../../../config/route-config.json";
 import Input from "../../../shared/Input";
 import { FormData } from "../../../shared/FormData";
-import { UserUpdate } from "../../../store/actions/user.actions";  
+import { UserUpdate } from "../../../store/actions/user.actions";
 import { styles as globalStyles } from "../../../../Styles.config";
 import { ScrollView } from "react-native-gesture-handler";
+import { auth } from "../../../../firebase";
 
 export default function Default({ route, navigation }: NavigationProps) {
   console.log(route);
 
   const [editMode, setEditMode] = useState(false);
   const userState = useAppSelector(selectUser);
-  console.log(userState);
-  const dispatch = useAppDispatch();
 
+  const dispatch = useAppDispatch();
   const [count, setCount] = useState(0);
 
+  const userRef = {
+    ...auth.currentUser,
+    ...Object(userState),
+  };
   const logout = async () => {
     dispatch(AuthRemove());
   };
@@ -131,10 +135,10 @@ export default function Default({ route, navigation }: NavigationProps) {
                         style={[
                           styles.image,
                           {
-                            margin: 4,
+                            margin: 20,
                           },
                         ]}
-                        source={config["add"]}
+                        source={config["upload-image"]}
                       ></Image>
                     </TouchableOpacity>
                   )}
@@ -170,12 +174,14 @@ export default function Default({ route, navigation }: NavigationProps) {
                       <Text
                         style={[
                           styles.text,
-                          { fontSize: 24, fontWeight: "bold" },
+                          { fontSize: 24, fontWeight: "bold", color: "white" },
                         ]}
                       >
                         {userState.username}
                       </Text>
-                      <Text style={[styles.text, { fontSize: 16 }]}>
+                      <Text
+                        style={[styles.text, { fontSize: 16, color: "white" }]}
+                      >
                         {userState.displayedName ?? ""}
                       </Text>
                     </>
@@ -212,23 +218,26 @@ export default function Default({ route, navigation }: NavigationProps) {
                     }}
                     onPress={() => submitProfileForm()}
                   >
-                    c
+                    <Image
+                      style={{ width: 12, height: 12 }}
+                      source={config["green-tick"]}
+                    ></Image>
                   </TouchableOpacity>
                 )}
               </View>
             </View>
             <View style={{ width: "100%", flex: 1 }}>
               <View style={{ margin: 12 }}>
-                <Text style={styles.text}>Status:</Text>
+                <Text style={styles.text}>STATUS</Text>
               </View>
               <Pressable
                 onPress={() => setEditMode(!editMode)}
                 style={{
-                  backgroundColor: theme.walnut,
+                  backgroundColor: theme.smoothGrey,
                   flex: 1,
                   padding: 12,
                   position: "relative",
-                  minHeight: 150
+                  minHeight: 150,
                 }}
               >
                 {editMode ? (
@@ -241,11 +250,12 @@ export default function Default({ route, navigation }: NavigationProps) {
                     style="minimalTextarea"
                     multiline={true}
                     numberOfLines={4}
-                    background={theme.khaki}
                   />
                 ) : (
                   <>
-                    <Text style={styles.text}>{userState.status ?? ""}</Text>
+                    <Text style={{ color: "white" }}>
+                      {userState.status ?? ""}
+                    </Text>
                     <Image
                       style={{
                         width: 12,
@@ -266,7 +276,9 @@ export default function Default({ route, navigation }: NavigationProps) {
                 key={section.heading}
               >
                 <View style={{ margin: 12 }}>
-                  <Text style={styles.text}>{section.heading}</Text>
+                  <Text style={styles.text}>
+                    {section.heading.toUpperCase()}
+                  </Text>
                 </View>
                 <View style={styles.selectionContainer}>
                   {section.options.map((option) => (
@@ -277,9 +289,43 @@ export default function Default({ route, navigation }: NavigationProps) {
                       underlayColor="rgba(0, 0, 0, 0.266)"
                       style={styles.selection}
                     >
-                      <Text style={{ fontSize: 14, fontWeight: "500" }}>
-                        {option.name}
-                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 14,
+                            fontWeight: "500",
+                            color: "white",
+                          }}
+                        >
+                          {option.name}
+                        </Text>
+                        <View style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 16
+                        }}>
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              fontWeight: "500",
+                              color: theme.heading,
+                            }}
+                          >
+                            {userRef[option.key]}
+                          </Text>
+                          <Image
+                           style={{
+                            width: 24,
+                            height: 24
+                          }}
+                           source={config["arrow-right"]}></Image>
+                        </View>
+                      </View>
                     </TouchableHighlight>
                   ))}
                 </View>
@@ -312,11 +358,11 @@ export default function Default({ route, navigation }: NavigationProps) {
 
 const styles = StyleSheet.create({
   safeAreaContainer: {
-    backgroundColor: theme.gunmetal,
+    backgroundColor: theme.background,
     flex: 1,
   },
   container: {
-    backgroundColor: theme.gunmetal,
+    backgroundColor: theme.background,
     flex: 1,
     gap: 16,
     alignItems: "center",
@@ -341,10 +387,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   text: {
-    color: "white",
+    color: theme.heading,
+    fontWeight: "600",
   },
   selectionContainer: {
-    backgroundColor: theme.almond,
+    backgroundColor: theme.smoothGrey,
     flexDirection: "column",
     width: "100%",
   },
@@ -352,12 +399,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 20,
     width: "100%",
+    borderBottomWidth: 0.4,
   },
   // TODO FIX OVERLAY OPACITY ISSUE
   profilePicOverlay: {
     position: "absolute",
-    backgroundColor: "black",
-    opacity: 0.3,
+    backgroundColor: "rgba(255,255,255, 0.3)", 
     borderRadius: 50,
     top: 0,
     bottom: 0,

@@ -16,20 +16,14 @@ import { FormData } from "../shared/FormData";
 import { useState } from "react";
 import theme from "./../../config/theme.config.json";
 import { selectUser } from "../store/slices/user.slice";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { auth, db } from "../../firebase";
-import {
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  updateEmail,
-  updatePassword,
-} from "firebase/auth";
+import { useAppDispatch, useAppSelector } from "../store/hooks"; 
 import { UserUpdate } from "../store/actions/user.actions";
 import config from "./../../Images.config";
+import { AuthUpdate } from "../store/actions/auth.actions";
+import Error from "../shared/Error";
 
 export default function UpdateField({ route, navigation }: NavigationProps) {
-  //   console.log(route);
-  const messageLink: any = routeConfig;
+   const messageLink: any = routeConfig;
   const userState = useAppSelector(selectUser);
   const [invalid, setFormInvalid] = useState("");
   const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
@@ -48,61 +42,19 @@ export default function UpdateField({ route, navigation }: NavigationProps) {
   const submit = async () => {
     if (
       !Object.keys(formValues).length ||
-      Object.keys(formValues).some((key) => formValues[key] == "")
+      Object.keys(formValues).some((key) => !Boolean(formValues[key]))
     ) {
       setFormInvalid("Fill up all fields");
       return;
     }
 
     if (["username", "displayedName"].includes(route.params!.key)) {
-      //username && displayedname
-      await dispatch(UserUpdate(formValues, Object(userState)));
+       await dispatch(UserUpdate(formValues, Object(userState)));
       navigation.goBack();
       return;
     }
-    console.log("retrieve cred");
-    const credential = EmailAuthProvider.credential(
-      auth.currentUser?.email!,
-      formValues["currentPassword"]
-    );
-
-    const reauth = await reauthenticateWithCredential(
-      auth.currentUser!,
-      credential
-    );
-    if (reauth && reauth.user) {
-      if (route.params!.key === "password") {
-        //password
-        if (formValues["newPassword"] !== formValues["confirmNewPassword"]) {
-          setFormInvalid("Ensure your new passwords match!");
-          console.log("password no match");
-        } else {
-          console.log("updaing password");
-          updatePassword(auth.currentUser!, formValues["newPassword"])
-            .then(() => navigation.goBack())
-            .catch((err) => {
-              console.log(err.code);
-              setFormInvalid("There was an issue updating your password");
-            });
-        }
-      } else {
-        //email
-        updateEmail(auth.currentUser!, formValues["email"]!)
-          .then(() => {
-            console.log("success");
-            navigation.goBack();
-          })
-          .catch((error) => {
-            console.log("fail", error);
-            setFormInvalid(
-              `There was an error changing your ${route.params!.name.toLowerCase()}`
-            );
-          });
-      }
-    } else {
-      console.log("invalid password");
-      setFormInvalid("Your password is invalid");
-    }
+    
+    dispatch(AuthUpdate(formValues, route, navigation, setFormInvalid))
   };
 
   return (
@@ -125,8 +77,8 @@ export default function UpdateField({ route, navigation }: NavigationProps) {
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <View style={{ flex: 1, gap: 16 }}>
             <Text
-              style={{ color: "white", fontSize: 24, fontWeight: "500" }}
-            >{`Update ${route.params!.name.toLowerCase()} here:`}</Text>
+              style={{ color: theme.heading, fontSize: 16, fontWeight: "700" }}
+            >{`Update ${route.params!.name.toLowerCase()} here:`.toUpperCase()}</Text>
             {formKeys.map((key) => (
               <Input
                 key={key}
@@ -136,35 +88,13 @@ export default function UpdateField({ route, navigation }: NavigationProps) {
                 value={formValues[key]}
                 style="square"
                 background={theme.almond}
+                secureTextEntry={key.toLowerCase().includes('password')}
               />
             ))}
             {Boolean(invalid) && (
-              <View
-                style={{ 
-                  justifyContent: "flex-start",
-                  flexDirection: "row",
-                  alignContent: "center", 
-                  gap: 12,
-                  padding: 4,
-                  borderRadius: 12,
-                  borderColor: 'red',
-                  borderWidth: 1
-                }}
-              >
-                <Image
-                  style={{ width: 22, height: 22 }}
-                  source={config["error"]}
-                ></Image>
-                <Text
-                  style={{
-                    color: "red", 
-                    fontWeight: "bold",
-                    fontSize: 16,    
-                  }}
-                >
-                  {invalid}
-                </Text>
-              </View>
+              <Error
+              message={invalid}
+              ></Error>
             )}
           </View>
         </TouchableWithoutFeedback>
@@ -175,7 +105,7 @@ export default function UpdateField({ route, navigation }: NavigationProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.gunmetal,
+    backgroundColor: theme.background,
     width: "100%",
     height: "100%",
     paddingHorizontal: 12,
@@ -184,7 +114,7 @@ const styles = StyleSheet.create({
   button: {
     flexGrow: 1,
     width: "auto",
-    backgroundColor: "#283c46fa",
+    backgroundColor: theme.smoothGrey,
     padding: 8,
     borderRadius: 0,
   },

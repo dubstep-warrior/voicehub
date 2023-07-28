@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
       justifyContent: "center",
       padding: 12,
       borderRadius: 12,
-      backgroundColor: theme.khaki,
+      backgroundColor: theme.button,
       marginBottom: 12,
     }
   }); 

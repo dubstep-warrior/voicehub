@@ -1,14 +1,19 @@
 import { assign as assignUser } from "../slices/user.slice";
 import { auth, db } from "../../../firebase";
 import {
+  EmailAuthProvider,
   browserLocalPersistence,
   createUserWithEmailAndPassword,
+  reauthenticateWithCredential,
   setPersistence,
   signInWithEmailAndPassword,
   signOut,
+  updateEmail,
+  updatePassword,
   updateProfile,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore"; 
+import { StackNavigationProp } from "@react-navigation/stack";
 
 export const resolveAccess = (data: any, current: string) => {
   //   const dispatch = useAppDispatch();
@@ -48,49 +53,18 @@ export const resolveAccess = (data: any, current: string) => {
         };
       })) as { success: boolean; data: any };
 
-    // if (res && res.success) {
-    //   console.log(res.data)
-    //   dispatch(
-    //     assignUser({
-    //       user: res.data,
-    //     })
-    //   );
-    // }
-
     return res;
-
-    // await fetch(`${REACT_APP_BACKEND_URL}/api/v1/auth/${current}`, {
-    //   ...ApiConfig["POST"],
-    //   body: JSON.stringify(data),
-    // }).then((response) => response.json());
-    // console.log(res.success);
-    // if (res && res["success"]) {
-    //   console.log("login success");
-    //   await Promise.all([
-    //     SecureStore.setItemAsync("token", res.data.token),
-    //     SecureStore.setItemAsync(res.data.token, JSON.stringify(res.data.user)),
-    //   ]).then(() => {
-    //     dispatch(
-    //       assignAuth({
-    //         token: res.data.token,
-    //       }),
-    //       assignUser({
-    //         user: res.data.user,
-    //       })
-    //     );
-    //   });
-    // } else {
-    //   console.log("failed");
-    // }
   };
 };
 
 export const AuthOnRender = () => {
-  console.log('auth on render calle0')
+  console.log("auth on render calle0");
   return async (dispatch: any) => {
-    console.log('auth on render called')
+    console.log("auth on render called");
     if (auth.currentUser) {
-      const profile = await getDoc(doc(db, "userProfiles", auth.currentUser.uid!));
+      const profile = await getDoc(
+        doc(db, "userProfiles", auth.currentUser.uid!)
+      );
 
       dispatch(
         assignUser({
@@ -98,35 +72,8 @@ export const AuthOnRender = () => {
         })
       );
     } else {
-      console.log('but no auth current user')
+      console.log("but no auth current user");
     }
-
-    //   SecureStore.getItemAsync("token")
-    //     .then((token) => {
-    //       if (token) {
-    //         SecureStore.getItemAsync(token)
-    //           .then((user) => {
-    //             if (user) {
-    //               dispatch(
-    //                 assignAuth({
-    //                   token: token,
-    //                 })
-    //               );
-    //               dispatch(
-    //                 assignUser({
-    //                   user: JSON.parse(user),
-    //                 })
-    //               );
-    //             }
-    //           })
-    //           .catch((err) => {
-    //             throw "Cant get user";
-    //           });
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       console.log("Couldnt get token or user: ", err);
-    //     });
   };
 };
 
@@ -141,23 +88,57 @@ export const AuthRemove = () => {
         );
       })
       .catch((err) => {});
+  };
+};
 
-    // const res = await Promise.all([
-    //   SecureStore.setItemAsync("token", ""),
-    //   SecureStore.setItemAsync(token, ""),
-    // ])
-    //   .then((res) => true)
-    //   .catch((err) => false);
+export const AuthUpdate = (
+  formValues: any,
+  route: any,
+  navigation: StackNavigationProp<any, any>,
+  setFormInvalid: any
+) => {
+  return async () => {
+    const credential = EmailAuthProvider.credential(
+      auth.currentUser?.email!,
+      formValues["currentPassword"]
+    );
 
-    // if (res) {
-    //   dispatch(
-    //     assignAuth({
-    //       token: "",
-    //     }),
-    //     assignUser({
-    //       user: {},
-    //     })
-    //   );
-    // }
+    const reauth = await reauthenticateWithCredential(
+      auth.currentUser!,
+      credential
+    );
+
+    if (reauth && reauth.user) {
+      if (route.params!.key === "password") {
+        //password
+        if (formValues["newPassword"] !== formValues["confirmNewPassword"]) {
+          setFormInvalid("Ensure your new passwords match!");
+          console.log("password no match");
+        } else {
+          console.log("updaing password");
+          updatePassword(auth.currentUser!, formValues["newPassword"])
+            .then(() => navigation.goBack())
+            .catch((err) => {
+              console.log(err.code);
+              setFormInvalid("There was an issue updating your password");
+            });
+        }
+      } else {
+        //email
+        updateEmail(auth.currentUser!, formValues["email"]!)
+          .then(() => {
+            console.log("success");
+            navigation.goBack();
+          })
+          .catch((error) => {
+            console.log("fail", error);
+            setFormInvalid(
+              `There was an error changing your ${route.params!.name.toLowerCase()}`
+            );
+          });
+      }
+    } else {
+      setFormInvalid("Your password is invalid");
+    }
   };
 };

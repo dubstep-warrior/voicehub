@@ -12,24 +12,7 @@ export const UserUpdate = (
   currentUser: any,
   setEditMode?: any
 ) => {
-  return async (dispatch: any) => {
-    //   const res = await Promise.all([
-    //     SecureStore.setItemAsync("token", ""),
-    //     SecureStore.setItemAsync(token, ""),
-    //   ])
-    //     .then((res) => true)
-    //     .catch((err) => false);
-
-    //   if (res) {
-    //     dispatch(
-    //       assignAuth({
-    //         token: "",
-    //       }),
-    //       assignUser({
-    //         user: {},
-    //       })
-    //     );
-    //   }
+  return async (dispatch: any) => { 
 
     const newChanges: any = {};
     Object.keys(changes).forEach((key) => {
@@ -69,17 +52,6 @@ export const UserUpdate = (
       setEditMode(false);
     }
 
-    return res;
-
-    // const res = await fetch(`${REACT_APP_BACKEND_URL}/api/v1/user`, {
-    //   ...ApiConfig["PUT"],
-    //   headers: {
-    //     Authorization: `Token ${auth.token}`,
-    //   },
-    //   body: { changes: data } as any,
-    // }).then((response) => response.json());
-
-    // dispatch(update(newChanges));
-    // setEdit(false)
+    return res; 
   };
 };
