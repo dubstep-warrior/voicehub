@@ -1,14 +1,16 @@
 import { REACT_APP_BACKEND_URL } from "@env";
 import ApiConfig from "../../../config/api-config.json";
-import { update } from "./user.slice";
+import { update } from "../slices/user.slice";
 import { Platform } from "react-native/Libraries/Utilities/Platform";
-import { updateProfile } from "firebase/auth";
-import { auth } from "../../../firebase";
+import { assign as assignUser } from "../slices/user.slice";
+
+import { auth, db } from "../../../firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export const UserUpdate = (
   changes: any,
   currentUser: any,
-  setEditMode: any
+  setEditMode?: any
 ) => {
   return async (dispatch: any) => {
     //   const res = await Promise.all([
@@ -40,14 +42,19 @@ export const UserUpdate = (
     console.log("user action being run");
 
     console.log("new changes ", newChanges);
+    const ref = doc(db, 'userProfiles', auth.currentUser!.uid);
+    const res = await setDoc(ref, newChanges, { merge: true })
+      .then(async () => {
+        const profile = await getDoc(ref)
 
-    const res = await updateProfile(auth.currentUser!, {
-      ...newChanges,
-    })
-      .then((response) => {
+        dispatch(assignUser({
+          user: profile.data()
+        }))
+
+
         return {
           success: true,
-          data: response,
+          data: profile.data(),
         };
       })
       .catch((error) => {
@@ -58,7 +65,9 @@ export const UserUpdate = (
       });
 
     console.log('response',res);
-    setEditMode(false);
+    if(setEditMode) {
+      setEditMode(false);
+    }
 
     return res;
 

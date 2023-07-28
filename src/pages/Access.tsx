@@ -15,9 +15,9 @@ import Input from "../shared/Input";
 import { FormData } from "../shared/FormData";
 import routeConfig from "../../config/route-config.json"; 
 import { useAppDispatch } from "./../store/hooks"; 
-import { resolveAccess } from "../store/auth/auth.actions";
+import { resolveAccess } from "../store/actions/auth.actions";
 import theme from './../../config/theme.config.json'
-import { unwrapResult } from "@reduxjs/toolkit";
+import {styles as globalStyles} from "../../Styles.config";
 
 export default function Access({ route, navigation }: NavigationProps) {
   const current = route.name.toLowerCase();
@@ -83,16 +83,7 @@ export default function Access({ route, navigation }: NavigationProps) {
         </View>
         <View style={styles.row}>
           <TouchableOpacity
-            style={{
-              width: "100%",
-              alignContent: "center",
-              flexDirection: "row",
-              justifyContent: "center",
-              padding: 12,
-              borderRadius: 12,
-              backgroundColor: theme.khaki,
-              marginBottom: 12,
-            }}
+            style={globalStyles.button}
             onPress={() => submitForm()}
           >
             <Text

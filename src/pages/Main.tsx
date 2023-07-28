@@ -2,13 +2,13 @@ import * as React from "react";
 import { StyleSheet, Image } from "react-native";
 import { NavigationProps } from "../interfaces/NavigationProps.interface";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { selectAuth } from "../store/auth/auth.slice";
 import  MainTab from './../config/Main.config'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import theme from "./../../config/theme.config.json";
+import { RootStackParamList } from "../interfaces/RootStackParamList.interface";
+import UpdateField from "./UpdateField";
 
 export default function Main({ route, navigation }: NavigationProps) {
-  const authState = useAppSelector(selectAuth);
   const Tab = createBottomTabNavigator();
   const dispatch = useAppDispatch();
 
@@ -23,7 +23,7 @@ export default function Main({ route, navigation }: NavigationProps) {
       {MainTab.map((option) => (
         <Tab.Screen
           key={option.name}
-          name={option.name}
+          name={option.name as keyof RootStackParamList}
           component={option.component}
           options={{
             tabBarIcon: ({ focused }) =>
@@ -35,7 +35,7 @@ export default function Main({ route, navigation }: NavigationProps) {
             tabBarLabel: "Home",
           }}
         />
-      ))}
+      ))} 
     </Tab.Navigator>
   );
 }

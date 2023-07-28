@@ -1,9 +1,4 @@
-import { REACT_APP_BACKEND_URL } from "@env";
-import ApiConfig from "../../../config/api-config.json";
-import { useAppDispatch } from "../hooks";
-import { assign as assignAuth } from "./auth.slice";
-import { assign as assignUser } from "./../user/user.slice";
-import * as SecureStore from "expo-secure-store";
+import { assign as assignUser } from "../slices/user.slice";
 import { auth, db } from "../../../firebase";
 import {
   browserLocalPersistence,
@@ -18,24 +13,28 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 export const resolveAccess = (data: any, current: string) => {
   //   const dispatch = useAppDispatch();
   return async (dispatch: any) => {
-    console.log("logging in"); 
-    
+    console.log("logging in");
+
     const res = (await (current == "register"
       ? createUserWithEmailAndPassword(auth, data.email, data.password)
       : signInWithEmailAndPassword(auth, data.email, data.password)
     )
       .then(async (userCredential) => {
-        const user = userCredential.user; 
-        if(current == 'register') {  
+        const user = userCredential.user;
+        if (current == "register") {
           await setDoc(doc(db, "userProfiles", user.uid!), {
-            username: auth.currentUser?.email?.split('@')[0],
-            displayedName: auth.currentUser?.email?.split('@')[0] 
+            username: auth.currentUser?.email?.split("@")[0],
+            displayedName: auth.currentUser?.email?.split("@")[0],
           });
-        } 
+        }
 
-        const profile = await getDoc(doc(db, "userProfiles", user.uid!))
+        const profile = await getDoc(doc(db, "userProfiles", user.uid!));
 
-        console.log('profile', profile.data)
+        dispatch(
+          assignUser({
+            user: profile.data(),
+          })
+        );
 
         return {
           success: true,
@@ -87,56 +86,61 @@ export const resolveAccess = (data: any, current: string) => {
 };
 
 export const AuthOnRender = () => {
+  console.log('auth on render calle0')
   return async (dispatch: any) => {
-    if(auth.currentUser) {
+    console.log('auth on render called')
+    if (auth.currentUser) {
+      const profile = await getDoc(doc(db, "userProfiles", auth.currentUser.uid!));
+
       dispatch(
         assignUser({
-          user: auth.currentUser
+          user: profile.data(),
         })
       );
+    } else {
+      console.log('but no auth current user')
     }
 
-
-
-  //   SecureStore.getItemAsync("token")
-  //     .then((token) => {
-  //       if (token) {
-  //         SecureStore.getItemAsync(token)
-  //           .then((user) => {
-  //             if (user) {
-  //               dispatch(
-  //                 assignAuth({
-  //                   token: token,
-  //                 })
-  //               );
-  //               dispatch(
-  //                 assignUser({
-  //                   user: JSON.parse(user),
-  //                 })
-  //               );
-  //             }
-  //           })
-  //           .catch((err) => {
-  //             throw "Cant get user";
-  //           });
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log("Couldnt get token or user: ", err);
-  //     });
+    //   SecureStore.getItemAsync("token")
+    //     .then((token) => {
+    //       if (token) {
+    //         SecureStore.getItemAsync(token)
+    //           .then((user) => {
+    //             if (user) {
+    //               dispatch(
+    //                 assignAuth({
+    //                   token: token,
+    //                 })
+    //               );
+    //               dispatch(
+    //                 assignUser({
+    //                   user: JSON.parse(user),
+    //                 })
+    //               );
+    //             }
+    //           })
+    //           .catch((err) => {
+    //             throw "Cant get user";
+    //           });
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.log("Couldnt get token or user: ", err);
+    //     });
   };
 };
 
-export const AuthRemove = (token: string) => {
+export const AuthRemove = () => {
   return async (dispatch: any) => {
-
-    signOut(auth).then(res => {
-      dispatch(assignUser({
-        user: {}
-      }))
-    }).catch(err => {
-       
-    })
+    signOut(auth)
+      .then((res) => {
+        dispatch(
+          assignUser({
+            user: {},
+          })
+        );
+      })
+      .catch((err) => {});
 
     // const res = await Promise.all([
     //   SecureStore.setItemAsync("token", ""),

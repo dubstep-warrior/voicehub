@@ -12,7 +12,8 @@ const config = {
   "edit": require("./assets/edit.png"),
   "add": require("./assets/add.png"),
   "close": require("./assets/close.png"),
-  "green-tick": require("./assets/green-tick.png")
+  "green-tick": require("./assets/green-tick.png"),
+  "error": require("./assets/error.png")
 };
 
 export default config;

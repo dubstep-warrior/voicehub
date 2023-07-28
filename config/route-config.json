@@ -18,9 +18,56 @@
   },
   "profile": {  
     "form": {
-      "displayName": "",
-      "photoURL": null,
+      "username": "",
+      "displayedName": "",
+      "profile_img": null,
       "status": ""
+    },
+    "sections": [
+      {
+        "heading": "Account Information",
+        "options" : [
+          {
+            "name": "Username",
+            "key": "username"
+          },
+          {
+            "name": "Display Name",
+            "key": "displayedName"
+          },{
+            "name": "Email",
+            "key": "email"
+          },{
+            "name": "Password",
+            "key": "password"
+          }
+        ]
+      }
+    ]
+  },
+  "updatefield": {
+    "username": {
+      "username": ""
+    },
+    "displayedName": {
+      "displayedName": ""
+    },
+    "email": {
+      "email": "",
+      "currentPassword": ""
+    },
+    "password": {
+      "currentPassword": "", 
+      "newPassword": "",
+      "confirmNewPassword": ""
+    },
+    "placeholders" : {
+      "username": "Tap to add username",
+      "displayedName": "Tap to change your displayed name",
+      "email": "Enter a new email", 
+      "currentPassword": "Enter your current password",
+      "newPassword": "Enter your new password",
+      "confirmNewPassword": "Confirm your new password"
     }
   }
 }

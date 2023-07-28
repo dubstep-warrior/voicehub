@@ -3,7 +3,7 @@ import { TextInput } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native";
 import { View } from "react-native";
 
-interface IInput {
+export interface IInput {
   name: string;
   handleFormValueChange: any; 
   textInputProps?: any;
@@ -12,7 +12,8 @@ interface IInput {
   style?: keyof typeof styles
   multiline?: boolean
   numberOfLines?: number,
-  secureTextEntry?: boolean
+  secureTextEntry?: boolean,
+  background?: string
 }
 
 export default function Input({ style = 'input' ,...props}: IInput) {
@@ -22,7 +23,7 @@ export default function Input({ style = 'input' ,...props}: IInput) {
     <View style={{ width: "100%" }}>
       <TextInput
         placeholder={name}
-        style={styles[style]}
+        style={[styles[style], {backgroundColor: props.background ?? 'white'}]}
         onChange={(event) =>
           handleFormValueChange(formKey, event.nativeEvent.text)
         }
@@ -54,10 +55,17 @@ const styles = StyleSheet.create({
   },
   minimalTextarea: {
     width: "100%", 
-    height: 100,
+    height: "100%",
     backgroundColor: "white",
     borderRadius: 12,
     fontSize: 16,
     padding: 4
+  },
+  square: {
+    width: "100%",  
+    backgroundColor: "white", 
+    fontSize: 18,
+    padding: 8,
+    borderRadius: 4
   }
 });

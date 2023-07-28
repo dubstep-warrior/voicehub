@@ -1,7 +1,7 @@
 import Friends from "../tabs/main/Friends";
 import Home from "../tabs/main/Home";
 import Notification from "../tabs/main/Notification";
-import Profile from "../tabs/main/Profile";
+import Profile from "../tabs/main/Profile/Profile";
 import config from "./../../Images.config"
 
 const MainTab = [

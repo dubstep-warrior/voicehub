@@ -1,31 +1,23 @@
-import {
-  NavigationContainer,
-  NavigationContainerRef,
-} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Access from "./pages/Access";
-import { useEffect, useState } from "react";
 import { RootStackParamList } from "./interfaces/RootStackParamList.interface";
-import { useAppSelector, useAppDispatch } from "./store/hooks";
-import * as SecureStore from "expo-secure-store";
-import { assign, selectAuth } from "./store/auth/auth.slice";
+import { useAppDispatch } from "./store/hooks";
 import Main from "./pages/Main";
-import { AuthOnRender } from "./store/auth/auth.actions";
+import { AuthOnRender } from "./store/actions/auth.actions";
 import { auth } from "../firebase";
 import { User, onAuthStateChanged } from "firebase/auth";
-// import { useNavigation } from '@react-navigation/native';
+import {useState, useEffect} from 'react'
 
 export default function VoiceHub() {
   const Stack = createStackNavigator<RootStackParamList>();
-  // const authState = useAppSelector(selectAuth); 
-  const [user, setUser] = useState<User | null>(null)
+  const dispatch = useAppDispatch();  
+  const [authRef, setAuthRef] = useState<null | User>(null)
+   
 
   onAuthStateChanged(auth, (user) => {
-    if (user) { 
-      setUser(user)
-    } else {
-      setUser(null)
-    } 
+    setAuthRef(user ?? null) 
+    dispatch(AuthOnRender())
   });
 
   return (
@@ -35,7 +27,7 @@ export default function VoiceHub() {
           headerShown: false,
         }}
       >
-        {user ? (
+        {authRef ? (
           <Stack.Group>
             <Stack.Screen name="Main" component={Main} />
           </Stack.Group>

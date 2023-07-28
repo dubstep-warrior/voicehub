@@ -7,7 +7,7 @@ import { User, UserCredential } from 'firebase/auth'
 interface UserState extends User { 
   profile_img: any,
   username: string,
-  display_name: string,
+  displayedName: string,
   status?: string
 }
 
@@ -15,7 +15,7 @@ interface UserState extends User {
 const initialState: UserState = {  
   profile_img: null,
   username: '',
-  display_name: ''
+  displayedName: ''
 } as UserState
 
 export const userSlice = createSlice({
@@ -25,7 +25,13 @@ export const userSlice = createSlice({
   reducers: {
     assign: (state, actions) => {
       console.log('redux store has been updated in user slice: ', actions.payload)
-      state = actions.payload.user
+      // state = actions.payload.user
+      const user = actions.payload.user
+      state.displayedName = user.displayedName
+      state.username = user.username
+      state.status = user.status
+      state.profile_img = user.profile_img
+      console.log(state)
     },
     update: (state: UserState, actions) => {
       Object.keys(actions.payload).forEach(key => {
