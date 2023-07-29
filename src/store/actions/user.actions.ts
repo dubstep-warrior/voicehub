@@ -5,18 +5,29 @@ import { Platform } from "react-native/Libraries/Utilities/Platform";
 import { assign as assignUser } from "../slices/user.slice";
 
 import { auth, db } from "../../../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { assign as assignApp } from "../slices/app.slice";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query, 
+  setDoc,
+  where,
+} from "firebase/firestore";
+import { assign as assignApp, update as updateApp } from "../slices/app.slice";
+import { getAuth } from "firebase/auth";
 
 export const UserUpdate = (
   changes: any,
   currentUser: any,
   setEditMode?: any
 ) => {
-  return async (dispatch: any) => { 
-    dispatch(assignApp({
-      submitting: true
-    }))
+  return async (dispatch: any) => {
+    dispatch(
+      assignApp({
+        submitting: true,
+      })
+    );
 
     const newChanges: any = {};
     Object.keys(changes).forEach((key) => {
@@ -29,15 +40,16 @@ export const UserUpdate = (
     console.log("user action being run");
 
     console.log("new changes ", newChanges);
-    const ref = doc(db, 'userProfiles', auth.currentUser!.uid);
+    const ref = doc(db, "userProfiles", auth.currentUser!.uid);
     const res = await setDoc(ref, newChanges, { merge: true })
       .then(async () => {
-        const profile = await getDoc(ref)
+        const profile = await getDoc(ref);
 
-        dispatch(assignUser({
-          user: profile.data()
-        }))
-
+        dispatch(
+          assignUser({
+            user: profile.data(),
+          })
+        );
 
         return {
           success: true,
@@ -51,16 +63,59 @@ export const UserUpdate = (
         };
       });
 
-    console.log('response',res);
-    if(setEditMode) {
+    console.log("response", res);
+    if (setEditMode) {
       setEditMode(false);
     }
 
-    dispatch(assignApp({
-      submitting: false
-    }))
+    dispatch(
+      assignApp({
+        submitting: false,
+      })
+    );
 
+    return res;
+  };
+};
 
-    return res; 
+export const SearchUsers = (changes: any) => {
+  return async (dispatch: any) => {
+    dispatch(
+      updateApp({
+        submitting: true,
+      })
+    );
+
+    
+
+     
+    // ([
+    //   { uid: "uid1" },
+    //   { email: "user2@example.com" },
+    //   { phoneNumber: "+15555550003" },
+    //   { providerId: "google.com", providerUid: "google_uid4" },
+    // ]);
+    console.log('check username')
+    if (changes.username) {
+      console.log('retrieving users')
+      const q = query(collection(db, "userProfiles"), where("username", ">=", changes.username.toLowerCase()));
+      const res = (await getDocs(q));
+      const users: any[] = []
+      if(res) {
+        res.forEach(doc => { 
+          users.push(doc.data())
+        })
+      }
+      
+      dispatch(updateApp({
+        users: users
+      }))
+    }
+
+    dispatch(
+      updateApp({
+        submitting: false,
+      })
+    );
   };
 };

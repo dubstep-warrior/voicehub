@@ -7,10 +7,13 @@ import { styles as globalStyles } from "../../../../Styles.config";
 import { useAppSelector } from "../../../store/hooks";
 import { selectUser } from "../../../store/slices/user.slice";
 import { NavigationProps } from "../../../interfaces/NavigationProps.interface";
+import UserList from "../../../shared/UserList";
+import { selectApp } from "../../../store/slices/app.slice";
 
 export default function Default({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
-
+  const appState = useAppSelector(selectApp);
+  console.log(Boolean(userState.friends?.length));
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <View
@@ -20,6 +23,7 @@ export default function Default({ route, navigation }: NavigationProps) {
           alignItems: "center",
           flexDirection: "row",
           position: "relative",
+          zIndex: 2
         }}
       >
         <Text
@@ -35,25 +39,30 @@ export default function Default({ route, navigation }: NavigationProps) {
         >
           Friends
         </Text>
-        <TouchableOpacity style={{ padding: 4 }} onPress={() => navigation.navigate("AddFriend", {
-            key: 'username',
-            heading: "FiND A USER HERE:"
-        })}>
+        <TouchableOpacity
+          style={{ padding: 4 }}
+          onPress={() =>
+            navigation.navigate("AddFriend", {
+              key: "username",
+              heading: "FiND A USER HERE:",
+              submit: "Search"
+            })
+          }
+        >
           <Image
             style={{ width: 24, height: 24 }}
             source={config["add-user"]}
           ></Image>
         </TouchableOpacity>
       </View>
-      <ScrollView
-        style={{
-          backgroundColor: theme.smoothGrey,
-          flex: 1,
-          minHeight: "100%",
-        }}
-      >
-        {userState.friends!.length ? (
-          userState.friends!.map((friend) => (
+
+      {Boolean(userState.friends?.length) ? (
+        <ScrollView
+          style={{ 
+            flex: 1
+          }}
+        >
+          {/* {userState.friends!.map((friend) => (
             <TouchableOpacity
               key={friend.uid}
               style={{
@@ -122,32 +131,34 @@ export default function Default({ route, navigation }: NavigationProps) {
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
-          ))
-        ) : (
-          <View
+          ))} */}
+          <UserList list={userState.friends as any[]}></UserList>
+        </ScrollView>
+      ) : (
+        <View
+          style={{ 
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8, 
+            backgroundColor:  theme.smoothGrey, 
+            minHeight: '100%',
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
+            You have no friends!
+          </Text>
+          <Text
             style={{
-              minHeight: "100%",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
+              color: theme.heading,
+              maxWidth: "80%",
+              textAlign: "center",
+              fontWeight: "600",
             }}
           >
-            <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
-              You have no friends!
-            </Text>
-            <Text
-              style={{
-                color: theme.heading,
-                maxWidth: "80%",
-                textAlign: "center",
-                fontWeight: "600",
-              }}
-            >
-              {"Press the add friend icon on the top right to get started".toUpperCase()}
-            </Text>
-          </View>
-        )}
-      </ScrollView>
+            {"Press the add friend icon on the top right to get started".toUpperCase()}
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -157,5 +168,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.background,
     flex: 1,
     flexDirection: "column",
+    position: 'relative' 
   },
 });

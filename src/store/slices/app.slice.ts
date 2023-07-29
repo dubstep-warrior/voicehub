@@ -3,12 +3,14 @@ import type { RootState } from '../store'
 
 // Define a type for the slice state
 interface App {  
-    submitting: boolean
+    submitting: boolean,
+    users: any[]
 }
 
 // Define the initial state using that type
 const initialState: App = {  
-    submitting: false
+    submitting: false,
+    users: []
 }  
 
 export const appSlice = createSlice({
@@ -19,12 +21,19 @@ export const appSlice = createSlice({
     assign: (state, actions) => {
       console.log('redux store has been updated in state slice: ', actions.payload)
     
-      state.submitting = actions.payload.submitting 
+      state.submitting = actions.payload.submitting ?? false
+      state.users = actions.payload.users ?? []
     }, 
+    update: (state, actions) => {
+      Object.keys(actions.payload).forEach((key) => {
+        state[key as keyof typeof state] = actions.payload[key]
+      })
+      console.log('updated state', state)
+    }
   },
 })
 
-export const { assign } = appSlice.actions
+export const { assign, update } = appSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectApp = (state: RootState) => state.app 

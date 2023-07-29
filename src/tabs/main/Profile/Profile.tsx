@@ -28,6 +28,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Default from "./Default";
 import { RootStackParamList } from "../../../interfaces/RootStackParamList.interface";
 import { createStackNavigator } from "@react-navigation/stack";
+import SimpleForm from "../../../shared/SimpleForm";
 import UpdateField from "../../../pages/UpdateField";
 
 export default function Profile({ route }: NavigationProps) {

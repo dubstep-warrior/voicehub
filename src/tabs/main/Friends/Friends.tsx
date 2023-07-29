@@ -8,9 +8,8 @@ import { useAppSelector } from "../../../store/hooks";
 import { selectUser } from "../../../store/slices/user.slice";
 import { createStackNavigator } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../interfaces/RootStackParamList.interface";
-import Default from "./Default";
-import UpdateField from "../../../pages/UpdateField";
-import AddFriend from "../../../pages/AddFriend";
+import Default from "./Default"; 
+import SearchUsers from "../../../pages/SearchUsers";
 
 export default function Friends() {
   const Stack = createStackNavigator();
@@ -27,7 +26,7 @@ export default function Friends() {
       />
       <Stack.Screen
         name={"AddFriend" as keyof RootStackParamList}
-        component={AddFriend as any}
+        component={SearchUsers as any}
       />
     </Stack.Navigator>
   );

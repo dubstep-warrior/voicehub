@@ -9,7 +9,7 @@ import { useAppSelector } from "../store/hooks";
 import { selectApp } from "../store/slices/app.slice";
 
 export default function Button({ theme = "purple", ...props }) {
-  const load = ["submit"].includes(props.text.toLowerCase());
+  const load = ["submit", "search"].includes(props.text.toLowerCase());
 
   const appState = useAppSelector(selectApp);
 
