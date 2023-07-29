@@ -19,12 +19,13 @@ import { resolveAccess } from "../store/actions/auth.actions";
 import theme from "./../../config/theme.config.json";
 import { styles as globalStyles } from "../../Styles.config";
 import Error from "../shared/Error";
+import ButtonBody from "../shared/Button";
 
 export default function Access({ route, navigation }: NavigationProps) {
   const current = route.name.toLowerCase();
   const dispatch = useAppDispatch();
   const messageLink: any = routeConfig;
-  console.log(route)
+  console.log(route);
   const [invalid, setFormInvalid] = useState("");
   const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
     messageLink[current].form,
@@ -85,19 +86,8 @@ export default function Access({ route, navigation }: NavigationProps) {
             ></Input>
           )}
         </View>
-        <View style={styles.row}>
-          <TouchableOpacity
-            style={globalStyles.button}
-            onPress={() => submitForm()}
-          >
-            <Text
-              style={{
-                fontSize: 24,
-              }}
-            >
-              Submit
-            </Text>
-          </TouchableOpacity>
+        <View style={{width: '80%'}}> 
+          <ButtonBody text={"Submit"} onPress={() => submitForm()}></ButtonBody>
           <TouchableOpacity
             onPress={() => navigation.navigate(messageLink[current].navigateTo)}
           >
@@ -105,7 +95,8 @@ export default function Access({ route, navigation }: NavigationProps) {
               style={{
                 fontSize: 16,
                 textDecorationLine: "underline",
-                color: "white",
+                color: "white", 
+                textAlign: 'center'
               }}
             >
               {messageLink[current].message}

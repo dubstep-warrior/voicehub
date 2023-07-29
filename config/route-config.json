@@ -69,5 +69,13 @@
       "newPassword": "Enter your new password",
       "confirmNewPassword": "Confirm your new password"
     }
+  },
+  "addfriend": {
+    "username": {
+      "username": ""
+    },
+    "placeholders" : {
+      "username": "Tap to add username"
+    }
   }
 }

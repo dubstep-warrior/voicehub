@@ -1,4 +1,5 @@
 import { assign as assignUser } from "../slices/user.slice";
+import { assign as assignApp } from "../slices/app.slice";
 import { auth, db } from "../../../firebase";
 import {
   EmailAuthProvider,
@@ -12,13 +13,19 @@ import {
   updatePassword,
   updateProfile,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore"; 
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { StackNavigationProp } from "@react-navigation/stack";
 
 export const resolveAccess = (data: any, current: string) => {
   //   const dispatch = useAppDispatch();
   return async (dispatch: any) => {
     console.log("logging in");
+
+    dispatch(
+      assignApp({
+        submitting: true,
+      })
+    );
 
     const res = (await (current == "register"
       ? createUserWithEmailAndPassword(auth, data.email, data.password)
@@ -53,6 +60,11 @@ export const resolveAccess = (data: any, current: string) => {
         };
       })) as { success: boolean; data: any };
 
+    dispatch(
+      assignApp({
+        submitting: false,
+      })
+    );
     return res;
   };
 };
@@ -79,7 +91,13 @@ export const AuthOnRender = () => {
 
 export const AuthRemove = () => {
   return async (dispatch: any) => {
-    signOut(auth)
+    dispatch(
+      assignApp({
+        submitting: true,
+      })
+    );
+
+    await signOut(auth)
       .then((res) => {
         dispatch(
           assignUser({
@@ -88,6 +106,12 @@ export const AuthRemove = () => {
         );
       })
       .catch((err) => {});
+
+    dispatch(
+      assignApp({
+        submitting: false,
+      })
+    );
   };
 };
 
@@ -97,7 +121,13 @@ export const AuthUpdate = (
   navigation: StackNavigationProp<any, any>,
   setFormInvalid: any
 ) => {
-  return async () => {
+  return async (dispatch: any) => {
+    dispatch(
+      assignApp({
+        submitting: true,
+      })
+    );
+
     const credential = EmailAuthProvider.credential(
       auth.currentUser?.email!,
       formValues["currentPassword"]
@@ -140,5 +170,11 @@ export const AuthUpdate = (
     } else {
       setFormInvalid("Your password is invalid");
     }
+
+    dispatch(
+      assignApp({
+        submitting: false,
+      })
+    );
   };
 };

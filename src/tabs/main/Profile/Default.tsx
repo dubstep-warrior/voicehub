@@ -25,6 +25,19 @@ import { UserUpdate } from "../../../store/actions/user.actions";
 import { styles as globalStyles } from "../../../../Styles.config";
 import { ScrollView } from "react-native-gesture-handler";
 import { auth } from "../../../../firebase";
+import ButtonBody from "../../../shared/Button";
+import { selectApp } from "../../../store/slices/app.slice";
+import {
+  BallIndicator,
+  BarIndicator,
+  DotIndicator,
+  MaterialIndicator,
+  PacmanIndicator,
+  PulseIndicator,
+  SkypeIndicator,
+  UIActivityIndicator,
+  WaveIndicator,
+} from "react-native-indicators";
 
 export default function Default({ route, navigation }: NavigationProps) {
   console.log(route);
@@ -33,7 +46,7 @@ export default function Default({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
 
   const dispatch = useAppDispatch();
-  const [count, setCount] = useState(0);
+  const appState = useAppSelector(selectApp);
 
   const userRef = {
     ...auth.currentUser,
@@ -94,7 +107,10 @@ export default function Default({ route, navigation }: NavigationProps) {
   };
 
   const updateField = (key: any) => {
-    navigation.navigate("UpdateField", key);
+    navigation.navigate("UpdateField", {
+      ...key,
+      heading: `Update ${key.name.toLowerCase()} here:`.toUpperCase(),
+    });
   };
   return (
     userState && (
@@ -164,9 +180,6 @@ export default function Default({ route, navigation }: NavigationProps) {
                         handleFormValueChange={handleFormValueChange}
                         value={formValues["displayedName"]}
                         style="minimal"
-                        //   style="minimalTextarea"
-                        //   multiline={true}
-                        //   numberOfLines={4}
                       />
                     </>
                   ) : (
@@ -218,10 +231,17 @@ export default function Default({ route, navigation }: NavigationProps) {
                     }}
                     onPress={() => submitProfileForm()}
                   >
-                    <Image
-                      style={{ width: 12, height: 12 }}
-                      source={config["green-tick"]}
-                    ></Image>
+                    {appState.submitting ? (
+                      <MaterialIndicator
+                        color="white"
+                        size={12}
+                      ></MaterialIndicator>
+                    ) : (
+                      <Image
+                        style={{ width: 12, height: 12 }}
+                        source={config["green-tick"]}
+                      ></Image>
+                    )}
                   </TouchableOpacity>
                 )}
               </View>
@@ -246,7 +266,6 @@ export default function Default({ route, navigation }: NavigationProps) {
                     formKey="status"
                     handleFormValueChange={handleFormValueChange}
                     value={formValues["status"]}
-                    //   style="minimal"
                     style="minimalTextarea"
                     multiline={true}
                     numberOfLines={4}
@@ -304,11 +323,13 @@ export default function Default({ route, navigation }: NavigationProps) {
                         >
                           {option.name}
                         </Text>
-                        <View style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: 16
-                        }}>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 16,
+                          }}
+                        >
                           <Text
                             style={{
                               fontSize: 14,
@@ -319,11 +340,12 @@ export default function Default({ route, navigation }: NavigationProps) {
                             {userRef[option.key]}
                           </Text>
                           <Image
-                           style={{
-                            width: 24,
-                            height: 24
-                          }}
-                           source={config["arrow-right"]}></Image>
+                            style={{
+                              width: 24,
+                              height: 24,
+                            }}
+                            source={config["arrow-right"]}
+                          ></Image>
                         </View>
                       </View>
                     </TouchableHighlight>
@@ -331,23 +353,9 @@ export default function Default({ route, navigation }: NavigationProps) {
                 </View>
               </View>
             ))}
-            <TouchableOpacity
-              style={[
-                globalStyles.button,
-                {
-                  width: "90%",
-                },
-              ]}
-              onPress={() => logout()}
-            >
-              <Text
-                style={{
-                  fontSize: 24,
-                }}
-              >
-                Logout
-              </Text>
-            </TouchableOpacity>
+            <View style={{ width: "80%" }}>
+              <ButtonBody text={"Logout"} onPress={() => logout()}></ButtonBody>
+            </View>
           </View>
         </ScrollView>
         <ActionSheet {...actionSheetProps}></ActionSheet>
@@ -404,7 +412,7 @@ const styles = StyleSheet.create({
   // TODO FIX OVERLAY OPACITY ISSUE
   profilePicOverlay: {
     position: "absolute",
-    backgroundColor: "rgba(255,255,255, 0.3)", 
+    backgroundColor: "rgba(255,255,255, 0.3)",
     borderRadius: 50,
     top: 0,
     bottom: 0,

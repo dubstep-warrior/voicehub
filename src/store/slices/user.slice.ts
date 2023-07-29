@@ -8,14 +8,15 @@ interface UserState extends User {
   profile_img: any,
   username: string,
   displayedName: string,
-  status?: string
+  status?: string,
+  friends?: UserState[]
 }
 
 // Define the initial state using that type
 const initialState: UserState = {  
   profile_img: null,
   username: '',
-  displayedName: ''
+  displayedName: '', 
 } as UserState
 
 export const userSlice = createSlice({
@@ -30,6 +31,7 @@ export const userSlice = createSlice({
       state.displayedName = user.displayedName
       state.username = user.username
       state.status = user.status
+      state.friends = user.friends ?? []
       state.profile_img = user.profile_img
       console.log(state)
     },

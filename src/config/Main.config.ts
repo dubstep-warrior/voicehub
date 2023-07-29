@@ -1,4 +1,4 @@
-import Friends from "../tabs/main/Friends";
+import Friends from "../tabs/main/Friends/Friends";
 import Home from "../tabs/main/Home";
 import Notification from "../tabs/main/Notification";
 import Profile from "../tabs/main/Profile/Profile";

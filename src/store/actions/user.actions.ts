@@ -6,6 +6,7 @@ import { assign as assignUser } from "../slices/user.slice";
 
 import { auth, db } from "../../../firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { assign as assignApp } from "../slices/app.slice";
 
 export const UserUpdate = (
   changes: any,
@@ -13,6 +14,9 @@ export const UserUpdate = (
   setEditMode?: any
 ) => {
   return async (dispatch: any) => { 
+    dispatch(assignApp({
+      submitting: true
+    }))
 
     const newChanges: any = {};
     Object.keys(changes).forEach((key) => {
@@ -51,6 +55,11 @@ export const UserUpdate = (
     if(setEditMode) {
       setEditMode(false);
     }
+
+    dispatch(assignApp({
+      submitting: false
+    }))
+
 
     return res; 
   };

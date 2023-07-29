@@ -16,22 +16,23 @@ import { FormData } from "../shared/FormData";
 import { useState } from "react";
 import theme from "./../../config/theme.config.json";
 import { selectUser } from "../store/slices/user.slice";
-import { useAppDispatch, useAppSelector } from "../store/hooks"; 
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { UserUpdate } from "../store/actions/user.actions";
 import config from "./../../Images.config";
 import { AuthUpdate } from "../store/actions/auth.actions";
 import Error from "../shared/Error";
+import Button from "../shared/Button";
 
 export default function UpdateField({ route, navigation }: NavigationProps) {
-   const messageLink: any = routeConfig;
+  const messageLink: any = routeConfig;
   const userState = useAppSelector(selectUser);
-  const [invalid, setFormInvalid] = useState("");
+  const [invalid, setFormInvalid] = useState(""); 
   const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
     messageLink[route.name.toLowerCase()][route.params!.key],
     setFormInvalid,
-    {
+    route.name == 'UpdateField' ? {
       ...Object(userState),
-    }
+    } : {}
   );
 
   const formKeys = Object.keys(
@@ -40,45 +41,43 @@ export default function UpdateField({ route, navigation }: NavigationProps) {
   const dispatch = useAppDispatch();
 
   const submit = async () => {
-    if (
-      !Object.keys(formValues).length ||
-      Object.keys(formValues).some((key) => !Boolean(formValues[key]))
-    ) {
-      setFormInvalid("Fill up all fields");
-      return;
+    if(route.name.toLowerCase().includes('update')) {
+      if (
+        !Object.keys(formValues).length ||
+        Object.keys(formValues).some((key) => !Boolean(formValues[key]))
+      ) {
+        setFormInvalid("Fill up all fields");
+        return;
+      }
+  
+      if (["username", "displayedName"].includes(route.params!.key)) {
+        await dispatch(UserUpdate(formValues, Object(userState)));
+        navigation.goBack();
+        return;
+      } else if(['email', 'password'].includes(route.params!.key)) {
+        dispatch(AuthUpdate(formValues, route, navigation, setFormInvalid));
+      }
     }
-
-    if (["username", "displayedName"].includes(route.params!.key)) {
-       await dispatch(UserUpdate(formValues, Object(userState)));
-      navigation.goBack();
-      return;
-    }
-    
-    dispatch(AuthUpdate(formValues, route, navigation, setFormInvalid))
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1, gap: 16 }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TouchableOpacity
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 12 }}>
+          <Button
             onPress={navigation.goBack}
-            style={[globalStyles.button, styles.button]}
-          >
-            <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={submit}
-            style={[globalStyles.button, styles.button]}
-          >
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+            text={route.name.toLowerCase().includes('update') ? "Cancel" : "Back"}
+            theme="minimal"
+          ></Button>
+          <Button onPress={submit} text={"Submit"} theme="minimal"></Button>
         </View>
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <View style={{ flex: 1, gap: 16 }}>
             <Text
               style={{ color: theme.heading, fontSize: 16, fontWeight: "700" }}
-            >{`Update ${route.params!.name.toLowerCase()} here:`.toUpperCase()}</Text>
+            >
+              {route.params?.heading}
+            </Text>
             {formKeys.map((key) => (
               <Input
                 key={key}
@@ -88,14 +87,10 @@ export default function UpdateField({ route, navigation }: NavigationProps) {
                 value={formValues[key]}
                 style="square"
                 background={theme.almond}
-                secureTextEntry={key.toLowerCase().includes('password')}
+                secureTextEntry={key.toLowerCase().includes("password")}
               />
             ))}
-            {Boolean(invalid) && (
-              <Error
-              message={invalid}
-              ></Error>
-            )}
+            {Boolean(invalid) && <Error message={invalid}></Error>}
           </View>
         </TouchableWithoutFeedback>
       </View>
@@ -110,17 +105,5 @@ const styles = StyleSheet.create({
     height: "100%",
     paddingHorizontal: 12,
     justifyContent: "center",
-  },
-  button: {
-    flexGrow: 1,
-    width: "auto",
-    backgroundColor: theme.smoothGrey,
-    padding: 8,
-    borderRadius: 0,
-  },
-  buttonText: {
-    fontSize: 18,
-    color: "white",
-    fontWeight: "500",
-  },
+  }
 });

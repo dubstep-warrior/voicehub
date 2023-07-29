@@ -3,4 +3,5 @@ export type RootStackParamList = {
     Login: undefined;
     Main: undefined;
     UpdateField: any;
+    AddFriend: any;
   };
