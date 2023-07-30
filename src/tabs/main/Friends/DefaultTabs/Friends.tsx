@@ -4,31 +4,70 @@ import theme from "../../../../../config/theme.config.json";
 import { ScrollView } from "react-native-gesture-handler";
 import config from "../../../../../Images.config";
 import { styles as globalStyles } from "../../../../../Styles.config";
-import { useAppSelector } from "../../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { selectUser } from "../../../../store/slices/user.slice";
 import { NavigationProps } from "../../../../interfaces/NavigationProps.interface";
 import UserList from "../../../../shared/UserList";
 import { selectApp } from "../../../../store/slices/app.slice";
+import { useRef } from "react";
+import ActionSheet from "react-native-actionsheet";
+import { acceptRequest, rejectRequest, removeRequest } from "../../../../store/actions/user.actions";
 
 export default function Friends({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
+  const dispatch = useAppDispatch()
+  const selectedUser = useRef(null)
+
   const friendsConfig = {
     friends: {
-      empty: "friends"
+      empty: "friends",
+      actionSheetProps: {
+        ref: useRef<ActionSheet>(null),
+        options: ["Send Message","Remove Friend", "Cancel"],
+        cancelButtonIndex: 2,
+        onPress: async (index: number): Promise<void> => {},
+      },
     },
     requests: {
-      empty:"friend requests"
+      empty: "friend requests",
+      actionSheetProps: {
+        ref: useRef<ActionSheet>(null),
+        options: ["Accept Request", "Reject Request", "Cancel"],
+        cancelButtonIndex: 2,
+        onPress: async (index: number): Promise<void> => {
+          if([0].includes(index)) {  
+            // ACCEPT REQUEST
+            dispatch(acceptRequest(selectedUser.current))
+          }
+          if([1].includes(index)) {  
+            // Reject request
+            dispatch(rejectRequest(selectedUser.current))
+          }
+        },
+      },
     },
     pending: {
       empty: "outgoing requests",
-    }
+      actionSheetProps: {
+        ref: useRef<ActionSheet>(null),
+        options: ["Remove Request", "Cancel"],
+        cancelButtonIndex: 1,
+        onPress: async (index: number): Promise<void> => {
+          if([0].includes(index)) {  
+            dispatch(removeRequest(selectedUser.current))
+          }
+        },
+      },
+    },
   };
   const current = route.name.toLowerCase();
-  console.log(current);
+  const currentActionSheetProps =
+    friendsConfig[current as keyof typeof friendsConfig].actionSheetProps;
 
-  const tappedUser = (user: any) => {
-    console.log(user)
-  }
+  const tappedUser = (user: any) => { 
+    selectedUser.current = user
+    currentActionSheetProps.ref.current!.show();
+  };
 
   return (
     <>
@@ -45,9 +84,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
           ></UserList>
         </ScrollView>
       ) : (
-        <View
-          style={styles.container}
-        >
+        <View style={styles.container}>
           <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
             {`You have no ${
               friendsConfig[current as keyof typeof friendsConfig].empty
@@ -65,6 +102,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
           </Text>
         </View>
       )}
+      <ActionSheet {...currentActionSheetProps}></ActionSheet>
     </>
   );
 }

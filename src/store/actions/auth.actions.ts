@@ -104,7 +104,8 @@ export const AuthOnRender = () => {
         )
       );
       onSnapshot(requestQuery, async (snapshot) => {
-        const pending: any[] = ['xxx'], requests: any[]  = ['xxx'];
+        const pending: any[] = ["xxx"],
+          requests: any[] = ["xxx"];
         snapshot.forEach((doc) => {
           const request = doc.data();
           if (request.from == auth.currentUser!.uid) pending.push(request.to);
@@ -121,18 +122,22 @@ export const AuthOnRender = () => {
           where(documentId(), "in", requests)
         );
 
-        const [pendingRes, requestsRes] = await Promise.all([getDocs(pendingQuery), getDocs(requestsQuery)])
-        
-        const pendingProfiles: any[] = [], requestsProfiles: any[] = []
-        
-        pendingRes.forEach(doc => {
-          pendingProfiles.push({...doc.data(), uid: doc.id})
-        })
+        const [pendingRes, requestsRes] = await Promise.all([
+          getDocs(pendingQuery),
+          getDocs(requestsQuery),
+        ]);
 
-        requestsRes.forEach(doc => {
-          requestsProfiles.push({...doc.data(), uid: doc.id})
-        })
-         
+        const pendingProfiles: any[] = [],
+          requestsProfiles: any[] = [];
+
+        pendingRes.forEach((doc) => {
+          pendingProfiles.push({ ...doc.data(), uid: doc.id });
+        });
+
+        requestsRes.forEach((doc) => {
+          requestsProfiles.push({ ...doc.data(), uid: doc.id });
+        });
+
         dispatch(
           updateUser({
             pending: pendingProfiles,
@@ -141,6 +146,39 @@ export const AuthOnRender = () => {
         );
       });
 
+      const friendsQuery = query(
+        collection(db, "friends"),
+        where("group", "array-contains", auth.currentUser.uid)
+      );
+
+      onSnapshot(friendsQuery, async (snapshot) => {
+        const friends: any[] = ["xxx"];
+        snapshot.forEach((doc) => {
+          const friend = doc.data(); 
+          friends.push(friend.group.find((uid: string) => uid !== auth.currentUser!.uid))
+        });
+
+        const q = query(
+          collection(db, "userProfiles"),
+          where(documentId(), "in", friends)
+        );
+ 
+
+        const res = await getDocs(q)
+
+        const friendProfiles: any[] = [] 
+
+        res.forEach((doc) => {
+          friendProfiles.push({ ...doc.data(), uid: doc.id });
+        });
+ 
+
+        dispatch(
+          updateUser({
+            friends: friendProfiles
+          })
+        );
+      });
       // const q = query(
       //   collection(db, "userProfiles"),
       //   where(documentId(), "!=", auth.currentUser?.uid)

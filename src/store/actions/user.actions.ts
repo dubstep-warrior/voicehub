@@ -8,7 +8,9 @@ import { auth, db } from "../../../firebase";
 import {
   FieldPath,
   addDoc,
+  and,
   collection,
+  deleteDoc,
   doc,
   documentId,
   getDoc,
@@ -117,9 +119,9 @@ export const SearchUsers = (changes: any, currentUser: any) => {
             user.username
               .trim()
               .toLowerCase()
-              .includes(changes.username.trim().toLowerCase()) 
+              .includes(changes.username.trim().toLowerCase())
           ) {
-            users.push({...doc.data(), uid: doc.id});
+            users.push({ ...doc.data(), uid: doc.id });
           }
         });
       }
@@ -140,27 +142,141 @@ export const SearchUsers = (changes: any, currentUser: any) => {
   };
 };
 
-export const addUser  = (to: any) => {
+export const addUser = (to: any) => {
   return async (dispatch: any) => {
-    console.log('dispatching add user from:', auth.currentUser?.uid)
-    console.log('dispatching add user to:', to.uid)
-    if(auth.currentUser) {
+    console.log("dispatching add user from:", auth.currentUser?.uid);
+    console.log("dispatching add user to:", to.uid);
+    if (auth.currentUser) {
       addDoc(collection(db, "requests"), {
         from: auth.currentUser?.uid,
-        to: to.uid
-      }).then(
-        () => {
-          console.log('successfully sent a request')
-          Alert.alert(`Successfully sent a request to ${to.username}`,undefined, [ 
-            {text: 'OK', onPress: () => console.log('OK Pressed')},
-          ]);
-        }
-      ).catch((err) => {
-        console.log('cant add user:', err)
-        // Alert.alert(`Failed to send a request to ${to.username}`,undefined, [ 
-        //   {text: 'OK', onPress: () => console.log('OK Pressed')},
-        // ]);
+        to: to.uid,
       })
+        .then(() => {
+          console.log("successfully sent a request");
+          Alert.alert(
+            `Successfully sent a request to ${to.username}`,
+            undefined,
+            [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+          );
+        })
+        .catch((err) => {
+          console.log("cant add user:", err);
+          // Alert.alert(`Failed to send a request to ${to.username}`,undefined, [
+          //   {text: 'OK', onPress: () => console.log('OK Pressed')},
+          // ]);
+        });
     }
-  }; 
+  };
+};
+
+export const removeRequest = (to: any) => {
+  return async (dispatch: any) => {
+    console.log("dispatching delete request from:", auth.currentUser?.uid);
+    console.log("dispatching delete request to:", to.uid);
+    if (auth.currentUser) {
+      // addDoc(collection(db, "requests"), {
+      //   from: auth.currentUser?.uid,
+      //   to: to.uid
+      // })
+      const q = query(
+        collection(db, "requests"),
+        and(
+          where("from", "==", auth.currentUser?.uid),
+          where("to", "==", to.uid)
+        )
+      );
+      getDocs(q)
+        .then((snapshot) => {
+          snapshot.forEach((doc) => deleteDoc(doc.ref));
+
+          console.log("successfully sent a delete request");
+          Alert.alert(`Successfully deleted request`, undefined, [
+            { text: "OK", onPress: () => console.log("OK Pressed") },
+          ]);
+        })
+        .catch((err) => {
+          console.log("cant delete user:", err);
+          // Alert.alert(`Failed to send a request to ${to.username}`,undefined, [
+          //   {text: 'OK', onPress: () => console.log('OK Pressed')},
+          // ]);
+        });
+    }
+  };
+};
+
+export const rejectRequest = (from: any) => {
+  return async (dispatch: any) => {
+    console.log("dispatching reject request to:", from.uid);
+    if (auth.currentUser) {
+      // addDoc(collection(db, "requests"), {
+      //   from: auth.currentUser?.uid,
+      //   to: to.uid
+      // })
+      const q = query(
+        collection(db, "requests"),
+        and(
+          where("from", "==", from.uid),
+          where("to", "==", auth.currentUser?.uid)
+        )
+      );
+      getDocs(q)
+        .then((snapshot) => {
+          snapshot.forEach((doc) => deleteDoc(doc.ref));
+
+          console.log("successfully sent a rejection");
+          Alert.alert(`Successfully rejected request`, undefined, [
+            { text: "OK", onPress: () => console.log("OK Pressed") },
+          ]);
+        })
+        .catch((err) => {
+          console.log("cant delete user:", err);
+          // Alert.alert(`Failed to send a request to ${to.username}`,undefined, [
+          //   {text: 'OK', onPress: () => console.log('OK Pressed')},
+          // ]);
+        });
+    }
+  };
+};
+
+export const acceptRequest = (from: any) => {
+  return async (dispatch: any) => {
+    console.log("dispatching accept request to:", from.uid);
+    if (auth.currentUser) {
+      const q = query(
+        collection(db, "requests"),
+        and(
+          where("from", "==", from.uid),
+          where("to", "==", auth.currentUser?.uid)
+        )
+      );
+      getDocs(q).then((snapshot) => {
+        snapshot.forEach(async (document) => {
+          console.log("retrieved", document.id);
+          setDoc(doc(db, "friends", document.id), {
+            group: [from.uid, auth.currentUser?.uid],
+          })
+            .then(() => {
+              deleteDoc(document.ref);
+              Alert.alert(`Successfully accepted request`, undefined, [
+                { text: "OK", onPress: () => console.log("OK Pressed") },
+              ]);
+            })
+            .catch((err) => {
+              console.log('request accept unsuccessful:',err)
+              Alert.alert(
+                `Request unsuccessful`,
+                "There was a problem trying to accept your friend request, please try again later",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+              );
+            });
+        });
+
+        // console.log('successfully sent a rejection')
+      });
+      // addDoc(collection(db, "friends"), {
+      //   from: auth.currentUser?.uid,
+      //   to: to.uid
+      // })
+    }
+  };
 };
