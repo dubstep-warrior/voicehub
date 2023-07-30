@@ -49,17 +49,17 @@ export const UserUpdate = (
     const ref = doc(db, "userProfiles", auth.currentUser!.uid);
     const res = await setDoc(ref, newChanges, { merge: true })
       .then(async () => {
-        const profile = await getDoc(ref);
+        // const profile = await getDoc(ref);
 
-        dispatch(
-          assignUser({
-            user: profile.data(),
-          })
-        );
+        // dispatch(
+        //   assignUser({
+        //     user: profile.data(),
+        //   })
+        // );
 
         return {
           success: true,
-          data: profile.data(),
+          // data: profile.data(),
         };
       })
       .catch((error) => {
