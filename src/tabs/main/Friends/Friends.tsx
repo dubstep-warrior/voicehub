@@ -10,8 +10,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../interfaces/RootStackParamList.interface";
 import Default from "./Default"; 
 import SearchUsers from "../../../pages/SearchUsers";
+import { NavigationProps } from "../../../interfaces/NavigationProps.interface";
 
-export default function Friends() {
+export default function Friends({ route, navigation }: NavigationProps) {
   const Stack = createStackNavigator();
 
   return (
@@ -19,6 +20,7 @@ export default function Friends() {
       screenOptions={{
         headerShown: false,
       }}
+      initialRouteName={route.name}
     >
       <Stack.Screen
         name={"Default" as keyof RootStackParamList}

@@ -10,7 +10,7 @@ export interface IUserListProps {
 }
 
 export default function UserList({ list, ...props }: IUserListProps) {
-
+  console.log(list)
   return (
     <>
       {list.map((user) => (
@@ -24,7 +24,7 @@ export default function UserList({ list, ...props }: IUserListProps) {
             borderBottomWidth: 0.3,
             borderBottomColor: "rgba(255,255,255,0.3)",
           }}
-          onPress={() => props.onPress!(user)}
+          onPress={() => props.onPress ? props.onPress!(user) : null}
         >
           <Image
             style={globalStyles.icon}

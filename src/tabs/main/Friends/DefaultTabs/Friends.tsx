@@ -11,38 +11,47 @@ import UserList from "../../../../shared/UserList";
 import { selectApp } from "../../../../store/slices/app.slice";
 
 export default function Friends({ route, navigation }: NavigationProps) {
-  const userState = useAppSelector(selectUser); 
-  const messageNouns = {
-    friends: "friends",
-    requests: "friend requests",
-    pending: "outgoing requests"
-  }
+  const userState = useAppSelector(selectUser);
+  const friendsConfig = {
+    friends: {
+      empty: "friends"
+    },
+    requests: {
+      empty:"friend requests"
+    },
+    pending: {
+      empty: "outgoing requests",
+    }
+  };
   const current = route.name.toLowerCase();
-  console.log(current)
+  console.log(current);
+
+  const tappedUser = (user: any) => {
+    console.log(user)
+  }
+
   return (
     <>
-      {Boolean(userState.friends?.length) ? (
+      {Boolean(userState[current as keyof typeof userState]?.length) ? (
         <ScrollView
           style={{
             flex: 1,
+            backgroundColor: theme.smoothGrey,
           }}
         >
           <UserList
             list={userState[current as keyof typeof userState] as any[]}
+            onPress={(user) => tappedUser(user)}
           ></UserList>
         </ScrollView>
       ) : (
         <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            backgroundColor: theme.smoothGrey,
-            minHeight: "100%",
-          }}
+          style={styles.container}
         >
           <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
-            {`You have no ${messageNouns[current as keyof typeof messageNouns]}!`}
+            {`You have no ${
+              friendsConfig[current as keyof typeof friendsConfig].empty
+            }!`}
           </Text>
           <Text
             style={{
@@ -61,10 +70,11 @@ export default function Friends({ route, navigation }: NavigationProps) {
 }
 
 const styles = StyleSheet.create({
-  safeAreaContainer: {
-    backgroundColor: theme.background,
-    flex: 1,
-    flexDirection: "column",
-    position: "relative",
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: theme.smoothGrey,
+    minHeight: "100%",
   },
 });

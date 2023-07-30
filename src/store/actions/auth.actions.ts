@@ -19,7 +19,9 @@ import {
 import {
   collection,
   doc,
+  documentId,
   getDoc,
+  getDocs,
   onSnapshot,
   or,
   query,
@@ -101,19 +103,40 @@ export const AuthOnRender = () => {
           where("to", "==", auth.currentUser.uid)
         )
       );
-      onSnapshot(requestQuery, (snapshot) => {
-        const pending: any[] = [];
-        const requests: any[] = [];
+      onSnapshot(requestQuery, async (snapshot) => {
+        const pending: any[] = ['xxx'], requests: any[]  = ['xxx'];
         snapshot.forEach((doc) => {
-          const user = doc.data();
-          if (user.from == auth.currentUser!.uid) pending.push(user);
-          else requests.push(user);
+          const request = doc.data();
+          if (request.from == auth.currentUser!.uid) pending.push(request.to);
+          else requests.push(request.from);
         });
 
+        const pendingQuery = query(
+          collection(db, "userProfiles"),
+          where(documentId(), "in", pending)
+        );
+
+        const requestsQuery = query(
+          collection(db, "userProfiles"),
+          where(documentId(), "in", requests)
+        );
+
+        const [pendingRes, requestsRes] = await Promise.all([getDocs(pendingQuery), getDocs(requestsQuery)])
+        
+        const pendingProfiles: any[] = [], requestsProfiles: any[] = []
+        
+        pendingRes.forEach(doc => {
+          pendingProfiles.push({...doc.data(), uid: doc.id})
+        })
+
+        requestsRes.forEach(doc => {
+          requestsProfiles.push({...doc.data(), uid: doc.id})
+        })
+         
         dispatch(
           updateUser({
-            pending: pending,
-            requests: requests,
+            pending: pendingProfiles,
+            requests: requestsProfiles,
           })
         );
       });

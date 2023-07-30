@@ -7,6 +7,7 @@ import { assign as assignUser } from "../slices/user.slice";
 import { auth, db } from "../../../firebase";
 import {
   FieldPath,
+  addDoc,
   collection,
   doc,
   documentId,
@@ -18,6 +19,7 @@ import {
 } from "firebase/firestore";
 import { assign as assignApp, update as updateApp } from "../slices/app.slice";
 import { getAuth } from "firebase/auth";
+import { Alert } from "react-native";
 
 export const UserUpdate = (
   changes: any,
@@ -81,7 +83,7 @@ export const UserUpdate = (
 };
 
 export const SearchUsers = (changes: any, currentUser: any) => {
-  return async (dispatch: any) => {
+  return async (dispatch: any, getState: any) => {
     dispatch(
       updateApp({
         submitting: true,
@@ -96,7 +98,7 @@ export const SearchUsers = (changes: any, currentUser: any) => {
     // ]);
 
     // TODO use cloud functions
-    console.log("check username");
+    // const currentUser = getState().user
     if (changes.username) {
       console.log("retrieving users");
       console.log("query: ", changes.username, currentUser);
@@ -110,11 +112,12 @@ export const SearchUsers = (changes: any, currentUser: any) => {
         res.forEach((doc) => {
           console.log("res:", doc.data());
           const user = doc.data();
+          // const filter = [...getState().user.friends,]
           if (
             user.username
               .trim()
               .toLowerCase()
-              .includes(changes.username.trim().toLowerCase())
+              .includes(changes.username.trim().toLowerCase()) 
           ) {
             users.push({...doc.data(), uid: doc.id});
           }
@@ -139,16 +142,25 @@ export const SearchUsers = (changes: any, currentUser: any) => {
 
 export const addUser  = (to: any) => {
   return async (dispatch: any) => {
-    console.log('dispatching add user to:', to)
-    setDoc(doc(db, "requests"), {
-      from: auth.currentUser?.uid,
-      to: to.uid
-    }).then(
-      () => {
-        console.log('successfully sent a request')
-      }
-    ).catch((err) => {
-      console.log('cant add user:', err)
-    })
+    console.log('dispatching add user from:', auth.currentUser?.uid)
+    console.log('dispatching add user to:', to.uid)
+    if(auth.currentUser) {
+      addDoc(collection(db, "requests"), {
+        from: auth.currentUser?.uid,
+        to: to.uid
+      }).then(
+        () => {
+          console.log('successfully sent a request')
+          Alert.alert(`Successfully sent a request to ${to.username}`,undefined, [ 
+            {text: 'OK', onPress: () => console.log('OK Pressed')},
+          ]);
+        }
+      ).catch((err) => {
+        console.log('cant add user:', err)
+        // Alert.alert(`Failed to send a request to ${to.username}`,undefined, [ 
+        //   {text: 'OK', onPress: () => console.log('OK Pressed')},
+        // ]);
+      })
+    }
   }; 
 };

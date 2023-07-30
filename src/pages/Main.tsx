@@ -18,6 +18,7 @@ export default function Main({ route, navigation }: NavigationProps) {
         tabBarShowLabel: false,
         headerShown: false,
       }}
+      initialRouteName={route.name}
     >
       {MainTab.map((option) => (
         <Tab.Screen

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Image, Animated } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import theme from "../../../../config/theme.config.json";
 import { ScrollView } from "react-native-gesture-handler";
@@ -15,9 +15,12 @@ import { RootStackParamList } from "../../../interfaces/RootStackParamList.inter
 
 export default function Default({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
-  const appState = useAppSelector(selectApp);
   const Tab = createMaterialTopTabNavigator();
-  console.log(Boolean(userState.friends?.length));
+
+  const av = new Animated.Value(0);
+  av.addListener(() => {
+    return;
+  });
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       {/* HEADING */}
@@ -61,7 +64,19 @@ export default function Default({ route, navigation }: NavigationProps) {
         </TouchableOpacity>
       </View>
       {/* BODY */}
-      <Tab.Navigator style={{minHeight: '100%'}}>
+      <Tab.Navigator
+        initialRouteName="FriendsDefault"
+        style={{ minHeight: "100%" }}
+        screenListeners={{
+          focus: () => {
+            Animated.timing(av, {
+              toValue: 1,
+              duration: 200,
+              useNativeDriver: true,
+            }).start();
+          },
+        }}
+      >
         <Tab.Screen
           name={"Friends" as keyof RootStackParamList}
           component={FriendsTab}

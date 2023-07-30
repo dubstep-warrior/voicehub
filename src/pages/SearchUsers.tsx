@@ -31,9 +31,8 @@ export default function SearchUsers({ route, navigation }: NavigationProps) {
     options:  options,
     cancelButtonIndex: options.length - 1,
     onPress: async (index: number): Promise<void> => { 
-      if([0].includes(index)) { 
-        console.log(selectedUser)
-        dispatch(addUser(selectedUser))
+      if([0].includes(index)) {  
+        dispatch(addUser(selectedUser.current))
       }
     },
   };
