@@ -13,6 +13,7 @@ import { selectUser } from "../store/slices/user.slice";
 import ActionSheet from "react-native-actionsheet";
 import {useRef, useState} from "react"
 import actionSheetConfig from "../../config/actionSheet-config.json";
+import { addUser } from "../store/actions/user.actions";
 
 
 export default function SearchUsers({ route, navigation }: NavigationProps) {
@@ -29,12 +30,10 @@ export default function SearchUsers({ route, navigation }: NavigationProps) {
     ref: actionSheetRef,
     options:  options,
     cancelButtonIndex: options.length - 1,
-    onPress: async (index: number): Promise<void> => {
-      console.log(index)
-      console.log(selectedUser)
-      if([0].includes(index)) {
-        // TODO find a way to get docid of other user
-        // dispatch(addUser())
+    onPress: async (index: number): Promise<void> => { 
+      if([0].includes(index)) { 
+        console.log(selectedUser)
+        dispatch(addUser(selectedUser))
       }
     },
   };

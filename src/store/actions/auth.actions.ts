@@ -1,4 +1,7 @@
-import { assign as assignUser } from "../slices/user.slice";
+import {
+  assign as assignUser,
+  update as updateUser,
+} from "../slices/user.slice";
 import { assign as assignApp } from "../slices/app.slice";
 import { auth, db } from "../../../firebase";
 import {
@@ -13,7 +16,16 @@ import {
   updatePassword,
   updateProfile,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  or,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
 import { StackNavigationProp } from "@react-navigation/stack";
 
 export const resolveAccess = (data: any, current: string) => {
@@ -35,18 +47,15 @@ export const resolveAccess = (data: any, current: string) => {
         const user = userCredential.user;
         if (current == "register") {
           await setDoc(doc(db, "userProfiles", user.uid!), {
-            username: auth.currentUser?.email?.split("@")[0],
+            username:
+              auth.currentUser?.email?.split("@")[0] + " " + user.uid.slice(-4),
             displayedName: auth.currentUser?.email?.split("@")[0],
           });
         }
 
-        const profile = await getDoc(doc(db, "userProfiles", user.uid!));
+        // const profile = await getDoc(doc(db, "userProfiles", user.uid!));
 
-        dispatch(
-          assignUser({
-            user: profile.data(),
-          })
-        );
+        dispatch(AuthOnRender);
 
         return {
           success: true,
@@ -74,15 +83,45 @@ export const AuthOnRender = () => {
   return async (dispatch: any) => {
     console.log("auth on render called");
     if (auth.currentUser) {
-      const profile = await getDoc(
-        doc(db, "userProfiles", auth.currentUser.uid!)
-      );
+      // const profile = await getDoc(
+      //   doc(db, "userProfiles", auth.currentUser.uid!)
+      // );
+      onSnapshot(doc(db, "userProfiles", auth.currentUser.uid!), (profile) => {
+        dispatch(
+          assignUser({
+            user: profile.data(),
+          })
+        );
+      });
 
-      dispatch(
-        assignUser({
-          user: profile.data(),
-        })
+      const requestQuery = query(
+        collection(db, "requests"),
+        or(
+          where("from", "==", auth.currentUser.uid),
+          where("to", "==", auth.currentUser.uid)
+        )
       );
+      onSnapshot(requestQuery, (snapshot) => {
+        const pending: any[] = [];
+        const requests: any[] = [];
+        snapshot.forEach((doc) => {
+          const user = doc.data();
+          if (user.from == auth.currentUser!.uid) pending.push(user);
+          else requests.push(user);
+        });
+
+        dispatch(
+          updateUser({
+            pending: pending,
+            requests: requests,
+          })
+        );
+      });
+
+      // const q = query(
+      //   collection(db, "userProfiles"),
+      //   where(documentId(), "!=", auth.currentUser?.uid)
+      // );
     } else {
       console.log("but no auth current user");
     }

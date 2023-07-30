@@ -116,7 +116,7 @@ export const SearchUsers = (changes: any, currentUser: any) => {
               .toLowerCase()
               .includes(changes.username.trim().toLowerCase())
           ) {
-            users.push(doc.data());
+            users.push({...doc.data(), uid: doc.id});
           }
         });
       }
@@ -137,8 +137,18 @@ export const SearchUsers = (changes: any, currentUser: any) => {
   };
 };
 
-export const addUser  = (from: any, to: any) => {
+export const addUser  = (to: any) => {
   return async (dispatch: any) => {
-     
-  };
+    console.log('dispatching add user to:', to)
+    setDoc(doc(db, "requests"), {
+      from: auth.currentUser?.uid,
+      to: to.uid
+    }).then(
+      () => {
+        console.log('successfully sent a request')
+      }
+    ).catch((err) => {
+      console.log('cant add user:', err)
+    })
+  }; 
 };

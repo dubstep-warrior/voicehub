@@ -18,6 +18,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
     pending: "outgoing requests"
   }
   const current = route.name.toLowerCase();
+  console.log(current)
   return (
     <>
       {Boolean(userState.friends?.length) ? (
