@@ -88,7 +88,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
           <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
             {`You have no ${
               friendsConfig[current as keyof typeof friendsConfig].empty
-            }!`}
+            }`}
           </Text>
           <Text
             style={{
