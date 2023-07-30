@@ -5,5 +5,11 @@
             "Use Camera",
             "Cancel"
         ]
+    },
+    "addfriend": {
+        "user": [
+            "Add Friend",
+            "Cancel"
+        ]
     }
 }

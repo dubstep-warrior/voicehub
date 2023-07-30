@@ -5,11 +5,14 @@ import { styles as globalStyles } from "../../Styles.config";
 
 export interface IUserListProps {
   list: any[];
+  onMore?: () => void;
+  onPress?: (user: any) => void;
 }
 
 export default function UserList({ list, ...props }: IUserListProps) {
+
   return (
-    <> 
+    <>
       {list.map((user) => (
         <TouchableOpacity
           key={user.username}
@@ -21,10 +24,15 @@ export default function UserList({ list, ...props }: IUserListProps) {
             borderBottomWidth: 0.3,
             borderBottomColor: "rgba(255,255,255,0.3)",
           }}
+          onPress={() => props.onPress!(user)}
         >
           <Image
             style={globalStyles.icon}
-            source={config["profile-grey"]}
+            source={
+              user.profile_img
+                ? { uri: user.profile_img.uri }
+                : config["profile-grey"]
+            }
           ></Image>
           <View
             style={{
@@ -58,25 +66,27 @@ export default function UserList({ list, ...props }: IUserListProps) {
               justifyContent: "flex-end",
             }}
           >
-            <TouchableOpacity
-              style={{
-                backgroundColor: theme.background,
-                width: 35,
-                height: 35,
-                borderRadius: 17,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Image
+            {props.onMore && (
+              <TouchableOpacity
                 style={{
-                  width: 20,
-                  height: 20,
+                  backgroundColor: theme.background,
+                  width: 35,
+                  height: 35,
+                  borderRadius: 17,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
-                source={config["more"]}
-              ></Image>
-            </TouchableOpacity>
+              >
+                <Image
+                  style={{
+                    width: 20,
+                    height: 20,
+                  }}
+                  source={config["more"]}
+                ></Image>
+              </TouchableOpacity>
+            )}
           </View>
         </TouchableOpacity>
       ))}

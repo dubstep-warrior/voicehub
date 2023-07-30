@@ -58,16 +58,17 @@ export default function Default({ route, navigation }: NavigationProps) {
 
   const messageLink: any = routeConfig;
   const current = "profile";
-
+  const options = (actionSheetConfig as any)[current]["profile_img"] as (
+    | string
+    | React.ReactNode
+  )[]
   const actionSheetRef = useRef<ActionSheet>(null);
   const actionSheetProps = {
     ref: actionSheetRef,
-    options: (actionSheetConfig as any)[current]["profile_img"] as (
-      | string
-      | React.ReactNode
-    )[],
-    cancelButtonIndex: 2,
+    options:  options,
+    cancelButtonIndex: options.length - 1,
     onPress: async (index: number): Promise<void> => {
+      if(![0,1].includes(index)) return;
       const permissionResult =
         await ImagePicker.requestCameraPermissionsAsync();
 

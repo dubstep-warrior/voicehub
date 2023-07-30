@@ -64,7 +64,7 @@ export default function SimpleForm({ route, navigation }: NavigationProps) {
     }
     if (route.name.toLowerCase().includes("addfriend")) {
       console.log("running search users dispatch");
-      dispatch(SearchUsers(formValues));
+      dispatch(SearchUsers(formValues, Object(userState)));
     }
   };
 

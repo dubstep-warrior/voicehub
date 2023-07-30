@@ -6,11 +6,13 @@ import { assign as assignUser } from "../slices/user.slice";
 
 import { auth, db } from "../../../firebase";
 import {
+  FieldPath,
   collection,
   doc,
+  documentId,
   getDoc,
   getDocs,
-  query, 
+  query,
   setDoc,
   where,
 } from "firebase/firestore";
@@ -78,7 +80,7 @@ export const UserUpdate = (
   };
 };
 
-export const SearchUsers = (changes: any) => {
+export const SearchUsers = (changes: any, currentUser: any) => {
   return async (dispatch: any) => {
     dispatch(
       updateApp({
@@ -86,30 +88,45 @@ export const SearchUsers = (changes: any) => {
       })
     );
 
-    
-
-     
     // ([
     //   { uid: "uid1" },
     //   { email: "user2@example.com" },
     //   { phoneNumber: "+15555550003" },
     //   { providerId: "google.com", providerUid: "google_uid4" },
     // ]);
-    console.log('check username')
+
+    // TODO use cloud functions
+    console.log("check username");
     if (changes.username) {
-      console.log('retrieving users')
-      const q = query(collection(db, "userProfiles"), where("username", ">=", changes.username.toLowerCase()));
-      const res = (await getDocs(q));
-      const users: any[] = []
-      if(res) {
-        res.forEach(doc => { 
-          users.push(doc.data())
-        })
+      console.log("retrieving users");
+      console.log("query: ", changes.username, currentUser);
+      const q = query(
+        collection(db, "userProfiles"),
+        where(documentId(), "!=", auth.currentUser?.uid)
+      );
+      const res = await getDocs(q);
+      const users: any[] = [];
+      if (res) {
+        res.forEach((doc) => {
+          console.log("res:", doc.data());
+          const user = doc.data();
+          if (
+            user.username
+              .trim()
+              .toLowerCase()
+              .includes(changes.username.trim().toLowerCase())
+          ) {
+            users.push(doc.data());
+          }
+        });
       }
-      
-      dispatch(updateApp({
-        users: users
-      }))
+      // console.log('query retrieved: ', users)
+      dispatch(
+        updateApp({
+          users: users,
+          submitting: false,
+        })
+      );
     }
 
     dispatch(
@@ -117,5 +134,11 @@ export const SearchUsers = (changes: any) => {
         submitting: false,
       })
     );
+  };
+};
+
+export const addUser  = (from: any, to: any) => {
+  return async (dispatch: any) => {
+     
   };
 };

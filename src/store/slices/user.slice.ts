@@ -9,7 +9,9 @@ interface UserState extends User {
   username: string,
   displayedName: string,
   status?: string,
-  friends?: UserState[]
+  friends?: UserState[],
+  requests?: UserState[],
+  pending?: UserState[]
 }
 
 // Define the initial state using that type
