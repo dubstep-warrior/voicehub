@@ -1,5 +1,5 @@
 import Friends from "../tabs/main/Friends/Friends";
-import Home from "../tabs/main/Home";
+import Home from "../tabs/main/Home/Home";
 import Notification from "../tabs/main/Notification";
 import Profile from "../tabs/main/Profile/Profile";
 import config from "./../../Images.config"

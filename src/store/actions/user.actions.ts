@@ -262,7 +262,7 @@ export const acceptRequest = (from: any) => {
               ]);
             })
             .catch((err) => {
-              console.log('request accept unsuccessful:',err)
+              console.log("request accept unsuccessful:", err);
               Alert.alert(
                 `Request unsuccessful`,
                 "There was a problem trying to accept your friend request, please try again later",
@@ -273,6 +273,32 @@ export const acceptRequest = (from: any) => {
 
         // console.log('successfully sent a rejection')
       });
+      // addDoc(collection(db, "friends"), {
+      //   from: auth.currentUser?.uid,
+      //   to: to.uid
+      // })
+    }
+  };
+};
+
+export const removeFriend = (friend: any) => {
+  return async (dispatch: any) => {
+    if (auth.currentUser) {
+      console.log('removing friend', friend)
+      await deleteDoc(doc(db, "friends", friend.friendshipID)).then(()=> {
+        Alert.alert(`Successfully deleted friend`, undefined, [
+          { text: "OK", onPress: () => console.log("OK Pressed") },
+        ]);
+      }).catch((err) => {
+        console.log(`Request unsuccessful`,err)
+        Alert.alert(`Request unsuccessful`, 'Please try again later', [
+          { text: "OK", onPress: () => console.log("OK Pressed") },
+        ]);
+      })
+      
+
+      // console.log('successfully sent a rejection')
+
       // addDoc(collection(db, "friends"), {
       //   from: auth.currentUser?.uid,
       //   to: to.uid

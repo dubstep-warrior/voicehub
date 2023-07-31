@@ -11,7 +11,8 @@ interface UserState extends User {
   status?: string,
   friends?: UserState[],
   requests?: UserState[],
-  pending?: UserState[]
+  pending?: UserState[],
+  chats?: any
 }
 
 // Define the initial state using that type

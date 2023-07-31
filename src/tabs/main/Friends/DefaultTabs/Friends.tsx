@@ -11,7 +11,7 @@ import UserList from "../../../../shared/UserList";
 import { selectApp } from "../../../../store/slices/app.slice";
 import { useRef } from "react";
 import ActionSheet from "react-native-actionsheet";
-import { acceptRequest, rejectRequest, removeRequest } from "../../../../store/actions/user.actions";
+import { acceptRequest, rejectRequest, removeFriend, removeRequest } from "../../../../store/actions/user.actions";
 
 export default function Friends({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
@@ -25,7 +25,16 @@ export default function Friends({ route, navigation }: NavigationProps) {
         ref: useRef<ActionSheet>(null),
         options: ["Send Message","Remove Friend", "Cancel"],
         cancelButtonIndex: 2,
-        onPress: async (index: number): Promise<void> => {},
+        onPress: async (index: number): Promise<void> => {
+          console.log(index)
+          if([0].includes(index)) {  
+            // Send message
+          }
+          if([1].includes(index)) {  
+            // Remove friend
+            dispatch(removeFriend(selectedUser.current))
+          }
+        }
       },
     },
     requests: {

@@ -4,13 +4,21 @@ import type { RootState } from '../store'
 // Define a type for the slice state
 interface App {  
     submitting: boolean,
-    users: any[]
+    users: any[],
+    home: {
+      selectedCat: string | null,
+      selectedSubCat: string | null
+    }
 }
 
 // Define the initial state using that type
 const initialState: App = {  
     submitting: false,
-    users: []
+    users: [],
+    home: {
+      selectedCat: null,
+      selectedSubCat: null
+    }
 }  
 
 export const appSlice = createSlice({
@@ -19,7 +27,7 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     assign: (state, actions) => {
-      console.log('redux store has been updated in state slice: ', actions.payload)
+      // console.log('redux store has been updated in state slice: ', actions.payload)
     
       state.submitting = actions.payload.submitting ?? false
       state.users = actions.payload.users ?? []
@@ -28,7 +36,7 @@ export const appSlice = createSlice({
       Object.keys(actions.payload).forEach((key) => {
         state[key as keyof typeof state] = actions.payload[key]
       })
-      console.log('updated state', state)
+      // console.log('updated state', state)
     }
   },
 })

@@ -153,9 +153,12 @@ export const AuthOnRender = () => {
 
       onSnapshot(friendsQuery, async (snapshot) => {
         const friends: any[] = ["xxx"];
+        const friendshipRef: any = {}
         snapshot.forEach((doc) => {
           const friend = doc.data(); 
-          friends.push(friend.group.find((uid: string) => uid !== auth.currentUser!.uid))
+          const friendUID = friend.group.find((uid: string) => uid !== auth.currentUser!.uid)
+          friends.push(friendUID)
+          friendshipRef[friendUID] = doc.id
         });
 
         const q = query(
@@ -169,7 +172,7 @@ export const AuthOnRender = () => {
         const friendProfiles: any[] = [] 
 
         res.forEach((doc) => {
-          friendProfiles.push({ ...doc.data(), uid: doc.id });
+          friendProfiles.push({ ...doc.data(), uid: doc.id, friendshipID: friendshipRef[doc.id] });
         });
  
 
