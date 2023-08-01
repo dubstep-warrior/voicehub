@@ -173,22 +173,23 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     alignSelf: "center",
                   }}
                 >
-                  {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] && (
+                  {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] ? (
                     <Image
                       style={[
                         { width: 60, height: 60, borderRadius: 30 },
                         appState.home.selectedCat == "chat" &&
-                          appState.home.selectedSubCat == key && {
-                            borderWidth: 2,
-                            borderColor: theme.black,
-                            borderRadius: 20
-                          },
+                        appState.home.selectedSubCat == key && {
+                          borderWidth: 2,
+                          borderColor: theme.black,
+                          borderRadius: 20
+                        },
                       ]}
                       source={{
                         uri: userState?.chats?.["chat"]?.[key]?.["chat_img"]
-                          ?.uri,
                       }}
                     ></Image>
+                  ) : (
+                    <Text style={{fontWeight: 'bold', color: 'white'}}>{userState?.chats?.["chat"]?.[key]['name'][0]}</Text>
                   )}
                 </View>
               </TouchableOpacity>
@@ -236,7 +237,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 </View>
               )}
               {appState.home.selectedCat &&
-                appState.home.selectedCat !== "dms" &&  (
+                appState.home.selectedCat !== "dms" && (
                   <View style={{ flexDirection: "column" }}>
                     <View style={{ padding: 16, borderBottomWidth: 1 }}>
                       <Text

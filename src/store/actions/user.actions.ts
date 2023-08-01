@@ -22,6 +22,7 @@ import {
 import { assign as assignApp, update as updateApp } from "../slices/app.slice";
 import { getAuth } from "firebase/auth";
 import { Alert } from "react-native";
+import uploadImage from "../../utils/FileUploader";
 
 export const UserUpdate = (
   changes: any,
@@ -46,6 +47,10 @@ export const UserUpdate = (
     console.log("user action being run");
 
     console.log("new changes ", newChanges);
+    if('profile_img' in newChanges) {
+      const imageURI = await uploadImage(newChanges['profile_img'])
+      newChanges['profile_img'] = imageURI;
+    }
     const ref = doc(db, "userProfiles", auth.currentUser!.uid);
     const res = await setDoc(ref, newChanges, { merge: true })
       .then(async () => {
@@ -308,12 +313,19 @@ export const removeFriend = (friend: any) => {
 };
 
 
-export const addChat = (chat: any) => {
+export const addChat = (chatObject: any) => {
   return async (dispatch: any) => {
     if (auth.currentUser) {
        dispatch(updateApp({
         submitting: true
        }))
+
+       const chat = chatObject
+
+       if('chat_img' in chat && chat['chat_img']) {
+        const imageURI = await uploadImage(chat['chat_img'])
+        chat['chat_img'] = imageURI;
+      }
 
        await addDoc(collection(db, "chats"), { 
         messages: [],

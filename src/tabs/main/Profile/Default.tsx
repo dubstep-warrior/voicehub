@@ -6,6 +6,7 @@ import {
   Image,
   TouchableHighlight,
   Pressable,
+  Platform,
 } from "react-native";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { AuthRemove } from "../../../store/actions/auth.actions";
@@ -135,7 +136,7 @@ export default function Default({ route, navigation }: NavigationProps) {
                       userState.profile_img || formValues.profile_img
                         ? {
                             uri:
-                              formValues.profile_img.uri ??
+                              formValues.profile_img?.uri ??
                               userState.profile_img,
                           }
                         : config["profile-white"]
