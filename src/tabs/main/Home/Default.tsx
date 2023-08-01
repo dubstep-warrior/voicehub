@@ -51,6 +51,10 @@ export default function Default({ route, navigation }: any) {
     setFormInvalid
   );
 
+  useEffect(() => {
+    reset()
+  }, [appState])
+
   const actionSheetRef = useRef<ActionSheet>(null);
   const options = (actionSheetConfig as any)[current] as (
     | string
@@ -142,18 +146,18 @@ export default function Default({ route, navigation }: any) {
             }}
           >
             {/* ADD CAROUSEL HERE? */}
-            <View style={{marginBottom: 12, padding: 4}}>
+            {!!formValues.images.length && <View style={{ marginBottom: 12 }}>
               <ScrollView
-                horizontal={true} 
+                horizontal={true}
               >
-                <View style={{flexDirection: 'row', gap: 8}}>
-                {!!formValues.images.length && 
-                formValues.images.map((image: any, index: number) => (
-                  <Image key={index} style={{width: 120, height: 100}} source={{uri: image.uri}}></Image>
-                )) }
-                </View> 
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  {
+                    formValues.images.map((image: any, index: number) => (
+                      <Image key={index} style={{ width: 120, height: 100 }} source={{ uri: image.uri }}></Image>
+                    ))}
+                </View>
               </ScrollView>
-            </View>
+            </View>}
             <View style={{
               flexDirection: "row",
               gap: 8,
