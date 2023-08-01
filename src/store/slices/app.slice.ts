@@ -16,7 +16,7 @@ const initialState: App = {
     submitting: false,
     users: [],
     home: {
-      selectedCat: null,
+      selectedCat: 'dms',
       selectedSubCat: null
     }
 }  

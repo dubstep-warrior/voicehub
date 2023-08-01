@@ -108,6 +108,21 @@ const CustomDrawerContent = ({ navigation }: any) => {
             }}
             onPress={() => selectHomeState("dms", null)}
           >
+
+            {appState.home.selectedCat == "dms" && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  width: "5%",
+                  backgroundColor: theme.smoothGrey,
+                  borderBottomRightRadius: 15,
+                  borderTopRightRadius: 15,
+                }}
+              ></View>
+            )}
             {appState.home.selectedCat == "home" && (
               <View
                 style={{
@@ -123,7 +138,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
               ></View>
             )}
             <View
-              style={{
+              style={[{
                 width: 60,
                 height: 60,
                 borderRadius: 30,
@@ -131,7 +146,11 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 justifyContent: "center",
                 backgroundColor: theme.background,
                 alignSelf: "center",
-              }}
+              }, appState.home.selectedCat == "dms" && {
+                borderWidth: 2,
+                borderColor: theme.black,
+                borderRadius: 20
+              }]}
             >
               <Image
                 style={[{ width: 30, height: 30 }]}
@@ -163,7 +182,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     ></View>
                   )}
                 <View
-                  style={{
+                  style={[{
                     width: 60,
                     height: 60,
                     borderRadius: 30,
@@ -171,25 +190,22 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     justifyContent: "center",
                     backgroundColor: theme.background,
                     alignSelf: "center",
-                  }}
+                  }, appState.home.selectedCat == "chat" &&
+                  appState.home.selectedSubCat == key && {
+                    borderWidth: 2,
+                    borderColor: theme.black,
+                    borderRadius: 20
+                  }]}
                 >
                   {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] ? (
                     <Image
-                      style={[
-                        { width: 60, height: 60, borderRadius: 30 },
-                        appState.home.selectedCat == "chat" &&
-                        appState.home.selectedSubCat == key && {
-                          borderWidth: 2,
-                          borderColor: theme.black,
-                          borderRadius: 20
-                        },
-                      ]}
+                      style={{ width: 60, height: 60, borderRadius: 30 }}
                       source={{
                         uri: userState?.chats?.["chat"]?.[key]?.["chat_img"]
                       }}
                     ></Image>
                   ) : (
-                    <Text style={{fontWeight: 'bold', color: 'white'}}>{userState?.chats?.["chat"]?.[key]['name'][0]}</Text>
+                    <Text style={{ fontWeight: 'bold', color: 'white' }}>{userState?.chats?.["chat"]?.[key]['name'][0]}</Text>
                   )}
                 </View>
               </TouchableOpacity>
