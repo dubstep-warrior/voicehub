@@ -177,7 +177,7 @@ export default function Default({ route, navigation }: any) {
                   multiline={true}
                 ></Input>
               </View>
-              <TouchableOpacity style={[styles.button]} onPress={submit()}>
+              <TouchableOpacity style={[styles.button]} onPress={submit}>
                 {/* <Image
                 style={styles.buttonImage}
                 source={config["send"]}
