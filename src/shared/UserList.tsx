@@ -9,7 +9,7 @@ export interface IUserListProps {
   onPress?: (user: any) => void;
 }
 
-export default function UserList({ list, ...props }: IUserListProps) {
+export default function UserList({ list = [], ...props }: IUserListProps) {
   console.log(list)
   return (
     <>

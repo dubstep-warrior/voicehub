@@ -11,5 +11,15 @@
             "Add Friend",
             "Cancel"
         ]
-    }
+    },
+    "createchat": [
+        "Select from Gallery",
+        "Use Camera",
+        "Cancel"
+    ],
+    "message": [
+        "Select from Gallery",
+        "Use Camera",
+        "Cancel"
+    ]
 }

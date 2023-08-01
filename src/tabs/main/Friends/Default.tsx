@@ -25,25 +25,10 @@ export default function Default({ route, navigation }: NavigationProps) {
     <SafeAreaView style={styles.safeAreaContainer}>
       {/* HEADING */}
       <View
-        style={{
-          padding: 12,
-          justifyContent: "flex-end",
-          alignItems: "center",
-          flexDirection: "row",
-          position: "relative",
-          zIndex: 2,
-        }}
+        style={globalStyles.headingContainer}
       >
         <Text
-          style={{
-            color: "white",
-            fontSize: 16,
-            fontWeight: "700",
-            position: "absolute",
-            left: 0,
-            right: 0,
-            textAlign: "center",
-          }}
+          style={globalStyles.headerText}
         >
           Friends
         </Text>

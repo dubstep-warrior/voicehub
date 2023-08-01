@@ -12,7 +12,10 @@ interface UserState extends User {
   friends?: UserState[],
   requests?: UserState[],
   pending?: UserState[],
-  chats?: any
+  chats: {
+    chat: any,
+    p2p: any
+  }
 }
 
 // Define the initial state using that type
@@ -20,6 +23,10 @@ const initialState: UserState = {
   profile_img: null,
   username: '',
   displayedName: '', 
+  chats: {
+    chat: {},
+    p2p: {}
+  }
 } as UserState
 
 export const userSlice = createSlice({

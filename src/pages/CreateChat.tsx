@@ -1,51 +1,198 @@
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
-import { useState } from "react";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  TouchableWithoutFeedback,
-  Keyboard,
-} from "react-native";
-import { NavigationProps } from "../interfaces/NavigationProps.interface";
+import { useState, useRef } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Input from "../shared/Input";
 import { FormData } from "../shared/FormData";
 import routeConfig from "../../config/route-config.json";
-import { useAppDispatch } from "./../store/hooks";
-import { resolveAccess } from "../store/actions/auth.actions";
 import theme from "./../../config/theme.config.json";
 import { styles as globalStyles } from "../../Styles.config";
 import Error from "../shared/Error";
-import ButtonBody from "../shared/Button";
 import { SafeAreaView } from "react-native-safe-area-context";
-import SimpleForm from "../shared/SimpleForm";
 import Button from "../shared/Button";
+import config from "./../../Images.config";
+import ActionSheet from "react-native-actionsheet";
+import actionSheetConfig from "../../config/actionSheet-config.json";
+import * as ImagePicker from "expo-image-picker";
+import { useAppDispatch } from "../store/hooks";
+import { addChat } from "../store/actions/user.actions";
+import { auth } from "../../firebase";
 
-export default function CreateChat() {
-  const submit = async () => {};
+export default function CreateChat(props: any) {
+  const dispatch = useAppDispatch();
+
+  const current = "createchat";
+  const messageLink: any = routeConfig;
+  const [invalid, setFormInvalid] = useState<string | null>(null);
+  const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
+    messageLink[current].form,
+    setFormInvalid
+  );
+
+  const actionSheetRef = useRef<ActionSheet>(null);
+  const options = (actionSheetConfig as any)[current] as (
+    | string
+    | React.ReactNode
+  )[];
+  const actionSheetProps = {
+    ref: actionSheetRef,
+    options: options,
+    cancelButtonIndex: options.length - 1,
+    onPress: async (index: number): Promise<void> => {
+      if (![0, 1].includes(index)) return;
+      const permissionResult =
+        await ImagePicker.requestCameraPermissionsAsync();
+
+      if (permissionResult.granted === false) return;
+
+      const result = await (index == 0
+        ? ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+          })
+        : ImagePicker.launchCameraAsync());
+
+      if (!result.canceled) {
+        handleFormValueChange("chat_img", result.assets[0]);
+      }
+    },
+  };
+  
+  const submit = async () => {
+    if (!formValues["name"]) {
+      console.log("please fill in name");
+      setFormInvalid("Please fill in your chat's name");
+    } else {
+      await dispatch(
+        addChat({
+          ...formValues,
+          owner: auth.currentUser?.uid,
+          users: [auth.currentUser?.uid],
+          type: "chat",
+        })
+      );
+      if(props.onSubmit) {
+        props.onSubmit()
+      }
+    }
+  };
 
   return (
-    <SafeAreaView style={{ flex: 0.6, padding: 16 }}>
+    <SafeAreaView style={{ padding: 16, gap: 12 }}>
+      <View style={{ alignItems: "center", gap: 8 }}>
+        <Text style={[globalStyles.text, { fontSize: 24, fontWeight: "bold" }]}>
+          Personalize your chat
+        </Text>
+        <Text
+          style={[
+            {
+              fontSize: 16,
+              fontWeight: "500",
+              color: theme.heading,
+              textAlign: "center",
+            },
+          ]}
+        >
+          Add uniqueness to your chat with a name and icon, you can always
+          change it later
+        </Text>
+      </View>
       <View style={{ backgroundColor: theme.background, padding: 8 }}>
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: "column",
             justifyContent: "space-between",
             marginBottom: 12,
+            gap: 32,
           }}
-        > 
-          <Button
-            onPress={submit}
-            text={"Submit"}
-            theme="minimal"
-          ></Button>
+        >
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              width: 100,
+              height: 100,
+              alignSelf: "center",
+              backgroundColor: theme.background2,
+              borderRadius: 50,
+              borderWidth: 2,
+              borderStyle: "dashed",
+              overflow: "hidden",
+            }}
+          >
+            {formValues.chat_img && (
+              <Image
+                style={styles.image}
+                source={{ uri: formValues.chat_img.uri }}
+              ></Image>
+            )}
+            <TouchableOpacity
+              style={styles.profilePicOverlay}
+              onPress={() => {
+                actionSheetRef.current?.show();
+              }}
+            >
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  style={[
+                    {
+                      width: 30,
+                      height: 30,
+                      marginBottom: 8,
+                    },
+                  ]}
+                  source={config["upload-image"]}
+                ></Image>
+                <Text style={{ color: theme.background, fontWeight: "bold" }}>
+                  UPLOAD
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={{ gap: 8 }}>
+            <Text style={{ color: theme.heading, fontWeight: "bold" }}>
+              CHAT NAME
+            </Text>
+            <Input
+              name="Chat name"
+              formKey="name"
+              handleFormValueChange={handleFormValueChange}
+              value={formValues["name"]}
+              // style="minimal"
+              background="white"
+            ></Input>
+          </View>
         </View>
+        <Button onPress={submit} text={"Submit"}></Button>
+        {invalid && <Error message={invalid}></Error>}
       </View>
+      <ActionSheet {...actionSheetProps}></ActionSheet>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  profilePicOverlay: {
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255,255,255,0.4)",
+  },
+  image: {
+    resizeMode: "contain",
+    borderRadius: 50,
+    flex: 1,
+    aspectRatio: 1,
+  },
+});

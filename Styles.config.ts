@@ -17,4 +17,24 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.button,
     marginBottom: 12,
   },
+  text: {
+    color: 'white'
+  },
+  headingContainer: {
+    padding: 12,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    flexDirection: "row",
+    position: "relative",
+    zIndex: 2,
+  },
+  headerText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "700",
+    position: "absolute",
+    left: 0,
+    right: 0,
+    textAlign: "center",
+  }
 });

@@ -18,7 +18,11 @@ const config = {
   "upload-image":require("./assets/upload-image.png"),
   "more": require("./assets/more.png"),
   "add-user": require("./assets/add-user.png"),
-  "dms": require("./assets/dms.png")
+  "dms": require("./assets/dms.png"),
+  "message": require("./assets/message.png"),
+  "voice": require("./assets/voice.png"),
+  "menu": require("./assets/menu.png"),
+  "photo": require("./assets/photo.png")
 };
 
 export default config;

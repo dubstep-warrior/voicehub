@@ -4,4 +4,5 @@ export type RootStackParamList = {
     Main: undefined;
     UpdateField: any;
     AddFriend: any;
+    Default: any;
   };

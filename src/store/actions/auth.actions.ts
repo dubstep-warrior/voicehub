@@ -82,7 +82,7 @@ export const resolveAccess = (data: any, current: string) => {
 
 export const AuthOnRender = () => {
   console.log("auth on render calle0");
-  return async (dispatch: any) => {
+  return async (dispatch: any, getState: any) => {
     console.log("auth on render called");
     if (auth.currentUser) {
       // const profile = await getDoc(
@@ -182,10 +182,61 @@ export const AuthOnRender = () => {
           })
         );
       });
-      // const q = query(
-      //   collection(db, "userProfiles"),
-      //   where(documentId(), "!=", auth.currentUser?.uid)
-      // );
+
+
+      
+      const chatsQeury = query(
+        collection(db, "chats"),
+        where('users', 'array-contains', auth.currentUser?.uid)
+      );
+
+       
+       onSnapshot(chatsQeury, async (snapshot) => {
+        const chats: any = {
+          chat: {},
+          p2p: {}
+        }
+
+        let users: Set<string> | string[] = new Set()
+        snapshot.forEach((doc) => {
+          const chat = doc.data();  
+          
+          users = new Set([...users, ...chat.users])
+          chats[chat.type][doc.id] = chat 
+
+        });
+
+        // updating profiles here
+        users = Array.from(users) 
+
+        const q = query(
+          collection(db, "userProfiles"),
+          where(documentId(), "in", users)
+        );
+
+        const res = await getDocs(q) 
+        const profiles: any = {}
+        res.forEach((doc) => {
+          profiles[doc.id] = doc.data()
+        });
+
+        Object.keys(chats).forEach(chatType => {
+          Object.keys(chats[chatType]).forEach(chatkey => {
+            const chat = chats[chatType][chatkey]
+            chats[chatType][chatkey].users = chat.users.map((uid: string) =>  profiles[uid])
+          })
+        })
+
+
+        console.log('updating chat', chats?.chat?.['3SHTkloJ7yFBL6dB8Sn8'])
+        dispatch(updateUser({
+          chats: chats
+        }))
+
+       })
+
+
+
     } else {
       console.log("but no auth current user");
     }
@@ -281,3 +332,5 @@ export const AuthUpdate = (
     );
   };
 };
+
+ 

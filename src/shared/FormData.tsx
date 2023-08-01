@@ -16,7 +16,7 @@ export const FormData = (formConfig: any, setFormInvalid: any, values?: any) => 
   });
 
   const handleFormValueChange = (key: string, value: any) => { 
-    setFormInvalid(false)
+    setFormInvalid(null)
     setFormValues(
       {
         ...formValues,

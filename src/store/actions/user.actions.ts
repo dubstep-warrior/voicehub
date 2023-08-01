@@ -306,3 +306,38 @@ export const removeFriend = (friend: any) => {
     }
   };
 };
+
+
+export const addChat = (chat: any) => {
+  return async (dispatch: any) => {
+    if (auth.currentUser) {
+       dispatch(updateApp({
+        submitting: true
+       }))
+
+       await addDoc(collection(db, "chats"), { 
+        messages: [],
+        ...chat
+      }).then(() => {
+        console.log("successfully added a chat");
+        Alert.alert(
+          `Successfully added chat ${chat.name}`,
+          undefined,
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+        );
+      })
+      .catch((err) => {
+        console.log("cant add chat:", err);
+        Alert.alert(
+          `Could not add chat ${chat.name}`,
+          'There was an issue with adding your chat, please try again later',
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+        );
+      });
+
+       dispatch(updateApp({
+        submitting: false
+       }))
+    }
+  };
+};
