@@ -8,8 +8,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  Keyboard
+  Keyboard,
 } from "react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
 import config from "../../../../Images.config";
 
 import theme from "../../../../config/theme.config.json";
@@ -22,12 +24,14 @@ import { selectUser } from "../../../store/slices/user.slice";
 import { selectApp } from "../../../store/slices/app.slice";
 import Input from "../../../shared/Input";
 import routeConfig from "../../../../config/route-config.json";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FormData } from "../../../shared/FormData";
 import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../../../config/actionSheet-config.json";
 import * as ImagePicker from "expo-image-picker";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { useHeaderHeight } from '@react-navigation/elements'
+
 
 export default function Default({ route, navigation }: any) {
   const current = "message";
@@ -35,7 +39,7 @@ export default function Default({ route, navigation }: any) {
   const appState = useAppSelector(selectApp);
   const selectedChat =
     userState?.chats?.[
-      appState.home.selectedCat as keyof typeof userState.chats
+    appState.home.selectedCat as keyof typeof userState.chats
     ]?.[appState.home.selectedSubCat as string];
 
   const messageLink: any = routeConfig;
@@ -65,11 +69,11 @@ export default function Default({ route, navigation }: any) {
 
       const result = await (index == 0
         ? ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-          })
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        })
         : ImagePicker.launchCameraAsync());
 
       if (!result.canceled) {
@@ -77,49 +81,64 @@ export default function Default({ route, navigation }: any) {
       }
     },
   };
+  
 
-  // TODO FIX KEYBOARD INPUT ISSUE
   return (
-    <>
-      <SafeAreaView style={styles.safeAreaContainer}>
-        {/* Header */}
-        <View
-          style={[
-            globalStyles.headingContainer,
-            { justifyContent: "space-between" },
-          ]}
-        >
-          <TouchableOpacity
-            style={{ padding: 8, zIndex: 5 }}
-            onPress={() => route.params.leftNavigation.openDrawer()}
+    <KeyboardAvoidingView
+      behavior={Platform.select({ 'android': undefined, 'ios': 'height' })}
+      keyboardVerticalOffset={useHeaderHeight()}
+      style={{ flex: 1 }}
+    >
+      <Pressable onPress={() => Keyboard.dismiss()} style={{ height: '100%' }}>
+        <SafeAreaView style={styles.safeAreaContainer}>
+          {/* Header */}
+          <View
+            style={[
+              globalStyles.headingContainer,
+              { justifyContent: "space-between" },
+            ]}
           >
-            <Image
-              style={{ width: 32, height: 24 }}
-              source={config["menu"]}
-            ></Image>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={{ padding: 8, zIndex: 5 }}
+              onPress={() => route.params.leftNavigation.openDrawer()}
+            >
+              <Image
+                style={{ width: 32, height: 24 }}
+                source={config["menu"]}
+              ></Image>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={{ padding: 8, zIndex: 5 }}
-            onPress={() => navigation.openDrawer()}
-          >
-            <Image
-              style={{ width: 32, height: 24 }}
-              source={config["friends-white"]}
-            ></Image>
-          </TouchableOpacity>
-          <Text style={globalStyles.headerText}>{selectedChat?.name}</Text>
-        </View>
-      </SafeAreaView>
-      <View style={{ backgroundColor: theme.background2, flex: 1 }}>
-        <View style={{ backgroundColor: "yellow", flex: 1 }}></View>
-        <KeyboardAvoidingView behavior="padding">
+            <TouchableOpacity
+              style={{ padding: 8, zIndex: 5 }}
+              onPress={() => navigation.openDrawer()}
+            >
+              <Image
+                style={{ width: 32, height: 24 }}
+                source={config["friends-white"]}
+              ></Image>
+            </TouchableOpacity>
+            <Text style={globalStyles.headerText}>{selectedChat?.name}</Text>
+          </View>
+        </SafeAreaView>
+        <View
+          style={{ flex: 1, flexDirection: 'column-reverse' }}
+        >
+          {/* <View style={{ backgroundColor: "yellow", zIndex: 1 }}>
+           <ScrollView>
+           {Array.from(Array(40).keys()).map((index) => (
+              <Text>HELLO WORLD</Text>
+            ))}
+           </ScrollView>
+          </View> */}
+
+
           <View
             style={{
               backgroundColor: "red",
               padding: 12,
               flexDirection: "row",
               gap: 8,
+              zIndex: 3
             }}
           >
             <TouchableOpacity style={styles.button}>
@@ -145,9 +164,10 @@ export default function Default({ route, navigation }: any) {
               ></Image>
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
-      </View>
-    </>
+
+        </View>
+      </Pressable>
+    </KeyboardAvoidingView>
   );
 }
 

@@ -50,7 +50,7 @@ export default function Home() {
           },
           drawerPosition: "left",
           headerShown: false,
-          drawerType: "slide",
+          // drawerType: "slide",
         }}
         drawerContent={(props) => <CustomDrawerContent {...props} />}
       >

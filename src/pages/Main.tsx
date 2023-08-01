@@ -17,6 +17,7 @@ export default function Main({ route, navigation }: NavigationProps) {
         tabBarStyle: { backgroundColor: theme.black, borderTopWidth: 0 },
         tabBarShowLabel: false,
         headerShown: false,
+        tabBarHideOnKeyboard: true
       }}
       initialRouteName={route.name}
     >

@@ -18,7 +18,7 @@ export default function Chat({ navigation }: any) {
       <Drawer.Navigator
         defaultStatus="closed"
         screenOptions={{
-          swipeEdgeWidth: Dimensions.get("window").width/5,
+          swipeEdgeWidth: Dimensions.get("window").width/3,
           drawerStyle: {
             width: "90%",
           },
