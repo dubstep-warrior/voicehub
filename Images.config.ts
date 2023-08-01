@@ -22,7 +22,8 @@ const config = {
   "message": require("./assets/message.png"),
   "voice": require("./assets/voice.png"),
   "menu": require("./assets/menu.png"),
-  "photo": require("./assets/photo.png")
+  "photo": require("./assets/photo.png"),
+  "send": require("./assets/send.png")
 };
 
 export default config;

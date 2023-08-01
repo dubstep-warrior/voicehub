@@ -31,6 +31,7 @@ import actionSheetConfig from "../../../../config/actionSheet-config.json";
 import * as ImagePicker from "expo-image-picker";
 import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { useHeaderHeight } from '@react-navigation/elements'
+import { Icon } from "react-native-elements";
 
 
 export default function Default({ route, navigation }: any) {
@@ -77,11 +78,16 @@ export default function Default({ route, navigation }: any) {
         : ImagePicker.launchCameraAsync());
 
       if (!result.canceled) {
-        handleFormValueChange("chat_img", result.assets[0]);
+        handleFormValueChange("images", [...formValues['images'], result.assets[0]]);
       }
     },
   };
-  
+
+  //TODO SETTLE SEND MESSAGE 
+  const submit = () => {
+
+  }
+
 
   return (
     <KeyboardAvoidingView
@@ -121,52 +127,69 @@ export default function Default({ route, navigation }: any) {
           </View>
         </SafeAreaView>
         <View
-          style={{ flex: 1, flexDirection: 'column-reverse' }}
+          style={{ flex: 1, flexDirection: 'column' }}
         >
-          {/* <View style={{ backgroundColor: "yellow", zIndex: 1 }}>
-           <ScrollView>
-           {Array.from(Array(40).keys()).map((index) => (
-              <Text>HELLO WORLD</Text>
-            ))}
-           </ScrollView>
-          </View> */}
+          <View style={{ flex: 1, backgroundColor: theme.background2 }}>
+            <ScrollView>
 
+            </ScrollView>
 
+          </View>
           <View
             style={{
-              backgroundColor: "red",
+              backgroundColor: theme.background,
               padding: 12,
-              flexDirection: "row",
-              gap: 8,
-              zIndex: 3
             }}
           >
-            <TouchableOpacity style={styles.button}>
-              <Image
-                style={styles.buttonImage}
-                source={config["photo"]}
-              ></Image>
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Input
-                name="Type your message here"
-                formKey="desc"
-                handleFormValueChange={handleFormValueChange}
-                value={formValues["desc"]}
-                style="minimal"
-                background="white"
-              ></Input>
+            {/* ADD CAROUSEL HERE? */}
+            <View style={{marginBottom: 12, padding: 4}}>
+              <ScrollView
+                horizontal={true} 
+              >
+                <View style={{flexDirection: 'row', gap: 8}}>
+                {!!formValues.images.length && 
+                formValues.images.map((image: any, index: number) => (
+                  <Image key={index} style={{width: 120, height: 100}} source={{uri: image.uri}}></Image>
+                )) }
+                </View> 
+              </ScrollView>
             </View>
-            <TouchableOpacity style={styles.button}>
-              <Image
+            <View style={{
+              flexDirection: "row",
+              gap: 8,
+              zIndex: 3,
+              alignItems: 'flex-end'
+            }}>
+              <TouchableOpacity onPress={() => actionSheetRef.current?.show()} style={styles.button}>
+                <Image
+                  style={styles.buttonImage}
+                  source={config["photo"]}
+                ></Image>
+              </TouchableOpacity>
+              <View style={{ flex: 1 }}>
+                <Input
+                  name="Type your message here"
+                  formKey="desc"
+                  handleFormValueChange={handleFormValueChange}
+                  value={formValues["desc"]}
+                  style="minimal"
+                  background="white"
+                  multiline={true}
+                ></Input>
+              </View>
+              <TouchableOpacity style={[styles.button]} onPress={submit()}>
+                {/* <Image
                 style={styles.buttonImage}
-                source={config["photo"]}
-              ></Image>
-            </TouchableOpacity>
+                source={config["send"]}
+              ></Image> */}
+                <Icon name="send" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
 
         </View>
       </Pressable>
+      <ActionSheet {...actionSheetProps}></ActionSheet>
     </KeyboardAvoidingView>
   );
 }
@@ -179,11 +202,10 @@ const styles = StyleSheet.create({
     maxHeight: 104,
   },
   button: {
-    padding: 8,
     backgroundColor: theme.background2,
     width: 30,
     height: 30,
-    borderRadius: 15,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
   },
