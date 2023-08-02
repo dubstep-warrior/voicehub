@@ -14,25 +14,33 @@ import config from "../../Images.config";
 import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../config/actionSheet-config.json";
 import * as ImagePicker from "expo-image-picker";
-import { useAppDispatch } from "../store/hooks";
-import { addChat } from "../store/actions/user.actions";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { addChat, joinChat } from "../store/actions/user.actions";
 import { auth } from "../../firebase";
+import { selectApp } from "../store/slices/app.slice";
+import { DotIndicator } from "react-native-indicators";
 
 export default function ResolveChat(props: any) {
   const dispatch = useAppDispatch();
   const [chatType, setChatType] = useState<"new" | "existing">("new");
+  const appState = useAppSelector(selectApp)
   const current = "createchat";
+  const dotIndicatorConfig = {
+    purple: 14.75,
+    minimal: 8,
+  };
   const messageLink: any = routeConfig;
   const [invalid, setFormInvalid] = useState<string | null>(null);
   const [formValues, handleFormValueChange, setFormValues, reset, replaceForm] =
     FormData(messageLink[current][chatType].form, setFormInvalid);
 
   useEffect(() => {
-    replaceForm(messageLink[current][chatType].form); 
+    replaceForm(messageLink[current][chatType].form);
   }, [chatType]);
 
-  useEffect(() => { 
-    console.log('yay new form',chatType ,formValues)
+
+  useEffect(() => {
+    console.log('yay new form', chatType, formValues)
   }, [formValues]);
 
   const actionSheetRef = useRef<ActionSheet>(null);
@@ -53,11 +61,11 @@ export default function ResolveChat(props: any) {
 
       const result = await (index == 0
         ? ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-          })
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        })
         : ImagePicker.launchCameraAsync());
 
       if (!result.canceled) {
@@ -67,29 +75,49 @@ export default function ResolveChat(props: any) {
   };
 
   const submit = async () => {
-    if (!formValues["name"]) {
-      console.log("please fill in name");
-      setFormInvalid("Please fill in your chat's name");
-    } else {
-      await dispatch(
-        addChat({
-          ...formValues,
-          owner: auth.currentUser?.uid,
-          users: [auth.currentUser?.uid],
-          type: "chat",
-        })
-      );
-      if (props.onSubmit) {
-        props.onSubmit();
+    console.log('submit called on chat resolve')
+    if (chatType == "new") {
+      if (!formValues["name"]) {
+        console.log("please fill in name");
+        setFormInvalid("Please fill in your chat's name");
+      } else {
+        await dispatch(
+          addChat({
+            ...formValues,
+            owner: auth.currentUser?.uid,
+            users: [auth.currentUser?.uid],
+            type: "chat",
+          })
+        );
+        if (props.onSubmit) {
+          props.onSubmit();
+        }
+      }
+    } else if (chatType == "existing") {
+      console.log('exisitng called')
+      if (!formValues["chat_id"]) {
+        console.log("please fill in chatid");
+        setFormInvalid("Please fill in the chat ID");
+      } else {
+        await dispatch(
+          joinChat(formValues)
+        );
+        if (props.onSubmit) {
+          props.onSubmit();
+        }
       }
     }
+
+
+
+
   };
 
   return (
     <SafeAreaView style={{ padding: 16, gap: 12 }}>
       <View style={{ alignItems: "center", gap: 8 }}>
         <Text style={[globalStyles.text, { fontSize: 24, fontWeight: "bold" }]}>
-         {routeConfig[current][chatType].heading}
+          {routeConfig[current][chatType].heading}
         </Text>
         <Text
           style={[
@@ -169,15 +197,35 @@ export default function ResolveChat(props: any) {
             </Text>
             <Input
               name="Chat name"
-              formKey="name"
+              formKey={chatType == 'new' ? "name" : "chat_id"}
               handleFormValueChange={handleFormValueChange}
-              value={formValues["name"]}
+              value={formValues[chatType == 'new' ? "name" : "chat_id"]}
               // style="minimal"
               background="white"
             ></Input>
           </View>
-        </View>
-        <Button onPress={submit} text={"Submit"}></Button>
+        </View> 
+        <TouchableOpacity
+          style={globalStyles.button}
+          onPress={submit}
+        >
+          {appState.submitting ? (
+            <DotIndicator
+              size={dotIndicatorConfig['purple' as keyof typeof dotIndicatorConfig]}
+              count={3}
+              color={theme.lightGrey}
+            />
+          ) : (
+            <Text
+              style={
+                {
+                  fontSize: 24,
+                }}
+            >
+              Submit
+            </Text>
+          )}
+        </TouchableOpacity>
         <View style={{ width: "100%", alignItems: "center", marginBottom: 12 }}>
           <TouchableOpacity onPress={() => setChatType(chatType == 'new' ? "existing" : 'new')}>
             <Text

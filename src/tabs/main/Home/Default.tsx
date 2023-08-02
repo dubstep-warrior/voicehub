@@ -24,7 +24,7 @@ import { selectUser } from "../../../store/slices/user.slice";
 import { selectApp } from "../../../store/slices/app.slice";
 import Input from "../../../shared/Input";
 import routeConfig from "../../../../config/route-config.json";
-import { useState, useRef, useEffect, Ref } from "react";
+import React, { useState, useRef, useEffect, Ref } from "react";
 import { FormData } from "../../../shared/FormData";
 import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../../../config/actionSheet-config.json";
@@ -36,6 +36,7 @@ import {
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Icon } from "react-native-elements";
 import { addMessage } from "../../../store/actions/user.actions";
+import { ImageGallery } from '@georstat/react-native-image-gallery';
 
 export default function Default({ route, navigation }: any) {
   const current = "message";
@@ -44,7 +45,7 @@ export default function Default({ route, navigation }: any) {
   const dispatch = useAppDispatch();
   const selectedChat =
     userState?.chats?.[
-      appState.home.selectedCat as keyof typeof userState.chats
+    appState.home.selectedCat as keyof typeof userState.chats
     ]?.[appState.home.selectedSubCat as string];
   const messages = appState.messages[appState.home.selectedSubCat as any];
   console.log("messages now", messages);
@@ -79,11 +80,11 @@ export default function Default({ route, navigation }: any) {
 
       const result = await (index == 0
         ? ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-          })
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        })
         : ImagePicker.launchCameraAsync());
 
       if (!result.canceled) {
@@ -102,6 +103,20 @@ export default function Default({ route, navigation }: any) {
       scrollViewRef.current?.scrollToEnd();
     }
   };
+
+  const [closeToBottom, setCloseToBottom] = useState(false)
+  const [galleryOpen, setGalleryOpen] = useState(false)
+  const setIsCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }: any) => {
+    const paddingToBottom = 20;
+    setCloseToBottom(layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom)
+  };
+
+  useEffect(() => {
+    if (closeToBottom) {
+      scrollViewRef.current?.scrollToEnd();
+    }
+  }, [messages]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -161,7 +176,12 @@ export default function Default({ route, navigation }: any) {
       </SafeAreaView>
       <View style={{ flex: 1, flexDirection: "column" }}>
         <View style={{ flex: 1, backgroundColor: theme.background2 }}>
-          <ScrollView style={{ flex: 1 }} ref={scrollViewRef}>
+          <ScrollView style={{ flex: 1 }} ref={scrollViewRef}
+            onScroll={({ nativeEvent }) => {
+              setIsCloseToBottom(nativeEvent as any)
+            }}
+            scrollEventThrottle={30}
+          >
             {!!messages &&
               !!messages.length &&
               messages.map((message: any, index: number) => (
@@ -208,6 +228,15 @@ export default function Default({ route, navigation }: any) {
                     <Text style={{ color: "black", padding: 4 }}>
                       {message.desc}
                     </Text>
+                    {/* IMAGE GALLERY HERE : TODO FIND BETTER IMAGE GALLERY*/}
+                    {!!message?.images?.length && <TouchableOpacity onPress={() => setGalleryOpen(true)} style={{ flexDirection: 'row', flexWrap: 'wrap', width: '90%', padding: 1, gap: 1, backgroundColor: 'white', justifyContent: 'space-between' }}>
+                      {message?.images?.map((image: string) => (
+                        <Image style={{ height: 100, width: '49.5%' }} source={{ uri: image }}></Image>
+                      ))}
+                    </TouchableOpacity>}
+                    {!!message?.images?.length && <ImageGallery 
+                      close={() => setGalleryOpen(false)} isOpen={galleryOpen} images={message?.images?.map((image: string) => { return { url: image } })} />
+                    }
                   </View>
                 </View>
               ))}

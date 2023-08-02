@@ -22,9 +22,16 @@
         "Use Camera",
         "Cancel"
     ],
-    "leftDrawer": [
-        "Invite to chat",
-        "",
-        "Cancel"
-    ]
+    "leftDrawer": {
+        "call": [
+            "Invite to chat",
+            "Leave call",
+            "Cancel"
+        ],
+        "norm": [
+            "Invite to chat",
+            "Join call",
+            "Cancel"
+        ]
+    }
 }

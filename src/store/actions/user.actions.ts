@@ -9,6 +9,7 @@ import {
   FieldPath,
   addDoc,
   and,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -20,12 +21,14 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { assign as assignApp, update as updateApp, updateAppMessages } from "../slices/app.slice";
 import { getAuth } from "firebase/auth";
 import { Alert } from "react-native";
 import uploadImage from "../../utils/FileUploader";
+import { getChatSubscription } from "../../utils/Subscribers";
 
 export const UserUpdate = (
   changes: any,
@@ -336,32 +339,7 @@ export const addChat = (chatObject: any) => {
         ...chat,
       })
         .then((docRef) => {
-          const messageQuery = query(
-            collection(doc(db, "chats", docRef.id), "messages"),
-            orderBy("created")
-          );
-
-          onSnapshot(messageQuery, async (snapshot) => {
-            const messages: any[] = []
-            snapshot.forEach((messageDoc) => {
-              const message = messageDoc.data();
-              messages.push({
-                ...message,
-                created: new Date(messageDoc.data().created).toLocaleDateString(
-                  "en-US"
-                ),
-                id: messageDoc.id,
-              });
-            });
-             
-            dispatch(
-              updateAppMessages({
-                messages: messages,
-                chat_id: docRef.id
-              })
-            );
-          });
-
+          dispatch(getChatSubscription(docRef.id))
 
           console.log("successfully added a chat");
           Alert.alert(`Successfully added chat ${chat.name}`, undefined, [
@@ -385,6 +363,45 @@ export const addChat = (chatObject: any) => {
     }
   };
 };
+
+export const joinChat = (form: any) => {
+  return async (dispatch: any) => {
+    if (auth.currentUser) {
+      dispatch(
+        updateApp({
+          submitting: true,
+        })
+      );
+
+      const ref = doc(db, "chats", form.chat_id);
+      await updateDoc(ref, {
+        users: arrayUnion(auth.currentUser!.uid)
+      }).then(() => {
+        dispatch(getChatSubscription(form.chat_id))
+
+        console.log("successfully join a chat");
+        Alert.alert(`Successfully joined chat!`, undefined, [
+          { text: "OK", onPress: () => console.log("OK Pressed") },
+        ]);
+      }).catch((err) => {
+        console.log("cant join chat:", err);
+        Alert.alert(
+          `Could not join chat`,
+          "There was an issue with joining the chat, please try again later",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+        );
+      });
+
+      dispatch(
+        updateApp({
+          submitting: false,
+        })
+      );
+    }
+
+  };
+};
+
 
 export const addMessage = (form: any, chat_id: string | null) => {
   return async (dispatch: any) => {

@@ -42,8 +42,7 @@ export const userSlice = createSlice({
       const user = actions.payload.user
       state.displayedName = user.displayedName
       state.username = user.username
-      state.status = user.status
-      state.friends = user.friends ?? []
+      state.status = user.status 
       state.profile_img = user.profile_img
       console.log(state)
     },

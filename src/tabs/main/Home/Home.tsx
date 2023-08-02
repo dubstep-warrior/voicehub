@@ -37,6 +37,9 @@ import { useRef, useState } from "react";
 import Chat from "./Chat";
 import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../../../config/actionSheet-config.json";
+import Invite from "../../../pages/Invite";
+import Modal from "react-native-modal";
+import FlashMessage from "react-native-flash-message";
 
 export default function Home() {
   const Drawer = createDrawerNavigator();
@@ -75,7 +78,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
     visible: false
   });
   const dispatch = useAppDispatch();
-  const toggleOverlay = (type = 'add') => {
+  const toggleOverlay = (type: string) => {
     setOverlay({
       type: type,
       visible: !overlay.visible
@@ -94,19 +97,21 @@ const CustomDrawerContent = ({ navigation }: any) => {
   };
 
   const actionSheetRef = useRef<ActionSheet>(null);
-  const options = (actionSheetConfig as any)[current] as (
+  const options = (actionSheetConfig as any)[current][!!appState?.call ? "call" : "norm"] as (
     | string
     | React.ReactNode
   )[];
-  options[1] = !!appState.call ? "Leave call" : "Join call";
+  // options[1] = !!appState.call ? "Leave call" : "Join call";
   const actionSheetProps = {
     ref: actionSheetRef,
     options: options,
     cancelButtonIndex: options.length - 1,
     onPress: async (index: number): Promise<void> => {
-      if(index == 0) {
-        setOverlayType()
-        toggleOverlay()
+      if (index == 0) {
+        setOverlay({
+          type: 'invite',
+          visible: !overlay.visible
+        })
       }
     },
   };
@@ -226,11 +231,11 @@ const CustomDrawerContent = ({ navigation }: any) => {
                       overflow: "hidden",
                     },
                     appState.home.selectedCat == "chat" &&
-                      appState.home.selectedSubCat == key && {
-                        borderWidth: 2,
-                        borderColor: theme.black,
-                        borderRadius: 20,
-                      },
+                    appState.home.selectedSubCat == key && {
+                      borderWidth: 2,
+                      borderColor: theme.black,
+                      borderRadius: 20,
+                    },
                   ]}
                 >
                   {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] ? (
@@ -256,8 +261,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
 
           <TouchableOpacity
             onPress={() => {
-              setOverlayType("add");
-              toggleOverlay();
+              toggleOverlay('add')
             }}
           >
             <View
@@ -370,30 +374,79 @@ const CustomDrawerContent = ({ navigation }: any) => {
           </SafeAreaView>
         </ScrollView>
       </View>
-      <Overlay
-        isVisible={visible}
-        onBackdropPress={() =>
-          Keyboard.isVisible() ? Keyboard.dismiss() : toggleOverlay()
-        }
-        backdropStyle={{ backgroundColor: "rgba(255,255,255,0.4)" }}
-        overlayStyle={{ backgroundColor: theme.background, borderRadius: 15 }}
-      >
-        <Pressable onPress={() => Keyboard.dismiss()}>
-          <View>
-            <View
-              style={{ position: "absolute", right: 0, padding: 8, zIndex: 5 }}
-            >
-              <TouchableOpacity onPress={toggleOverlay}>
-                <Image
-                  style={{ width: 20, height: 20 }}
-                  source={config["close"]}
-                ></Image>
-              </TouchableOpacity>
+      {overlay.type == 'add' ?
+        <Overlay
+          isVisible={overlay.visible}
+          onBackdropPress={() =>
+            Keyboard.isVisible() ? Keyboard.dismiss() : setOverlay({
+              type: overlay.type,
+              visible: false
+            })
+          }
+          backdropStyle={{ backgroundColor: "rgba(255,255,255,0.4)" }}
+          overlayStyle={{ backgroundColor: theme.background, borderRadius: 15 }}
+        >
+          <Pressable onPress={() => Keyboard.dismiss()}>
+            <View>
+              <View
+                style={{ position: "absolute", right: 0, padding: 8, zIndex: 5 }}
+              >
+                <TouchableOpacity onPress={() => setOverlay({
+                  type: overlay.type,
+                  visible: false
+                })}>
+                  <Image
+                    style={{ width: 20, height: 20 }}
+                    source={config["close"]}
+                  ></Image>
+                </TouchableOpacity>
+              </View>
+              <ResolveChat onSubmit={() => setOverlay({
+                type: overlay.type,
+                visible: false
+              })}></ResolveChat>
             </View>
-            <ResolveChat onSubmit={() => setVisible(false)}></ResolveChat>
-          </View>
-        </Pressable>
-      </Overlay>
+          </Pressable>
+        </Overlay> :
+        <Modal
+          isVisible={overlay.visible}
+          style={{
+            // flex: 0.2,
+            // position: 'absolute',
+            // bottom: 0,
+            // width: '100%',
+            margin: 0,
+            // borderRadius: 20,
+            backgroundColor: 'rgba(0,0,0,0.2)',
+            position: 'relative'
+          }}
+          presentationStyle="overFullScreen"
+          onBackdropPress={() => {
+            setOverlay({
+              type: overlay.type,
+              visible: false
+            });
+          }}
+          // transparent={false}
+          // hasBackdrop={false}
+          // animated
+          animationIn="slideInUp"
+        >
+          {overlay.visible && <FlashMessage position="top" />}
+
+          <Invite chat={userState.chats.chat[
+            appState.home
+              .selectedSubCat as keyof typeof userState.chats
+          ]}
+            onClose={() => {
+              setOverlay({
+                type: overlay.type,
+                visible: false
+              });
+            }}
+          ></Invite>
+        </Modal>
+      }
       <ActionSheet {...actionSheetProps}></ActionSheet>
     </View>
   );
