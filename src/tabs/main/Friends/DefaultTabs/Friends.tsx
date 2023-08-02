@@ -15,6 +15,7 @@ import { acceptRequest, rejectRequest, removeFriend, removeRequest } from "../..
 
 export default function Friends({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
+  const appState = useAppSelector(selectApp)
   const dispatch = useAppDispatch()
   const selectedUser = useRef(null)
 
@@ -70,6 +71,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
     },
   };
   const current = route.name.toLowerCase();
+  console.log('getting friends', userState[current as keyof typeof userState])
   const currentActionSheetProps =
     friendsConfig[current as keyof typeof friendsConfig].actionSheetProps;
 
@@ -88,7 +90,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
           }}
         >
           <UserList
-            list={userState[current as keyof typeof userState] as any[]}
+            list={userState[current as keyof typeof userState].map((ref: any) => appState.userProfiles[ref.uid]) as any[]}
             onPress={(user) => tappedUser(user)}
           ></UserList>
         </ScrollView>

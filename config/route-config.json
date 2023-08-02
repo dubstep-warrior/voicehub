@@ -79,9 +79,22 @@
     }
   },
   "createchat": {
-    "form": {
-      "name": "", 
-      "chat_img": null
+    "new": {
+      "heading": "Personalize your chat",
+      "subheading": "Add uniqueness to your chat with a name and icon, you can always change it later",
+      "inputLabel": "CHAT NAME",
+      "form": {
+        "name": "", 
+        "chat_img": null
+      }
+    },
+    "existing" : {
+      "heading": "Join an existing chat",
+      "subheading": "You can join an existing chat if a member has shared the chat ID with you!",
+      "inputLabel": "CHAT ID",
+      "form": {
+        "chat_id": ""
+      }
     }
   },
   "message": {

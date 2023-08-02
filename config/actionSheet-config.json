@@ -21,5 +21,10 @@
         "Select from Gallery",
         "Use Camera",
         "Cancel"
+    ],
+    "leftDrawer": [
+        "Invite to chat",
+        "",
+        "Cancel"
     ]
 }

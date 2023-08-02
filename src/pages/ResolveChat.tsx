@@ -1,16 +1,16 @@
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Input from "../shared/Input";
 import { FormData } from "../shared/FormData";
 import routeConfig from "../../config/route-config.json";
-import theme from "./../../config/theme.config.json";
+import theme from "../../config/theme.config.json";
 import { styles as globalStyles } from "../../Styles.config";
 import Error from "../shared/Error";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../shared/Button";
-import config from "./../../Images.config";
+import config from "../../Images.config";
 import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../config/actionSheet-config.json";
 import * as ImagePicker from "expo-image-picker";
@@ -18,16 +18,22 @@ import { useAppDispatch } from "../store/hooks";
 import { addChat } from "../store/actions/user.actions";
 import { auth } from "../../firebase";
 
-export default function CreateChat(props: any) {
+export default function ResolveChat(props: any) {
   const dispatch = useAppDispatch();
-
+  const [chatType, setChatType] = useState<"new" | "existing">("new");
   const current = "createchat";
   const messageLink: any = routeConfig;
   const [invalid, setFormInvalid] = useState<string | null>(null);
-  const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
-    messageLink[current].form,
-    setFormInvalid
-  );
+  const [formValues, handleFormValueChange, setFormValues, reset, replaceForm] =
+    FormData(messageLink[current][chatType].form, setFormInvalid);
+
+  useEffect(() => {
+    replaceForm(messageLink[current][chatType].form); 
+  }, [chatType]);
+
+  useEffect(() => { 
+    console.log('yay new form',chatType ,formValues)
+  }, [formValues]);
 
   const actionSheetRef = useRef<ActionSheet>(null);
   const options = (actionSheetConfig as any)[current] as (
@@ -59,7 +65,7 @@ export default function CreateChat(props: any) {
       }
     },
   };
-  
+
   const submit = async () => {
     if (!formValues["name"]) {
       console.log("please fill in name");
@@ -73,8 +79,8 @@ export default function CreateChat(props: any) {
           type: "chat",
         })
       );
-      if(props.onSubmit) {
-        props.onSubmit()
+      if (props.onSubmit) {
+        props.onSubmit();
       }
     }
   };
@@ -83,7 +89,7 @@ export default function CreateChat(props: any) {
     <SafeAreaView style={{ padding: 16, gap: 12 }}>
       <View style={{ alignItems: "center", gap: 8 }}>
         <Text style={[globalStyles.text, { fontSize: 24, fontWeight: "bold" }]}>
-          Personalize your chat
+         {routeConfig[current][chatType].heading}
         </Text>
         <Text
           style={[
@@ -95,8 +101,7 @@ export default function CreateChat(props: any) {
             },
           ]}
         >
-          Add uniqueness to your chat with a name and icon, you can always
-          change it later
+          {routeConfig[current][chatType].subheading}
         </Text>
       </View>
       <View style={{ backgroundColor: theme.background, padding: 8 }}>
@@ -108,57 +113,59 @@ export default function CreateChat(props: any) {
             gap: 32,
           }}
         >
-          <View
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              width: 100,
-              height: 100,
-              alignSelf: "center",
-              backgroundColor: theme.background2,
-              borderRadius: 50,
-              borderWidth: 2,
-              borderStyle: "dashed",
-              overflow: "hidden",
-            }}
-          >
-            {formValues.chat_img && (
-              <Image
-                style={styles.image}
-                source={{ uri: formValues.chat_img.uri }}
-              ></Image>
-            )}
-            <TouchableOpacity
-              style={styles.profilePicOverlay}
-              onPress={() => {
-                actionSheetRef.current?.show();
+          {chatType == "new" && (
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                width: 100,
+                height: 100,
+                alignSelf: "center",
+                backgroundColor: theme.background2,
+                borderRadius: 50,
+                borderWidth: 2,
+                borderStyle: "dashed",
+                overflow: "hidden",
               }}
             >
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
+              {formValues.chat_img && (
+                <Image
+                  style={styles.image}
+                  source={{ uri: formValues.chat_img.uri }}
+                ></Image>
+              )}
+              <TouchableOpacity
+                style={styles.profilePicOverlay}
+                onPress={() => {
+                  actionSheetRef.current?.show();
                 }}
               >
-                <Image
-                  style={[
-                    {
-                      width: 30,
-                      height: 30,
-                      marginBottom: 8,
-                    },
-                  ]}
-                  source={config["upload-image"]}
-                ></Image>
-                <Text style={{ color: theme.background, fontWeight: "bold" }}>
-                  UPLOAD
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    style={[
+                      {
+                        width: 30,
+                        height: 30,
+                        marginBottom: 8,
+                      },
+                    ]}
+                    source={config["upload-image"]}
+                  ></Image>
+                  <Text style={{ color: theme.background, fontWeight: "bold" }}>
+                    UPLOAD
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
           <View style={{ gap: 8 }}>
             <Text style={{ color: theme.heading, fontWeight: "bold" }}>
-              CHAT NAME
+              {routeConfig[current][chatType].inputLabel}
             </Text>
             <Input
               name="Chat name"
@@ -171,8 +178,25 @@ export default function CreateChat(props: any) {
           </View>
         </View>
         <Button onPress={submit} text={"Submit"}></Button>
+        <View style={{ width: "100%", alignItems: "center", marginBottom: 12 }}>
+          <TouchableOpacity onPress={() => setChatType(chatType == 'new' ? "existing" : 'new')}>
+            <Text
+              style={{
+                color: theme.heading,
+                textDecorationLine: "underline",
+                fontSize: 14,
+                textTransform: "uppercase",
+              }}
+            >
+              {chatType == "new"
+                ? "Join an existing chat"
+                : "Create a new chat"}
+            </Text>
+          </TouchableOpacity>
+        </View>
         {invalid && <Error message={invalid}></Error>}
       </View>
+
       <ActionSheet {...actionSheetProps}></ActionSheet>
     </SafeAreaView>
   );

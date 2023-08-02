@@ -4,7 +4,11 @@ import {
   updateUserChat,
   updateUserChatMessages,
 } from "../slices/user.slice";
-import { assign as assignApp, update as updateApp, updateAppMessages } from "../slices/app.slice";
+import {
+  assign as assignApp,
+  update as updateApp,
+  updateAppMessages,
+} from "../slices/app.slice";
 import { auth, db } from "../../../firebase";
 import {
   EmailAuthProvider,
@@ -107,44 +111,18 @@ export const AuthOnRender = () => {
         )
       );
       onSnapshot(requestQuery, async (snapshot) => {
-        const pending: any[] = ["xxx"],
-          requests: any[] = ["xxx"];
+        const pending: any[] = [],
+          requests: any[] = [];
         snapshot.forEach((doc) => {
           const request = doc.data();
-          if (request.from == auth.currentUser!.uid) pending.push(request.to);
-          else requests.push(request.from);
-        });
-
-        const pendingQuery = query(
-          collection(db, "userProfiles"),
-          where(documentId(), "in", pending)
-        );
-
-        const requestsQuery = query(
-          collection(db, "userProfiles"),
-          where(documentId(), "in", requests)
-        );
-
-        const [pendingRes, requestsRes] = await Promise.all([
-          getDocs(pendingQuery),
-          getDocs(requestsQuery),
-        ]);
-
-        const pendingProfiles: any[] = [],
-          requestsProfiles: any[] = [];
-
-        pendingRes.forEach((doc) => {
-          pendingProfiles.push({ ...doc.data(), uid: doc.id });
-        });
-
-        requestsRes.forEach((doc) => {
-          requestsProfiles.push({ ...doc.data(), uid: doc.id });
+          if (request.from == auth.currentUser!.uid) pending.push({uid: request.to, id: doc.id});
+          else requests.push({uid:request.from , id: doc.id});
         });
 
         dispatch(
           updateUser({
-            pending: pendingProfiles,
-            requests: requestsProfiles,
+            pending: pending,
+            requests: requests,
           })
         );
       });
@@ -155,37 +133,18 @@ export const AuthOnRender = () => {
       );
 
       onSnapshot(friendsQuery, async (snapshot) => {
-        const friends: any[] = ["xxx"];
-        const friendshipRef: any = {};
+        const friends: any[] = []; 
         snapshot.forEach((doc) => {
           const friend = doc.data();
           const friendUID = friend.group.find(
             (uid: string) => uid !== auth.currentUser!.uid
           );
-          friends.push(friendUID);
-          friendshipRef[friendUID] = doc.id;
-        });
-
-        const q = query(
-          collection(db, "userProfiles"),
-          where(documentId(), "in", friends)
-        );
-
-        const res = await getDocs(q);
-
-        const friendProfiles: any[] = [];
-
-        res.forEach((doc) => {
-          friendProfiles.push({
-            ...doc.data(),
-            uid: doc.id,
-            friendshipID: friendshipRef[doc.id],
-          });
-        });
+          friends.push({uid: friendUID, friendshipRef: doc.id});
+        }); 
 
         dispatch(
           updateUser({
-            friends: friendProfiles,
+            friends: friends,
           })
         );
       });
@@ -193,61 +152,36 @@ export const AuthOnRender = () => {
       const chatsQeury = query(
         collection(db, "chats"),
         where("users", "array-contains", auth.currentUser?.uid)
-      ); 
+      );
       onSnapshot(chatsQeury, async (snapshot) => {
         const chats: any = {
           chat: {},
           p2p: {},
         };
 
-        let users: Set<string> | string[] = new Set();
         snapshot.forEach((document) => {
           const chat = document.data();
-
-          users = new Set([...users, ...chat.users]);
-          chats[chat.type][document.id] = { ...chat }; 
-        });
-
-        users = Array.from(users);
-
-        const q = query(
-          collection(db, "userProfiles"),
-          where(documentId(), "in", users)
-        );
-
-        const res = await getDocs(q);
-        const profiles: any = {};
-        res.forEach((doc) => {
-          profiles[doc.id] = doc.data();
+          chats[chat.type][document.id] = { ...chat };
         });
 
         dispatch(
-          updateApp({
-            userProfiles: profiles,
-          })
-        );
-
-         dispatch(
           updateUser({
             chats: chats,
           })
         );
- 
       });
 
-      
-
-      const chats = await getDocs(chatsQeury)
+      const chats = await getDocs(chatsQeury);
       // console.log('gathered chatIDS', chatIDs)
       chats.forEach((document) => {
-        const id = document.id
+        const id = document.id;
         const messagesQuery = query(
           collection(doc(db, "chats", id), "messages"),
           orderBy("created")
         );
-         
+
         onSnapshot(messagesQuery, async (snapshot) => {
-          const messages: any[] = []
+          const messages: any[] = [];
           snapshot.forEach((messageDoc) => {
             const message = messageDoc.data();
             messages.push({
@@ -258,14 +192,31 @@ export const AuthOnRender = () => {
               id: messageDoc.id,
             });
           });
-           
+
           dispatch(
             updateAppMessages({
               messages: messages,
-              chat_id: id
+              chat_id: id,
             })
           );
         });
+      });
+
+      const allUsers = query(collection(db, "userProfiles"));
+
+      onSnapshot(allUsers, async (snapshot) => {
+        const profiles: any = {};
+        snapshot.forEach((document) => {
+          const user = document.data();
+          profiles[document.id] = user;
+        });
+
+        console.log('updating profiles here', Object.keys(profiles))
+        dispatch(
+          updateApp({
+            userProfiles: profiles,
+          })
+        );
       });
     } else {
       console.log("but no auth current user");

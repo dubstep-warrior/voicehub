@@ -30,11 +30,13 @@ import {
   update as updateApp,
 } from "../../../store/slices/app.slice";
 import { ScrollView } from "react-native-gesture-handler";
-import CreateChat from "../../../pages/CreateChat";
+import ResolveChat from "../../../pages/ResolveChat";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Button, Overlay } from "react-native-elements";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Chat from "./Chat";
+import ActionSheet from "react-native-actionsheet";
+import actionSheetConfig from "../../../../config/actionSheet-config.json";
 
 export default function Home() {
   const Drawer = createDrawerNavigator();
@@ -66,10 +68,18 @@ export default function Home() {
 const CustomDrawerContent = ({ navigation }: any) => {
   const userState = useAppSelector(selectUser);
   const appState = useAppSelector(selectApp);
-  const [visible, setVisible] = useState(false);
+  const current = "leftDrawer";
+  // const [visible, setVisible] = useState(false);
+  const [overlay, setOverlay] = useState({
+    type: "add",
+    visible: false
+  });
   const dispatch = useAppDispatch();
-  const toggleOverlay = () => {
-    setVisible(!visible);
+  const toggleOverlay = (type = 'add') => {
+    setOverlay({
+      type: type,
+      visible: !overlay.visible
+    });
   };
 
   const selectHomeState = (cat: string | null, subcat: string | null) => {
@@ -83,12 +93,34 @@ const CustomDrawerContent = ({ navigation }: any) => {
     );
   };
 
+  const actionSheetRef = useRef<ActionSheet>(null);
+  const options = (actionSheetConfig as any)[current] as (
+    | string
+    | React.ReactNode
+  )[];
+  options[1] = !!appState.call ? "Leave call" : "Join call";
+  const actionSheetProps = {
+    ref: actionSheetRef,
+    options: options,
+    cancelButtonIndex: options.length - 1,
+    onPress: async (index: number): Promise<void> => {
+      if(index == 0) {
+        setOverlayType()
+        toggleOverlay()
+      }
+    },
+  };
+
+  const chatOptions = () => {
+    actionSheetRef.current?.show();
+  };
+
   return (
     <View style={{ flexDirection: "row", flexGrow: 1 }}>
       <ScrollView
         style={{
           flex: 1,
-          backgroundColor: theme.background2, 
+          backgroundColor: theme.background2,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -106,7 +138,6 @@ const CustomDrawerContent = ({ navigation }: any) => {
             }}
             onPress={() => selectHomeState("p2p", null)}
           >
-
             {appState.home.selectedCat == "p2p" && (
               <View
                 style={{
@@ -136,19 +167,22 @@ const CustomDrawerContent = ({ navigation }: any) => {
               ></View>
             )}
             <View
-              style={[{
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: theme.background,
-                alignSelf: "center",
-              }, appState.home.selectedCat == "p2p" && {
-                borderWidth: 2,
-                borderColor: theme.black,
-                borderRadius: 20
-              }]}
+              style={[
+                {
+                  width: 60,
+                  height: 60,
+                  borderRadius: 30,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: theme.background,
+                  alignSelf: "center",
+                },
+                appState.home.selectedCat == "p2p" && {
+                  borderWidth: 2,
+                  borderColor: theme.black,
+                  borderRadius: 20,
+                },
+              ]}
             >
               <Image
                 style={[{ width: 30, height: 30 }]}
@@ -180,40 +214,52 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     ></View>
                   )}
                 <View
-                  style={[{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 30,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: theme.background,
-                    alignSelf: "center",
-                    overflow: 'hidden'
-                  }, appState.home.selectedCat == "chat" &&
-                  appState.home.selectedSubCat == key && {
-                    borderWidth: 2,
-                    borderColor: theme.black,
-                    borderRadius: 20
-                  }]}
+                  style={[
+                    {
+                      width: 60,
+                      height: 60,
+                      borderRadius: 30,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: theme.background,
+                      alignSelf: "center",
+                      overflow: "hidden",
+                    },
+                    appState.home.selectedCat == "chat" &&
+                      appState.home.selectedSubCat == key && {
+                        borderWidth: 2,
+                        borderColor: theme.black,
+                        borderRadius: 20,
+                      },
+                  ]}
                 >
                   {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] ? (
                     <Image
-                      style={{ flex: 1,
+                      style={{
+                        flex: 1,
                         width: 60,
                         height: 60,
-                        resizeMode: 'cover'}}
+                        resizeMode: "cover",
+                      }}
                       source={{
-                        uri: userState?.chats?.["chat"]?.[key]?.["chat_img"]
+                        uri: userState?.chats?.["chat"]?.[key]?.["chat_img"],
                       }}
                     ></Image>
                   ) : (
-                    <Text style={{ fontWeight: 'bold', color: 'white' }}>{userState?.chats?.["chat"]?.[key]['name'][0]}</Text>
+                    <Text style={{ fontWeight: "bold", color: "white" }}>
+                      {userState?.chats?.["chat"]?.[key]["name"][0]}
+                    </Text>
                   )}
                 </View>
               </TouchableOpacity>
             ))}
 
-          <TouchableOpacity onPress={toggleOverlay}>
+          <TouchableOpacity
+            onPress={() => {
+              setOverlayType("add");
+              toggleOverlay();
+            }}
+          >
             <View
               style={{
                 width: 60,
@@ -257,7 +303,14 @@ const CustomDrawerContent = ({ navigation }: any) => {
               {appState.home.selectedCat &&
                 appState.home.selectedCat !== "p2p" && (
                   <View style={{ flexDirection: "column" }}>
-                    <View style={{ padding: 16, borderBottomWidth: 1 }}>
+                    <View
+                      style={{
+                        padding: 16,
+                        borderBottomWidth: 1,
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
                       <Text
                         style={{
                           color: "white",
@@ -272,6 +325,16 @@ const CustomDrawerContent = ({ navigation }: any) => {
                           ].name
                         }
                       </Text>
+                      <TouchableOpacity onPress={() => chatOptions()}>
+                        <Image
+                          style={{
+                            width: 30,
+                            height: 30,
+                            transform: [{ rotateZ: "90deg" }],
+                          }}
+                          source={config["more"]}
+                        ></Image>
+                      </TouchableOpacity>
                     </View>
                     <View style={{ padding: 8, gap: 4 }}>
                       <TouchableOpacity
@@ -327,10 +390,11 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 ></Image>
               </TouchableOpacity>
             </View>
-            <CreateChat onSubmit={() => setVisible(false)}></CreateChat>
+            <ResolveChat onSubmit={() => setVisible(false)}></ResolveChat>
           </View>
         </Pressable>
       </Overlay>
+      <ActionSheet {...actionSheetProps}></ActionSheet>
     </View>
   );
 };

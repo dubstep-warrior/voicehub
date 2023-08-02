@@ -15,6 +15,18 @@ export const FormData = (formConfig: any, setFormInvalid: any, values?: any) => 
     ...form
   });
 
+  const replaceForm = (formConfig: any, values?: any) => { 
+    let form: any = {} 
+    if(values && typeof values == 'object') {
+      Object.keys(formConfig).forEach(key => {
+        if(key in values) {
+          form[key] = values[key]
+        }
+      })
+    } else form = {...formConfig}
+    setFormValues(form)
+  };
+
   const handleFormValueChange = (key: string, value: any) => { 
     setFormInvalid(null)
     setFormValues(
@@ -43,6 +55,7 @@ export const FormData = (formConfig: any, setFormInvalid: any, values?: any) => 
     formValues,
     handleFormValueChange,
     setFormValues,
-    reset
+    reset,
+    replaceForm
   ]
 };

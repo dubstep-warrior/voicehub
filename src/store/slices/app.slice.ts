@@ -10,7 +10,8 @@ interface App {
       selectedSubCat: string | null
     },
     messages: any,
-    userProfiles: any
+    userProfiles: any,
+    call: any
 }
 
 // Define the initial state using that type
@@ -22,7 +23,8 @@ const initialState: App = {
       selectedSubCat: null
     },
     messages: {}, 
-    userProfiles: {}
+    userProfiles: {},
+    call: null
 }  
 
 export const appSlice = createSlice({
