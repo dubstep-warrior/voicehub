@@ -105,7 +105,8 @@ export default function Default({ route, navigation }: any) {
   };
 
   const [closeToBottom, setCloseToBottom] = useState(false)
-  const [galleryOpen, setGalleryOpen] = useState(false)
+  // const [gallery, setGallery] = useState<null | any[]>(null)
+  const gallery = useRef<null | any[]>(null)
   const setIsCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }: any) => {
     const paddingToBottom = 20;
     setCloseToBottom(layoutMeasurement.height + contentOffset.y >=
@@ -225,17 +226,17 @@ export default function Default({ route, navigation }: any) {
                     >
                       {appState.userProfiles[message?.by].displayedName}
                     </Text>
-                    <Text style={{ color: "black", padding: 4 }}>
+                    <Text style={{ color: "black", padding: 4, marginBottom: 12 }}>
                       {message.desc}
                     </Text>
-                    {/* IMAGE GALLERY HERE : TODO FIND BETTER IMAGE GALLERY*/}
-                    {!!message?.images?.length && <TouchableOpacity onPress={() => setGalleryOpen(true)} style={{ flexDirection: 'row', flexWrap: 'wrap', width: '90%', padding: 1, gap: 1, backgroundColor: 'white', justifyContent: 'space-between' }}>
+                    {/* IMAGE GALLERY HERE : TODO FIND BETTER IMAGE GALLERY THIS ONE TOO MANY PROBLEMS*/}
+                    {!!message?.images?.length && <TouchableOpacity onPress={() => {gallery.current = message.images}} style={{ flexDirection: 'row', flexWrap: 'wrap', width: '90%', padding: 1, gap: 1, backgroundColor: 'white', justifyContent: 'space-between' }}>
                       {message?.images?.map((image: string) => (
-                        <Image style={{ height: 100, width: '49.5%' }} source={{ uri: image }}></Image>
+                        <Image style={{ height: message?.images?.length > 1 ? 100 : 200, width: message?.images?.length > 1 ? '49.5%' : '100%' }} source={{ uri: image }}></Image>
                       ))}
                     </TouchableOpacity>}
-                    {!!message?.images?.length && <ImageGallery 
-                      close={() => setGalleryOpen(false)} isOpen={galleryOpen} images={message?.images?.map((image: string) => { return { url: image } })} />
+                    {!!gallery.current?.length && <ImageGallery 
+                      close={() => gallery.current = null} isOpen={!!gallery} images={gallery.current?.map((image: string) => { return { url: image } })} />
                     }
                   </View>
                 </View>
