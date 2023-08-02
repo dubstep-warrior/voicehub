@@ -15,11 +15,14 @@ import {
   documentId,
   getDoc,
   getDocs,
+  onSnapshot,
+  orderBy,
   query,
+  serverTimestamp,
   setDoc,
   where,
 } from "firebase/firestore";
-import { assign as assignApp, update as updateApp } from "../slices/app.slice";
+import { assign as assignApp, update as updateApp, updateAppMessages } from "../slices/app.slice";
 import { getAuth } from "firebase/auth";
 import { Alert } from "react-native";
 import uploadImage from "../../utils/FileUploader";
@@ -47,9 +50,9 @@ export const UserUpdate = (
     console.log("user action being run");
 
     console.log("new changes ", newChanges);
-    if('profile_img' in newChanges) {
-      const imageURI = await uploadImage(newChanges['profile_img'])
-      newChanges['profile_img'] = imageURI;
+    if ("profile_img" in newChanges) {
+      const imageURI = await uploadImage(newChanges["profile_img"]);
+      newChanges["profile_img"] = imageURI;
     }
     const ref = doc(db, "userProfiles", auth.currentUser!.uid);
     const res = await setDoc(ref, newChanges, { merge: true })
@@ -289,18 +292,19 @@ export const acceptRequest = (from: any) => {
 export const removeFriend = (friend: any) => {
   return async (dispatch: any) => {
     if (auth.currentUser) {
-      console.log('removing friend', friend)
-      await deleteDoc(doc(db, "friends", friend.friendshipID)).then(()=> {
-        Alert.alert(`Successfully deleted friend`, undefined, [
-          { text: "OK", onPress: () => console.log("OK Pressed") },
-        ]);
-      }).catch((err) => {
-        console.log(`Request unsuccessful`,err)
-        Alert.alert(`Request unsuccessful`, 'Please try again later', [
-          { text: "OK", onPress: () => console.log("OK Pressed") },
-        ]);
-      })
-      
+      console.log("removing friend", friend);
+      await deleteDoc(doc(db, "friends", friend.friendshipID))
+        .then(() => {
+          Alert.alert(`Successfully deleted friend`, undefined, [
+            { text: "OK", onPress: () => console.log("OK Pressed") },
+          ]);
+        })
+        .catch((err) => {
+          console.log(`Request unsuccessful`, err);
+          Alert.alert(`Request unsuccessful`, "Please try again later", [
+            { text: "OK", onPress: () => console.log("OK Pressed") },
+          ]);
+        });
 
       // console.log('successfully sent a rejection')
 
@@ -312,44 +316,99 @@ export const removeFriend = (friend: any) => {
   };
 };
 
-
 export const addChat = (chatObject: any) => {
   return async (dispatch: any) => {
     if (auth.currentUser) {
-       dispatch(updateApp({
-        submitting: true
-       }))
+      dispatch(
+        updateApp({
+          submitting: true,
+        })
+      );
 
-       const chat = chatObject
+      const chat = chatObject;
 
-       if('chat_img' in chat && chat['chat_img']) {
-        const imageURI = await uploadImage(chat['chat_img'])
-        chat['chat_img'] = imageURI;
+      if ("chat_img" in chat && chat["chat_img"]) {
+        const imageURI = await uploadImage(chat["chat_img"]);
+        chat["chat_img"] = imageURI;
       }
 
-       await addDoc(collection(db, "chats"), { 
-        messages: [],
-        ...chat
-      }).then(() => {
-        console.log("successfully added a chat");
-        Alert.alert(
-          `Successfully added chat ${chat.name}`,
-          undefined,
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-        );
+      await addDoc(collection(db, "chats"), {
+        ...chat,
       })
-      .catch((err) => {
-        console.log("cant add chat:", err);
-        Alert.alert(
-          `Could not add chat ${chat.name}`,
-          'There was an issue with adding your chat, please try again later',
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-        );
-      });
+        .then((docRef) => {
+          const messageQuery = query(
+            collection(doc(db, "chats", docRef.id), "messages"),
+            orderBy("created")
+          );
 
-       dispatch(updateApp({
-        submitting: false
-       }))
+          onSnapshot(messageQuery, async (snapshot) => {
+            const messages: any[] = []
+            snapshot.forEach((messageDoc) => {
+              const message = messageDoc.data();
+              messages.push({
+                ...message,
+                created: new Date(messageDoc.data().created).toLocaleDateString(
+                  "en-US"
+                ),
+                id: messageDoc.id,
+              });
+            });
+             
+            dispatch(
+              updateAppMessages({
+                messages: messages,
+                chat_id: docRef.id
+              })
+            );
+          });
+
+
+          console.log("successfully added a chat");
+          Alert.alert(`Successfully added chat ${chat.name}`, undefined, [
+            { text: "OK", onPress: () => console.log("OK Pressed") },
+          ]);
+        })
+        .catch((err) => {
+          console.log("cant add chat:", err);
+          Alert.alert(
+            `Could not add chat ${chat.name}`,
+            "There was an issue with adding your chat, please try again later",
+            [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+          );
+        });
+
+      dispatch(
+        updateApp({
+          submitting: false,
+        })
+      );
     }
+  };
+};
+
+export const addMessage = (form: any, chat_id: string | null) => {
+  return async (dispatch: any) => {
+    dispatch(
+      updateApp({
+        submitting: true,
+      })
+    );
+
+    const message = {
+      ...form,
+      chatID: chat_id,
+      by: auth.currentUser?.uid,
+      created: serverTimestamp(),
+    };
+
+    if ("images" in message && message["images"]?.length > 0) {
+      const imageURIs = await Promise.all(
+        message["images"].map((image: any) => uploadImage(image))
+      );
+      message["images"] = imageURIs;
+    }
+
+    await addDoc(collection(doc(db, "chats", chat_id!), "messages"), message);
+    console.log('SENDING MESSAGE SUCCESFULL YAYYY')
   };
 };

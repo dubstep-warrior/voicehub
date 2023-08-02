@@ -1,8 +1,10 @@
 import {
   assign as assignUser,
   update as updateUser,
+  updateUserChat,
+  updateUserChatMessages,
 } from "../slices/user.slice";
-import { assign as assignApp } from "../slices/app.slice";
+import { assign as assignApp, update as updateApp, updateAppMessages } from "../slices/app.slice";
 import { auth, db } from "../../../firebase";
 import {
   EmailAuthProvider,
@@ -24,6 +26,7 @@ import {
   getDocs,
   onSnapshot,
   or,
+  orderBy,
   query,
   setDoc,
   where,
@@ -153,90 +156,117 @@ export const AuthOnRender = () => {
 
       onSnapshot(friendsQuery, async (snapshot) => {
         const friends: any[] = ["xxx"];
-        const friendshipRef: any = {}
+        const friendshipRef: any = {};
         snapshot.forEach((doc) => {
-          const friend = doc.data(); 
-          const friendUID = friend.group.find((uid: string) => uid !== auth.currentUser!.uid)
-          friends.push(friendUID)
-          friendshipRef[friendUID] = doc.id
+          const friend = doc.data();
+          const friendUID = friend.group.find(
+            (uid: string) => uid !== auth.currentUser!.uid
+          );
+          friends.push(friendUID);
+          friendshipRef[friendUID] = doc.id;
         });
 
         const q = query(
           collection(db, "userProfiles"),
           where(documentId(), "in", friends)
         );
- 
 
-        const res = await getDocs(q)
+        const res = await getDocs(q);
 
-        const friendProfiles: any[] = [] 
+        const friendProfiles: any[] = [];
 
         res.forEach((doc) => {
-          friendProfiles.push({ ...doc.data(), uid: doc.id, friendshipID: friendshipRef[doc.id] });
+          friendProfiles.push({
+            ...doc.data(),
+            uid: doc.id,
+            friendshipID: friendshipRef[doc.id],
+          });
         });
- 
 
         dispatch(
           updateUser({
-            friends: friendProfiles
+            friends: friendProfiles,
           })
         );
       });
 
-
-      
       const chatsQeury = query(
         collection(db, "chats"),
-        where('users', 'array-contains', auth.currentUser?.uid)
-      );
-
-       
-       onSnapshot(chatsQeury, async (snapshot) => {
+        where("users", "array-contains", auth.currentUser?.uid)
+      ); 
+      onSnapshot(chatsQeury, async (snapshot) => {
         const chats: any = {
           chat: {},
-          p2p: {}
-        }
+          p2p: {},
+        };
 
-        let users: Set<string> | string[] = new Set()
-        snapshot.forEach((doc) => {
-          const chat = doc.data();  
-          
-          users = new Set([...users, ...chat.users])
-          chats[chat.type][doc.id] = chat 
+        let users: Set<string> | string[] = new Set();
+        snapshot.forEach((document) => {
+          const chat = document.data();
 
+          users = new Set([...users, ...chat.users]);
+          chats[chat.type][document.id] = { ...chat }; 
         });
 
-        // updating profiles here
-        users = Array.from(users) 
+        users = Array.from(users);
 
         const q = query(
           collection(db, "userProfiles"),
           where(documentId(), "in", users)
         );
 
-        const res = await getDocs(q) 
-        const profiles: any = {}
+        const res = await getDocs(q);
+        const profiles: any = {};
         res.forEach((doc) => {
-          profiles[doc.id] = doc.data()
+          profiles[doc.id] = doc.data();
         });
 
-        Object.keys(chats).forEach(chatType => {
-          Object.keys(chats[chatType]).forEach(chatkey => {
-            const chat = chats[chatType][chatkey]
-            chats[chatType][chatkey].users = chat.users.map((uid: string) =>  profiles[uid])
+        dispatch(
+          updateApp({
+            userProfiles: profiles,
           })
-        })
+        );
 
+         dispatch(
+          updateUser({
+            chats: chats,
+          })
+        );
+ 
+      });
 
-        console.log('updating chat', chats?.chat?.['3SHTkloJ7yFBL6dB8Sn8'])
-        dispatch(updateUser({
-          chats: chats
-        }))
+      
 
-       })
-
-
-
+      const chats = await getDocs(chatsQeury)
+      // console.log('gathered chatIDS', chatIDs)
+      chats.forEach((document) => {
+        const id = document.id
+        const messagesQuery = query(
+          collection(doc(db, "chats", id), "messages"),
+          orderBy("created")
+        );
+         
+        onSnapshot(messagesQuery, async (snapshot) => {
+          const messages: any[] = []
+          snapshot.forEach((messageDoc) => {
+            const message = messageDoc.data();
+            messages.push({
+              ...message,
+              created: new Date(messageDoc.data().created).toLocaleDateString(
+                "en-US"
+              ),
+              id: messageDoc.id,
+            });
+          });
+           
+          dispatch(
+            updateAppMessages({
+              messages: messages,
+              chat_id: id
+            })
+          );
+        });
+      });
     } else {
       console.log("but no auth current user");
     }
@@ -332,5 +362,3 @@ export const AuthUpdate = (
     );
   };
 };
-
- 

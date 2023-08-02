@@ -8,7 +8,9 @@ interface App {
     home: {
       selectedCat: string | null,
       selectedSubCat: string | null
-    }
+    },
+    messages: any,
+    userProfiles: any
 }
 
 // Define the initial state using that type
@@ -16,9 +18,11 @@ const initialState: App = {
     submitting: false,
     users: [],
     home: {
-      selectedCat: 'dms',
+      selectedCat: 'p2p',
       selectedSubCat: null
-    }
+    },
+    messages: {}, 
+    userProfiles: {}
 }  
 
 export const appSlice = createSlice({
@@ -36,12 +40,16 @@ export const appSlice = createSlice({
       Object.keys(actions.payload).forEach((key) => {
         state[key as keyof typeof state] = actions.payload[key]
       })
-      // console.log('updated state', state)
-    }
+      console.log('updated app state', state)
+    },
+    updateAppMessages: (state, actions) => {
+      state.messages[actions.payload.chat_id] = actions.payload.messages
+      console.log('updated app state messages', state)
+    },
   },
 })
 
-export const { assign, update } = appSlice.actions
+export const { assign, update, updateAppMessages } = appSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectApp = (state: RootState) => state.app 

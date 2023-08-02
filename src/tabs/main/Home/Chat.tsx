@@ -113,7 +113,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 </TouchableOpacity>
               ))} */}
 
-              <UserList list={selectedChat?.users}></UserList>
+              <UserList list={selectedChat?.users.map((id: string) => appState.userProfiles[id])}></UserList>
    
           </SafeAreaView>
         </ScrollView> 

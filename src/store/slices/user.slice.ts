@@ -24,8 +24,10 @@ const initialState: UserState = {
   username: '',
   displayedName: '', 
   chats: {
-    chat: {},
-    p2p: {}
+    chat: { 
+    },
+    p2p: { 
+    }
   }
 } as UserState
 
@@ -50,11 +52,28 @@ export const userSlice = createSlice({
         (state[key as keyof UserState] as any) = actions.payload[key]
       })
       console.log('updated store', state)
-    }
+    },
+    updateUserChat: (state: UserState, actions) => {
+      const chatObj = actions.payload.chat
+      Object.keys(chatObj).forEach(type => {
+        const chats = chatObj[type]
+        Object.keys(chats).forEach(chatID => {
+          const chat = chats[chatID]
+          Object.keys(chat).forEach(attributeKey => {
+            state.chats[type as keyof typeof state.chats][chatID][attributeKey] = chat[attributeKey]
+          })  
+        })
+      })
+    },
+    updateUserChatMessages: (state: UserState, actions) => { 
+      const {messages, chat_type, chat_id} = actions.payload
+      console.log('updating messages', state.chats[chat_type as keyof typeof state.chats][chat_id])
+      state.chats[chat_type as keyof typeof state.chats][chat_id].messages = messages
+    },
   },
 })
 
-export const { assign, update } = userSlice.actions
+export const { assign, update, updateUserChat, updateUserChatMessages } = userSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectUser = (state: RootState) => state.user 

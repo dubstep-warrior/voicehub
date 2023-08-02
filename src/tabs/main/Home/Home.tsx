@@ -88,9 +88,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
       <ScrollView
         style={{
           flex: 1,
-          backgroundColor: theme.background2,
-          // flexDirection: "column",
-          // gap: 12,
+          backgroundColor: theme.background2, 
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -106,10 +104,10 @@ const CustomDrawerContent = ({ navigation }: any) => {
               marginBottom: 18,
               position: "relative",
             }}
-            onPress={() => selectHomeState("dms", null)}
+            onPress={() => selectHomeState("p2p", null)}
           >
 
-            {appState.home.selectedCat == "dms" && (
+            {appState.home.selectedCat == "p2p" && (
               <View
                 style={{
                   position: "absolute",
@@ -146,7 +144,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 justifyContent: "center",
                 backgroundColor: theme.background,
                 alignSelf: "center",
-              }, appState.home.selectedCat == "dms" && {
+              }, appState.home.selectedCat == "p2p" && {
                 borderWidth: 2,
                 borderColor: theme.black,
                 borderRadius: 20
@@ -190,6 +188,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     justifyContent: "center",
                     backgroundColor: theme.background,
                     alignSelf: "center",
+                    overflow: 'hidden'
                   }, appState.home.selectedCat == "chat" &&
                   appState.home.selectedSubCat == key && {
                     borderWidth: 2,
@@ -199,7 +198,10 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 >
                   {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] ? (
                     <Image
-                      style={{ width: 60, height: 60, borderRadius: 30 }}
+                      style={{ flex: 1,
+                        width: 60,
+                        height: 60,
+                        resizeMode: 'cover'}}
                       source={{
                         uri: userState?.chats?.["chat"]?.[key]?.["chat_img"]
                       }}
@@ -253,7 +255,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 </View>
               )}
               {appState.home.selectedCat &&
-                appState.home.selectedCat !== "dms" && (
+                appState.home.selectedCat !== "p2p" && (
                   <View style={{ flexDirection: "column" }}>
                     <View style={{ padding: 16, borderBottomWidth: 1 }}>
                       <Text
