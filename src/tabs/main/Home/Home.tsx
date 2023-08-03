@@ -247,7 +247,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                         resizeMode: "cover",
                       }}
                       source={{
-                        uri: userState?.chats?.["chat"]?.[key]?.["chat_img"],
+                        uri: userState?.chats?.["chat"]?.[key]?.["chat_img"], cache: 'force-cache'
                       }}
                     ></Image>
                   ) : (

@@ -44,7 +44,7 @@ import Modal from "react-native-modal";
 //   ImageObject,
 // } from "@georstat/react-native-image-gallery";
 // import Gallery from "react-native-image-gallery";
-import AnimatedGallery from "@akumzy/react-native-animated-gallery";
+import AnimatedGallery from "@akumzy/react-native-animated-gallery"; 
 
 export default function Default({ route, navigation }: any) {
   const current = "message";
@@ -448,7 +448,7 @@ export default function Default({ route, navigation }: any) {
                                 width:
                                   item?.images?.length > 1 ? "49.5%" : "100%",
                               }}
-                              source={{ uri: image }}
+                              source={{ uri: image , cache: 'force-cache'}}
                             ></Image>
                           ))}
                         </TouchableOpacity>

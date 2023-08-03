@@ -137,7 +137,8 @@ export default function Default({ route, navigation }: NavigationProps) {
                         ? {
                             uri:
                               formValues.profile_img?.uri ??
-                              userState.profile_img,
+                              userState.profile_img
+                              , cache: !!userState?.profile_img ? 'force-cache' : 'default'
                           }
                         : config["profile-white"]
                     }

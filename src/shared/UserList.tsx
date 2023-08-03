@@ -30,7 +30,7 @@ export default function UserList({ list = [], ...props }: IUserListProps) {
             style={globalStyles.icon}
             source={
               user.profile_img
-                ? { uri: user.profile_img }
+                ? { uri: user.profile_img, cache: 'force-cache' }
                 : config["profile-grey"]
             }
           ></Image>
