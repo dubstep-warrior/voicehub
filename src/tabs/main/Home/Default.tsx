@@ -38,13 +38,13 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { Header, Icon } from "react-native-elements";
 import { addMessage } from "../../../store/actions/user.actions";
 import Modal from "react-native-modal";
-
+import { Image as ExpoImage } from "expo-image";
 // import {
 //   ImageGallery,
 //   ImageObject,
 // } from "@georstat/react-native-image-gallery";
 // import Gallery from "react-native-image-gallery";
-import AnimatedGallery from "@akumzy/react-native-animated-gallery"; 
+import AnimatedGallery from "@akumzy/react-native-animated-gallery";
 
 export default function Default({ route, navigation }: any) {
   const current = "message";
@@ -68,7 +68,7 @@ export default function Default({ route, navigation }: any) {
   useEffect(() => {
     reset();
   }, [appState]);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<FlatList>(null);
   const actionSheetRef = useRef<ActionSheet>(null);
   const options = (actionSheetConfig as any)[current] as (
     | string
@@ -91,7 +91,7 @@ export default function Default({ route, navigation }: any) {
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 1,
+            quality: 0,
           })
         : ImagePicker.launchCameraAsync());
 
@@ -129,10 +129,10 @@ export default function Default({ route, navigation }: any) {
     setScrollViewPosition(contentOffset.y);
   };
 
-  useEffect(() => {
-    console.log(gallery);
-    scrollViewRef.current?.scrollTo(scrollViewPostion);
-  }, [gallery]);
+  // useEffect(() => {
+  //   console.log(gallery);
+  //   scrollViewRef.current?.scrollTo(scrollViewPostion);
+  // }, [gallery]);
 
   useEffect(() => {
     if (closeToBottom) {
@@ -153,9 +153,6 @@ export default function Default({ route, navigation }: any) {
       hideSubscription.remove();
     };
   }, []);
-
-  
- 
 
   return (
     <KeyboardAvoidingView
@@ -187,7 +184,9 @@ export default function Default({ route, navigation }: any) {
           // animated
           animationIn="slideInUp"
         >
-          <SafeAreaView style={{ position: 'absolute', top: 0, width: '100%', zIndex: 7}}>
+          <SafeAreaView
+            style={{ position: "absolute", top: 0, width: "100%", zIndex: 7 }}
+          >
             <View
               style={{
                 width: "100%",
@@ -208,7 +207,7 @@ export default function Default({ route, navigation }: any) {
             </View>
           </SafeAreaView>
           <AnimatedGallery
-            imageUrls={gallery} 
+            imageUrls={gallery}
             disablefullScreen={false}
             thumbBorderWidth={3}
             thumbBorderColor={"white"}
@@ -368,6 +367,7 @@ export default function Default({ route, navigation }: any) {
 
             {!!messages && !!messages.length && (
               <FlatList
+                ref={scrollViewRef}
                 data={messages}
                 renderItem={({ item, index }) => (
                   <View
@@ -391,15 +391,14 @@ export default function Default({ route, navigation }: any) {
                         overflow: "hidden",
                       }}
                     >
-                      <Image
+                      <ExpoImage
                         style={{
                           width: 60,
                           height: 60,
                         }}
-                        source={{
-                          uri: appState.userProfiles[item?.by].profile_img,
-                        }}
-                      ></Image>
+                        source={appState.userProfiles[item?.by].profile_img}
+                        cachePolicy={"memory-disk"}
+                      ></ExpoImage>
                     </View>
                     <View style={{ justifyContent: "space-between" }}>
                       <Text
@@ -441,15 +440,16 @@ export default function Default({ route, navigation }: any) {
                           }}
                         >
                           {item?.images?.map((image: string, index: number) => (
-                            <Image
+                            <ExpoImage
                               key={index + image}
                               style={{
                                 height: item?.images?.length > 1 ? 100 : 200,
                                 width:
                                   item?.images?.length > 1 ? "49.5%" : "100%",
                               }}
-                              source={{ uri: image , cache: 'force-cache'}}
-                            ></Image>
+                              source={image}
+                              cachePolicy={"memory-disk"}
+                            ></ExpoImage>
                           ))}
                         </TouchableOpacity>
                       )}

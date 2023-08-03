@@ -2,6 +2,7 @@ import { Text, View, TouchableOpacity, Image } from "react-native";
 import theme from "../../config/theme.config.json";
 import config from "../../Images.config";
 import { styles as globalStyles } from "../../Styles.config";
+import { Image as ExpoImage } from 'expo-image';
 
 export interface IUserListProps {
   list: any[];
@@ -10,7 +11,7 @@ export interface IUserListProps {
 }
 
 export default function UserList({ list = [], ...props }: IUserListProps) {
-  console.log(list)
+  console.log(list);
   return (
     <>
       {list.map((user) => (
@@ -24,16 +25,17 @@ export default function UserList({ list = [], ...props }: IUserListProps) {
             borderBottomWidth: 0.3,
             borderBottomColor: "rgba(255,255,255,0.3)",
           }}
-          onPress={() => props.onPress ? props.onPress!(user) : null}
+          onPress={() => (props.onPress ? props.onPress!(user) : null)}
         >
-          <Image
+          <ExpoImage
             style={globalStyles.icon}
             source={
               user.profile_img
-                ? { uri: user.profile_img, cache: 'force-cache' }
+                ? user.profile_img
                 : config["profile-grey"]
             }
-          ></Image>
+            cachePolicy={'memory-disk'}
+          ></ExpoImage>
           <View
             style={{
               gap: 8,

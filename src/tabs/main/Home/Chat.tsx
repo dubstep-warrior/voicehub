@@ -112,8 +112,8 @@ const CustomDrawerContent = ({ navigation }: any) => {
                   </View>
                 </TouchableOpacity>
               ))} */}
-
-              <UserList list={selectedChat?.users.map((id: string) => appState.userProfiles[id])}></UserList>
+              {/* TODO ENABLE SEND DMS HERE TOO */}
+              <UserList onPress={(user) => {}} list={selectedChat?.users.map((id: string) => appState.userProfiles[id])}></UserList>
    
           </SafeAreaView>
         </ScrollView> 

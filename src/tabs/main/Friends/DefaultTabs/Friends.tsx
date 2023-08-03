@@ -30,6 +30,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
           console.log(index)
           if([0].includes(index)) {  
             // Send message
+            // ENABLE SEND MESSAGE OVERLAY HERE
           }
           if([1].includes(index)) {  
             // Remove friend

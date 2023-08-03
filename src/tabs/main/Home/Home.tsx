@@ -40,6 +40,9 @@ import actionSheetConfig from "../../../../config/actionSheet-config.json";
 import Invite from "../../../pages/Invite";
 import Modal from "react-native-modal";
 import FlashMessage from "react-native-flash-message";
+import FastImage from "react-native-fast-image";
+import { Image as ExpoImage } from 'expo-image';
+
 
 export default function Home() {
   const Drawer = createDrawerNavigator();
@@ -75,13 +78,13 @@ const CustomDrawerContent = ({ navigation }: any) => {
   // const [visible, setVisible] = useState(false);
   const [overlay, setOverlay] = useState({
     type: "add",
-    visible: false
+    visible: false,
   });
   const dispatch = useAppDispatch();
   const toggleOverlay = (type: string) => {
     setOverlay({
       type: type,
-      visible: !overlay.visible
+      visible: !overlay.visible,
     });
   };
 
@@ -97,10 +100,9 @@ const CustomDrawerContent = ({ navigation }: any) => {
   };
 
   const actionSheetRef = useRef<ActionSheet>(null);
-  const options = (actionSheetConfig as any)[current][!!appState?.call ? "call" : "norm"] as (
-    | string
-    | React.ReactNode
-  )[];
+  const options = (actionSheetConfig as any)[current][
+    !!appState?.call ? "call" : "norm"
+  ] as (string | React.ReactNode)[];
   // options[1] = !!appState.call ? "Leave call" : "Join call";
   const actionSheetProps = {
     ref: actionSheetRef,
@@ -109,9 +111,9 @@ const CustomDrawerContent = ({ navigation }: any) => {
     onPress: async (index: number): Promise<void> => {
       if (index == 0) {
         setOverlay({
-          type: 'invite',
-          visible: !overlay.visible
-        })
+          type: "invite",
+          visible: !overlay.visible,
+        });
       }
     },
   };
@@ -231,25 +233,23 @@ const CustomDrawerContent = ({ navigation }: any) => {
                       overflow: "hidden",
                     },
                     appState.home.selectedCat == "chat" &&
-                    appState.home.selectedSubCat == key && {
-                      borderWidth: 2,
-                      borderColor: theme.black,
-                      borderRadius: 20,
-                    },
+                      appState.home.selectedSubCat == key && {
+                        borderWidth: 2,
+                        borderColor: theme.black,
+                        borderRadius: 20,
+                      },
                   ]}
                 >
                   {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] ? (
-                    <Image
+                    <ExpoImage
                       style={{
                         flex: 1,
                         width: 60,
                         height: 60,
-                        resizeMode: "cover",
                       }}
-                      source={{
-                        uri: userState?.chats?.["chat"]?.[key]?.["chat_img"], cache: 'force-cache'
-                      }}
-                    ></Image>
+                      source={userState?.chats?.["chat"]?.[key]?.["chat_img"]}
+                      cachePolicy={'memory-disk'}
+                    ></ExpoImage>
                   ) : (
                     <Text style={{ fontWeight: "bold", color: "white" }}>
                       {userState?.chats?.["chat"]?.[key]["name"][0]}
@@ -261,7 +261,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
 
           <TouchableOpacity
             onPress={() => {
-              toggleOverlay('add')
+              toggleOverlay("add");
             }}
           >
             <View
@@ -374,14 +374,16 @@ const CustomDrawerContent = ({ navigation }: any) => {
           </SafeAreaView>
         </ScrollView>
       </View>
-      {overlay.type == 'add' ?
+      {overlay.type == "add" ? (
         <Overlay
           isVisible={overlay.visible}
           onBackdropPress={() =>
-            Keyboard.isVisible() ? Keyboard.dismiss() : setOverlay({
-              type: overlay.type,
-              visible: false
-            })
+            Keyboard.isVisible()
+              ? Keyboard.dismiss()
+              : setOverlay({
+                  type: overlay.type,
+                  visible: false,
+                })
           }
           backdropStyle={{ backgroundColor: "rgba(255,255,255,0.4)" }}
           overlayStyle={{ backgroundColor: theme.background, borderRadius: 15 }}
@@ -389,25 +391,39 @@ const CustomDrawerContent = ({ navigation }: any) => {
           <Pressable onPress={() => Keyboard.dismiss()}>
             <View>
               <View
-                style={{ position: "absolute", right: 0, padding: 8, zIndex: 5 }}
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  padding: 8,
+                  zIndex: 5,
+                }}
               >
-                <TouchableOpacity onPress={() => setOverlay({
-                  type: overlay.type,
-                  visible: false
-                })}>
+                <TouchableOpacity
+                  onPress={() =>
+                    setOverlay({
+                      type: overlay.type,
+                      visible: false,
+                    })
+                  }
+                >
                   <Image
                     style={{ width: 20, height: 20 }}
                     source={config["close"]}
                   ></Image>
                 </TouchableOpacity>
               </View>
-              <ResolveChat onSubmit={() => setOverlay({
-                type: overlay.type,
-                visible: false
-              })}></ResolveChat>
+              <ResolveChat
+                onSubmit={() =>
+                  setOverlay({
+                    type: overlay.type,
+                    visible: false,
+                  })
+                }
+              ></ResolveChat>
             </View>
           </Pressable>
-        </Overlay> :
+        </Overlay>
+      ) : (
         <Modal
           isVisible={overlay.visible}
           style={{
@@ -417,14 +433,14 @@ const CustomDrawerContent = ({ navigation }: any) => {
             // width: '100%',
             margin: 0,
             // borderRadius: 20,
-            backgroundColor: 'rgba(0,0,0,0.2)',
-            position: 'relative'
+            backgroundColor: "rgba(0,0,0,0.2)",
+            position: "relative",
           }}
           presentationStyle="overFullScreen"
           onBackdropPress={() => {
             setOverlay({
               type: overlay.type,
-              visible: false
+              visible: false,
             });
           }}
           // transparent={false}
@@ -434,19 +450,21 @@ const CustomDrawerContent = ({ navigation }: any) => {
         >
           {overlay.visible && <FlashMessage position="top" />}
 
-          <Invite chat={userState.chats.chat[
-            appState.home
-              .selectedSubCat as keyof typeof userState.chats
-          ]}
+          <Invite
+            chat={
+              userState.chats.chat[
+                appState.home.selectedSubCat as keyof typeof userState.chats
+              ]
+            }
             onClose={() => {
               setOverlay({
                 type: overlay.type,
-                visible: false
+                visible: false,
               });
             }}
           ></Invite>
         </Modal>
-      }
+      )}
       <ActionSheet {...actionSheetProps}></ActionSheet>
     </View>
   );
