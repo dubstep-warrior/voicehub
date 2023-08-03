@@ -1,7 +1,7 @@
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "../../firebase"
+import { storage } from "../../firebase" 
 
-const uploadImage = async (image: any) => {
+const uploadImage = async (image: any, path: string) => {
   console.log('uploading image', image)
   const blob: Blob = await new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -18,7 +18,7 @@ const uploadImage = async (image: any) => {
   });
   console.log('got image blob, now uploading bytes')
   const uriArray = image.uri.split('/')
-  const storageRef = ref(storage, `profile-images/${uriArray[uriArray.length - 1]}`)
+  const storageRef = ref(storage, `${path}/${uriArray[uriArray.length - 1]}`)
   const res = await uploadBytes(storageRef, blob).then(async (snapshot) => {
     console.log('Uploaded a blob or file!');
     return await getDownloadURL(snapshot.ref).then((downloadURL) => {

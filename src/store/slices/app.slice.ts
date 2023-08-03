@@ -60,7 +60,7 @@ export const appSlice = createSlice({
       })
       state.firebaseListeners = []
     }
-  },
+  } 
 })
 
 export const { assign, update, updateAppMessages, addFirebaseListener, clearFirebase } = appSlice.actions

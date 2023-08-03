@@ -54,7 +54,7 @@ export const UserUpdate = (
 
     console.log("new changes ", newChanges);
     if ("profile_img" in newChanges) {
-      const imageURI = await uploadImage(newChanges["profile_img"]);
+      const imageURI = await uploadImage(newChanges["profile_img"], 'profile-images');
       newChanges["profile_img"] = imageURI;
     }
     const ref = doc(db, "userProfiles", auth.currentUser!.uid);
@@ -331,7 +331,7 @@ export const addChat = (chatObject: any) => {
       const chat = chatObject;
 
       if ("chat_img" in chat && chat["chat_img"]) {
-        const imageURI = await uploadImage(chat["chat_img"]);
+        const imageURI = await uploadImage(chat["chat_img"], 'chat-images');
         chat["chat_img"] = imageURI;
       }
 
@@ -420,7 +420,7 @@ export const addMessage = (form: any, chat_id: string | null) => {
 
     if ("images" in message && message["images"]?.length > 0) {
       const imageURIs = await Promise.all(
-        message["images"].map((image: any) => uploadImage(image))
+        message["images"].map((image: any) => uploadImage(image, 'message-images'))
       );
       message["images"] = imageURIs;
     }

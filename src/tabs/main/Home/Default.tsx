@@ -30,13 +30,21 @@ import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../../../config/actionSheet-config.json";
 import * as ImagePicker from "expo-image-picker";
 import {
+  FlatList,
   ScrollView,
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { Icon } from "react-native-elements";
+import { Header, Icon } from "react-native-elements";
 import { addMessage } from "../../../store/actions/user.actions";
-import { ImageGallery } from '@georstat/react-native-image-gallery';
+import Modal from "react-native-modal";
+
+// import {
+//   ImageGallery,
+//   ImageObject,
+// } from "@georstat/react-native-image-gallery";
+// import Gallery from "react-native-image-gallery";
+import AnimatedGallery from "@akumzy/react-native-animated-gallery";
 
 export default function Default({ route, navigation }: any) {
   const current = "message";
@@ -45,7 +53,7 @@ export default function Default({ route, navigation }: any) {
   const dispatch = useAppDispatch();
   const selectedChat =
     userState?.chats?.[
-    appState.home.selectedCat as keyof typeof userState.chats
+      appState.home.selectedCat as keyof typeof userState.chats
     ]?.[appState.home.selectedSubCat as string];
   const messages = appState.messages[appState.home.selectedSubCat as any];
   console.log("messages now", messages);
@@ -80,11 +88,11 @@ export default function Default({ route, navigation }: any) {
 
       const result = await (index == 0
         ? ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        })
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+          })
         : ImagePicker.launchCameraAsync());
 
       if (!result.canceled) {
@@ -104,14 +112,27 @@ export default function Default({ route, navigation }: any) {
     }
   };
 
-  const [closeToBottom, setCloseToBottom] = useState(false)
-  // const [gallery, setGallery] = useState<null | any[]>(null)
-  const gallery = useRef<null | any[]>(null)
-  const setIsCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }: any) => {
+  const [scrollViewPostion, setScrollViewPosition] = useState();
+  const [closeToBottom, setCloseToBottom] = useState(false);
+  const [gallery, setGallery] = useState<any[] | null>(null);
+  // const gallery = useRef<null | any[]>(null);
+  const setIsCloseToBottom = ({
+    layoutMeasurement,
+    contentOffset,
+    contentSize,
+  }: any) => {
     const paddingToBottom = 20;
-    setCloseToBottom(layoutMeasurement.height + contentOffset.y >=
-      contentSize.height - paddingToBottom)
+    setCloseToBottom(
+      layoutMeasurement.height + contentOffset.y >=
+        contentSize.height - paddingToBottom
+    );
+    setScrollViewPosition(contentOffset.y);
   };
+
+  useEffect(() => {
+    console.log(gallery);
+    scrollViewRef.current?.scrollTo(scrollViewPostion);
+  }, [gallery]);
 
   useEffect(() => {
     if (closeToBottom) {
@@ -120,10 +141,10 @@ export default function Default({ route, navigation }: any) {
   }, [messages]);
 
   useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       scrollViewRef.current?.scrollToEnd();
     });
-    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
       scrollViewRef.current?.scrollToEnd();
     });
 
@@ -133,177 +154,374 @@ export default function Default({ route, navigation }: any) {
     };
   }, []);
 
+  
+ 
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.select({ android: undefined, ios: "height" })}
       keyboardVerticalOffset={useHeaderHeight()}
       style={{ flex: 1 }}
     >
-      <SafeAreaView style={styles.safeAreaContainer}>
-        {/* Header */}
-        <View
-          style={[
-            globalStyles.headingContainer,
-            { justifyContent: "space-between" },
-          ]}
+      {!!gallery?.length && (
+        <Modal
+          isVisible={!!gallery?.length}
+          onSwipeComplete={() => setGallery(null)}
+          swipeDirection="up"
+          style={{
+            // flex: 0.2,
+            // position: 'absolute',
+            // bottom: 0,
+            // width: '100%',
+            margin: 0,
+            // borderRadius: 20,
+            backgroundColor: "rgba(0,0,0,0.2)",
+            position: "relative",
+          }}
+          presentationStyle="overFullScreen"
+          onBackdropPress={() => {
+            setGallery(null);
+          }}
+          // transparent={false}
+          // hasBackdrop={false}
+          // animated
+          animationIn="slideInUp"
         >
-          <TouchableOpacity
-            style={{ padding: 8, zIndex: 5 }}
-            onPress={() => {
-              Keyboard.dismiss();
-              route.params.leftNavigation.openDrawer();
+          <SafeAreaView style={{ position: 'absolute', top: 0, width: '100%', zIndex: 7}}>
+            <View
+              style={{
+                width: "100%",
+                padding: 16,
+                marginTop: 48,
+                alignItems: "flex-end",
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => setGallery(null)}
+                style={{ padding: 8, borderRadius: 16 }}
+              >
+                <Image
+                  style={{ width: 20, height: 20 }}
+                  source={config["close"]}
+                ></Image>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+          <AnimatedGallery
+            imageUrls={gallery} 
+            disablefullScreen={false}
+            thumbBorderWidth={3}
+            thumbBorderColor={"white"}
+            spacing={8}
+            imageSize={90}
+            backgroundColor={"#000000"}
+            onEndReached={() => {
+              console.log("yay! end reached");
             }}
+            invertThumbDirection={false}
+            invertGalleryDirection={false}
+          />
+        </Modal>
+      )}
+      <>
+        <SafeAreaView style={[styles.safeAreaContainer]}>
+          {/* Header */}
+          <View
+            style={[
+              globalStyles.headingContainer,
+              { justifyContent: "space-between" },
+            ]}
           >
-            <Image
-              style={{ width: 32, height: 24 }}
-              source={config["menu"]}
-            ></Image>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={{ padding: 8, zIndex: 5 }}
+              onPress={() => {
+                Keyboard.dismiss();
+                route.params.leftNavigation.openDrawer();
+              }}
+            >
+              <Image
+                style={{ width: 32, height: 24 }}
+                source={config["menu"]}
+              ></Image>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={{ padding: 8, zIndex: 5 }}
-            onPress={() => {
-              Keyboard.dismiss();
-              navigation.openDrawer();
-            }}
-          >
-            <Image
-              style={{ width: 32, height: 24 }}
-              source={config["friends-white"]}
-            ></Image>
-          </TouchableOpacity>
-          <Text style={globalStyles.headerText}>{selectedChat?.name}</Text>
-        </View>
-      </SafeAreaView>
-      <View style={{ flex: 1, flexDirection: "column" }}>
-        <View style={{ flex: 1, backgroundColor: theme.background2 }}>
-          <ScrollView style={{ flex: 1 }} ref={scrollViewRef}
-            onScroll={({ nativeEvent }) => {
-              setIsCloseToBottom(nativeEvent as any)
-            }}
-            scrollEventThrottle={30}
-          >
-            {!!messages &&
-              !!messages.length &&
-              messages.map((message: any, index: number) => (
-                <View
-                  key={message.id}
-                  style={[
-                    {
-                      flexDirection: "row",
-                      padding: 12,
-                      gap: 8,
-                    },
-                    index !== messages.length - 1 && { borderBottomWidth: 0.4 },
-                  ]}
-                >
+            <TouchableOpacity
+              style={{ padding: 8, zIndex: 5 }}
+              onPress={() => {
+                Keyboard.dismiss();
+                navigation.openDrawer();
+              }}
+            >
+              <Image
+                style={{ width: 32, height: 24 }}
+                source={config["friends-white"]}
+              ></Image>
+            </TouchableOpacity>
+            <Text style={globalStyles.headerText}>{selectedChat?.name}</Text>
+          </View>
+        </SafeAreaView>
+        <View style={{ flex: 1, flexDirection: "column" }}>
+          <View style={{ flex: 1, backgroundColor: theme.background2 }}>
+            {/* <ScrollView
+                style={{ flex: 1 }}
+                ref={scrollViewRef}
+                onScroll={({ nativeEvent }) => {
+                  setIsCloseToBottom(nativeEvent as any);
+                }}
+                scrollEventThrottle={30}
+              >
+                {!!messages &&
+                  !!messages.length &&
+                  messages.map((message: any, index: number) => (
+                    <View
+                      key={message.id}
+                      style={[
+                        {
+                          flexDirection: "row",
+                          padding: 12,
+                          gap: 8,
+                        },
+                        index !== messages.length - 1 && {
+                          borderBottomWidth: 0.4,
+                        },
+                      ]}
+                    >
+                      <View
+                        style={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: 30,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <Image
+                          style={{
+                            width: 60,
+                            height: 60,
+                          }}
+                          source={{
+                            uri: appState.userProfiles[message?.by].profile_img,
+                          }}
+                        ></Image>
+                      </View>
+                      <View style={{ justifyContent: "space-between" }}>
+                        <Text
+                          style={{
+                            color: "black",
+                            fontWeight: "bold",
+                            fontSize: 16,
+                            padding: 4,
+                          }}
+                        >
+                          {appState.userProfiles[message?.by].displayedName}
+                        </Text>
+                        <Text
+                          style={{
+                            color: "black",
+                            padding: 4,
+                            marginBottom: 12,
+                          }}
+                        >
+                          {message.desc}
+                        </Text>
+                         {!!message?.images?.length && (
+                          <TouchableOpacity
+                            onPress={() => {
+                              setGallery(
+                                message.images.map((image: string) => {
+                                  return { url: image };
+                                })
+                              );
+                            }}
+                            style={{
+                              flexDirection: "row",
+                              flexWrap: "wrap",
+                              width: "90%",
+                              padding: 1,
+                              gap: 1,
+                              backgroundColor: "white",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            {message?.images?.map(
+                              (image: string, index: number) => (
+                                <Image
+                                  key={index + image}
+                                  style={{
+                                    height:
+                                      message?.images?.length > 1 ? 100 : 200,
+                                    width:
+                                      message?.images?.length > 1
+                                        ? "49.5%"
+                                        : "100%",
+                                  }}
+                                  source={{ uri: image }}
+                                ></Image>
+                              )
+                            )}
+                          </TouchableOpacity>
+                        )} 
+                      </View>
+                    </View>
+                  ))}
+              </ScrollView> */}
+
+            {!!messages && !!messages.length && (
+              <FlatList
+                data={messages}
+                renderItem={({ item, index }) => (
                   <View
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 30,
-                      overflow: "hidden",
-                    }}
+                    key={item.id}
+                    style={[
+                      {
+                        flexDirection: "row",
+                        padding: 12,
+                        gap: 8,
+                      },
+                      index !== messages.length - 1 && {
+                        borderBottomWidth: 0.4,
+                      },
+                    ]}
                   >
-                    <Image
+                    <View
                       style={{
                         width: 60,
                         height: 60,
-                      }}
-                      source={{
-                        uri: appState.userProfiles[message?.by].profile_img,
-                      }}
-                    ></Image>
-                  </View>
-                  <View style={{ justifyContent: "space-between" }}>
-                    <Text
-                      style={{
-                        color: "black",
-                        fontWeight: "bold",
-                        fontSize: 16,
-                        padding: 4,
+                        borderRadius: 30,
+                        overflow: "hidden",
                       }}
                     >
-                      {appState.userProfiles[message?.by].displayedName}
-                    </Text>
-                    <Text style={{ color: "black", padding: 4, marginBottom: 12 }}>
-                      {message.desc}
-                    </Text>
-                    {/* IMAGE GALLERY HERE : TODO FIND BETTER IMAGE GALLERY THIS ONE TOO MANY PROBLEMS*/}
-                    {!!message?.images?.length && <TouchableOpacity onPress={() => {gallery.current = message.images}} style={{ flexDirection: 'row', flexWrap: 'wrap', width: '90%', padding: 1, gap: 1, backgroundColor: 'white', justifyContent: 'space-between' }}>
-                      {message?.images?.map((image: string) => (
-                        <Image style={{ height: message?.images?.length > 1 ? 100 : 200, width: message?.images?.length > 1 ? '49.5%' : '100%' }} source={{ uri: image }}></Image>
-                      ))}
-                    </TouchableOpacity>}
-                    {!!gallery.current?.length && <ImageGallery 
-                      close={() => gallery.current = null} isOpen={!!gallery} images={gallery.current?.map((image: string) => { return { url: image } })} />
-                    }
+                      <Image
+                        style={{
+                          width: 60,
+                          height: 60,
+                        }}
+                        source={{
+                          uri: appState.userProfiles[item?.by].profile_img,
+                        }}
+                      ></Image>
+                    </View>
+                    <View style={{ justifyContent: "space-between" }}>
+                      <Text
+                        style={{
+                          color: "black",
+                          fontWeight: "bold",
+                          fontSize: 16,
+                          padding: 4,
+                        }}
+                      >
+                        {appState.userProfiles[item?.by].displayedName}
+                      </Text>
+                      <Text
+                        style={{
+                          color: "black",
+                          padding: 4,
+                          marginBottom: 12,
+                        }}
+                      >
+                        {item.desc}
+                      </Text>
+                      {!!item?.images?.length && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setGallery(
+                              item.images.map((link: string, index: number) => {
+                                return { id: index, url: link };
+                              })
+                            );
+                          }}
+                          style={{
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            width: "90%",
+                            padding: 1,
+                            gap: 1,
+                            backgroundColor: "white",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          {item?.images?.map((image: string, index: number) => (
+                            <Image
+                              key={index + image}
+                              style={{
+                                height: item?.images?.length > 1 ? 100 : 200,
+                                width:
+                                  item?.images?.length > 1 ? "49.5%" : "100%",
+                              }}
+                              source={{ uri: image }}
+                            ></Image>
+                          ))}
+                        </TouchableOpacity>
+                      )}
+                    </View>
                   </View>
-                </View>
-              ))}
-          </ScrollView>
-        </View>
-        <View
-          style={{
-            backgroundColor: theme.background,
-            padding: 12,
-          }}
-        >
-          {/* ADD CAROUSEL HERE? */}
-          {!!formValues.images.length && (
-            <View style={{ marginBottom: 12 }}>
-              <ScrollView horizontal={true}>
-                <View style={{ flexDirection: "row", gap: 8 }}>
-                  {formValues.images.map((image: any, index: number) => (
-                    <Image
-                      key={index}
-                      style={{ width: 120, height: 100 }}
-                      source={{ uri: image.uri }}
-                    ></Image>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-          )}
+                )}
+                keyExtractor={(message) => message.id}
+              />
+            )}
+          </View>
           <View
             style={{
-              flexDirection: "row",
-              gap: 8,
-              zIndex: 3,
-              alignItems: "flex-end",
+              backgroundColor: theme.background,
+              padding: 12,
             }}
           >
-            <TouchableOpacity
-              onPress={() => actionSheetRef.current?.show()}
-              style={styles.button}
+            {/* ADD CAROUSEL HERE? */}
+            {!!formValues.images.length && (
+              <View style={{ marginBottom: 12 }}>
+                <ScrollView horizontal={true}>
+                  <View style={{ flexDirection: "row", gap: 8 }}>
+                    {formValues.images.map((image: any, index: number) => (
+                      <Image
+                        key={index}
+                        style={{ width: 120, height: 100 }}
+                        source={{ uri: image.uri }}
+                      ></Image>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+            )}
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 8,
+                zIndex: 3,
+                alignItems: "flex-end",
+              }}
             >
-              <Image
-                style={styles.buttonImage}
-                source={config["photo"]}
-              ></Image>
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Input
-                name="Type your message here"
-                formKey="desc"
-                handleFormValueChange={handleFormValueChange}
-                value={formValues["desc"]}
-                style="minimal"
-                background="white"
-                multiline={true}
-              ></Input>
-            </View>
-            <TouchableOpacity style={[styles.button]} onPress={submit}>
-              {/* <Image
+              <TouchableOpacity
+                onPress={() => actionSheetRef.current?.show()}
+                style={styles.button}
+              >
+                <Image
+                  style={styles.buttonImage}
+                  source={config["photo"]}
+                ></Image>
+              </TouchableOpacity>
+              <View style={{ flex: 1 }}>
+                <Input
+                  name="Type your message here"
+                  formKey="desc"
+                  handleFormValueChange={handleFormValueChange}
+                  value={formValues["desc"]}
+                  style="minimal"
+                  background="white"
+                  multiline={true}
+                ></Input>
+              </View>
+              <TouchableOpacity style={[styles.button]} onPress={submit}>
+                {/* <Image
                 style={styles.buttonImage}
                 source={config["send"]}
               ></Image> */}
-              <Icon name="send" size={20} color="white" />
-            </TouchableOpacity>
+                <Icon name="send" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-      <ActionSheet {...actionSheetProps}></ActionSheet>
+        <ActionSheet {...actionSheetProps}></ActionSheet>
+      </>
     </KeyboardAvoidingView>
   );
 }
