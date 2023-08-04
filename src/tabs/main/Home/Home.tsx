@@ -39,8 +39,7 @@ import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../../../config/actionSheet-config.json";
 import Invite from "../../../pages/Invite";
 import Modal from "react-native-modal";
-import FlashMessage from "react-native-flash-message";
-import FastImage from "react-native-fast-image";
+import FlashMessage from "react-native-flash-message"; 
 import { Image as ExpoImage } from 'expo-image';
 
 

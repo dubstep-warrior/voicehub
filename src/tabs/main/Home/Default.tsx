@@ -9,6 +9,7 @@ import {
   Platform,
   Pressable,
   Keyboard,
+  ImageProps,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -39,12 +40,13 @@ import { Header, Icon } from "react-native-elements";
 import { addMessage } from "../../../store/actions/user.actions";
 import Modal from "react-native-modal";
 import { Image as ExpoImage } from "expo-image";
-// import {
-//   ImageGallery,
-//   ImageObject,
-// } from "@georstat/react-native-image-gallery";
+import {
+  ImageGallery,
+  ImageObject,
+} from "@georstat/react-native-image-gallery";
 // import Gallery from "react-native-image-gallery";
 import AnimatedGallery from "@akumzy/react-native-animated-gallery";
+// import Gallery from "react-native-image-gallery";
 
 export default function Default({ route, navigation }: any) {
   const current = "message";
@@ -154,6 +156,49 @@ export default function Default({ route, navigation }: any) {
     };
   }, []);
 
+  const GalleryImage = (image: ImageObject) => {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ExpoImage
+          style={{
+            width: '100%',
+            height: '100%'
+          }}
+          source={image.url}
+          cachePolicy={"memory-disk"}
+          contentFit='contain'
+        ></ExpoImage>
+      </View>
+    );
+  };
+
+  const renderHeaderComponent = () => {
+    return (
+      <SafeAreaView
+            style={{ position: "absolute", top: 0, width: "100%", zIndex: 7 }}
+          >
+            <View
+              style={{
+                width: "100%",
+                padding: 16,
+                marginTop: 48,
+                alignItems: "flex-end",
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => setGallery(null)}
+                style={{ padding: 8, borderRadius: 16 }}
+              >
+                <Image
+                  style={{ width: 20, height: 20 }}
+                  source={config["close"]}
+                ></Image>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+    )
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.select({ android: undefined, ios: "height" })}
@@ -184,29 +229,8 @@ export default function Default({ route, navigation }: any) {
           // animated
           animationIn="slideInUp"
         >
-          <SafeAreaView
-            style={{ position: "absolute", top: 0, width: "100%", zIndex: 7 }}
-          >
-            <View
-              style={{
-                width: "100%",
-                padding: 16,
-                marginTop: 48,
-                alignItems: "flex-end",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => setGallery(null)}
-                style={{ padding: 8, borderRadius: 16 }}
-              >
-                <Image
-                  style={{ width: 20, height: 20 }}
-                  source={config["close"]}
-                ></Image>
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
-          <AnimatedGallery
+           
+          {/* <AnimatedGallery
             imageUrls={gallery}
             disablefullScreen={false}
             thumbBorderWidth={3}
@@ -219,7 +243,15 @@ export default function Default({ route, navigation }: any) {
             }}
             invertThumbDirection={false}
             invertGalleryDirection={false}
-          />
+          /> */}
+          {/* <Gallery images={gallery} imageComponent={GalleryImage}></Gallery> */}
+          <ImageGallery close={() => setGallery(null)}
+          hideThumbs
+          images={gallery}
+          isOpen={!!gallery?.length}
+          renderCustomImage={GalleryImage}
+          renderHeaderComponent={renderHeaderComponent}
+          ></ImageGallery>
         </Modal>
       )}
       <>
@@ -423,11 +455,7 @@ export default function Default({ route, navigation }: any) {
                       {!!item?.images?.length && (
                         <TouchableOpacity
                           onPress={() => {
-                            setGallery(
-                              item.images.map((link: string, index: number) => {
-                                return { id: index, url: link };
-                              })
-                            );
+                            setGallery(item.images);
                           }}
                           style={{
                             flexDirection: "row",
@@ -439,7 +467,7 @@ export default function Default({ route, navigation }: any) {
                             justifyContent: "space-between",
                           }}
                         >
-                          {item?.images?.map((image: string, index: number) => (
+                          {item?.images?.map((image: any, index: number) => (
                             <ExpoImage
                               key={index + image}
                               style={{
@@ -447,7 +475,7 @@ export default function Default({ route, navigation }: any) {
                                 width:
                                   item?.images?.length > 1 ? "49.5%" : "100%",
                               }}
-                              source={image}
+                              source={image.uri}
                               cachePolicy={"memory-disk"}
                             ></ExpoImage>
                           ))}

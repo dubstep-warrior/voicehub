@@ -87,7 +87,7 @@ export const resolveAccess = (data: any, current: string) => {
     );
     return res;
   };
-}; 
+};
 
 export const AuthOnRender = () => {
   console.log("auth on render calle0");
@@ -97,15 +97,20 @@ export const AuthOnRender = () => {
       // const profile = await getDoc(
       //   doc(db, "userProfiles", auth.currentUser.uid!)
       // );
-      dispatch(addFirebaseListener({
-        listener: onSnapshot(doc(db, "userProfiles", auth.currentUser.uid!), (profile) => {
-          dispatch(
-            assignUser({
-              user: profile.data(),
-            })
-          );
+      dispatch(
+        addFirebaseListener({
+          listener: onSnapshot(
+            doc(db, "userProfiles", auth.currentUser.uid!),
+            (profile) => {
+              dispatch(
+                assignUser({
+                  user: profile.data(),
+                })
+              );
+            }
+          ),
         })
-      }))
+      );
 
       const requestQuery = query(
         collection(db, "requests"),
@@ -114,72 +119,79 @@ export const AuthOnRender = () => {
           where("to", "==", auth.currentUser.uid)
         )
       );
-      dispatch(addFirebaseListener({
-        listener: onSnapshot(requestQuery, async (snapshot) => {
-          const pending: any[] = [],
-            requests: any[] = [];
-          snapshot.forEach((doc) => {
-            const request = doc.data();
-            if (request.from == auth.currentUser!.uid) pending.push({uid: request.to, id: doc.id});
-            else requests.push({uid:request.from , id: doc.id});
-          });
-  
-          dispatch(
-            updateUser({
-              pending: pending,
-              requests: requests,
-            })
-          );
+      dispatch(
+        addFirebaseListener({
+          listener: onSnapshot(requestQuery, async (snapshot) => {
+            const pending: any[] = [],
+              requests: any[] = [];
+            snapshot.forEach((doc) => {
+              const request = doc.data();
+              if (request.from == auth.currentUser!.uid)
+                pending.push({ uid: request.to, id: doc.id });
+              else requests.push({ uid: request.from, id: doc.id });
+            });
+
+            dispatch(
+              updateUser({
+                pending: pending,
+                requests: requests,
+              })
+            );
+          }),
         })
-      }))
+      );
 
       const friendsQuery = query(
         collection(db, "friends"),
         where("group", "array-contains", auth.currentUser.uid)
       );
 
-      dispatch(addFirebaseListener({
-        listener: onSnapshot(friendsQuery, async (snapshot) => {
-          const friends: any[] = []; 
-          snapshot.forEach((doc) => {
-            const friend = doc.data();
-            const friendUID = friend.group.find(
-              (uid: string) => uid !== auth.currentUser!.uid
+      dispatch(
+        addFirebaseListener({
+          listener: onSnapshot(friendsQuery, async (snapshot) => {
+            const friends: any[] = [];
+            snapshot.forEach((doc) => {
+              const friend = doc.data();
+              const friendUID = friend.group.find(
+                (uid: string) => uid !== auth.currentUser!.uid
+              );
+              friends.push({ uid: friendUID, friendshipRef: doc.id });
+            });
+
+            dispatch(
+              updateUser({
+                friends: friends,
+              })
             );
-            friends.push({uid: friendUID, friendshipRef: doc.id});
-          }); 
-  
-          dispatch(
-            updateUser({
-              friends: friends,
-            })
-          );
+          }),
         })
-      }))
+      );
 
       const chatsQeury = query(
         collection(db, "chats"),
         where("users", "array-contains", auth.currentUser?.uid)
       );
-      dispatch(addFirebaseListener({
-        listener: onSnapshot(chatsQeury, async (snapshot) => {
-          const chats: any = {
-            chat: {},
-            p2p: {},
-          };
-  
-          snapshot.forEach((document) => {
-            const chat = document.data();
-            chats[chat.type][document.id] = { ...chat, id: document.id };
-          });
-  
-          dispatch(
-            updateUser({
-              chats: chats,
-            })
-          );
+      dispatch(
+        addFirebaseListener({
+          listener: onSnapshot(chatsQeury, async (snapshot) => {
+            const chats: any = {
+              chat: {},
+              p2p: {},
+            };
+
+            snapshot.forEach((document) => {
+              const chat = document.data();
+              chats[chat.type][document.id] = { ...chat, id: document.id };
+            });
+
+            dispatch(
+              updateUser({
+                chats: chats,
+              })
+            );
+          }),
         })
-      }))
+      );
 
       const chats = await getDocs(chatsQeury);
       // console.log('gathered chatIDS', chatIDs)
@@ -190,48 +202,61 @@ export const AuthOnRender = () => {
           orderBy("created")
         );
 
-        dispatch(addFirebaseListener({
-          listener: onSnapshot(messagesQuery, async (snapshot) => {
-            const messages: any[] = [];
-            snapshot.forEach((messageDoc) => {
-              const message = messageDoc.data();
-              messages.push({
-                ...message,
-                created: new Date(messageDoc.data().created).toLocaleDateString(
-                  "en-US"
-                ),
-                id: messageDoc.id,
+        dispatch(
+          addFirebaseListener({
+            listener: onSnapshot(messagesQuery, async (snapshot) => {
+              const messages: any[] = [];
+              snapshot.forEach((messageDoc) => {
+                const message = messageDoc.data();
+                messages.push({
+                  ...message,
+                  created: new Date(
+                    messageDoc.data().created
+                  ).toLocaleDateString("en-US"),
+                  images:
+                    message?.images?.map((uri: string, index: number) => {
+                      return {
+                        id: index,
+                        uri: uri,
+                        url: uri,
+                        source: { uri: uri }, 
+                      };
+                    }) ?? [],
+                  id: messageDoc.id,
+                });
               });
-            });
-  
-            dispatch(
-              updateAppMessages({
-                messages: messages,
-                chat_id: id,
-              })
-            );
+
+              dispatch(
+                updateAppMessages({
+                  messages: messages,
+                  chat_id: id,
+                })
+              );
+            }),
           })
-        }))
+        );
       });
 
       const allUsers = query(collection(db, "userProfiles"));
 
-      dispatch(addFirebaseListener({
-        listener: onSnapshot(allUsers, async (snapshot) => {
-          const profiles: any = {};
-          snapshot.forEach((document) => {
-            const user = document.data();
-            profiles[document.id] = user;
-          });
-  
-          console.log('updating profiles here', Object.keys(profiles))
-          dispatch(
-            updateApp({
-              userProfiles: profiles,
-            })
-          );
+      dispatch(
+        addFirebaseListener({
+          listener: onSnapshot(allUsers, async (snapshot) => {
+            const profiles: any = {};
+            snapshot.forEach((document) => {
+              const user = document.data();
+              profiles[document.id] = user;
+            });
+
+            console.log("updating profiles here", Object.keys(profiles));
+            dispatch(
+              updateApp({
+                userProfiles: profiles,
+              })
+            );
+          }),
         })
-      }))
+      );
     } else {
       console.log("but no auth current user");
     }
@@ -248,7 +273,7 @@ export const AuthRemove = () => {
 
     await signOut(auth)
       .then((res) => {
-        dispatch(clearFirebase())
+        dispatch(clearFirebase());
         dispatch(
           assignUser({
             user: {},
