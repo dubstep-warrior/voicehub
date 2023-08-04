@@ -330,7 +330,7 @@ export const removeFriend = (friend: any) => {
   };
 };
 
-export const addChat = (chatObject: any, navigation: any) => {
+export const addChat = (chatObject: any) => {
   return async (dispatch: any) => {
     if (auth.currentUser) {
       dispatch(
@@ -340,17 +340,17 @@ export const addChat = (chatObject: any, navigation: any) => {
       );
 
       const chat = chatObject;
-      console.log('ADDING CHAT', chat)
+      console.log("ADDING CHAT", chat);
       if ("chat_img" in chat && chat["chat_img"]) {
         const imageURI = await uploadImage(chat["chat_img"], "chat-images");
         chat["chat_img"] = imageURI;
       }
 
-      await addDoc(collection(db, "chats"), {
+      const res = await addDoc(collection(db, "chats"), {
         ...chat,
       })
         .then((docRef) => {
-          console.log('add chat worked')
+          console.log("add chat worked");
           dispatch(getChatSubscription(docRef.id)).then(async () => {
             await dispatch(
               updateApp({
@@ -359,17 +359,7 @@ export const addChat = (chatObject: any, navigation: any) => {
                   selectedSubCat: docRef.id,
                 },
               })
-            );
-            navigation.navigate("Main", {
-              screen: "Home",
-              params: {
-                screen: "Chat",
-                params: {
-                  drawerStatus: "closed",
-                  screen: "Default",
-                },
-              },
-            });
+            ); 
           });
 
           console.log("successfully added a chat");
@@ -378,6 +368,10 @@ export const addChat = (chatObject: any, navigation: any) => {
               { text: "OK", onPress: () => console.log("OK Pressed") },
             ]);
           }
+          return {
+            succcess: true,
+            data: docRef,
+          };
         })
         .catch((err) => {
           console.log("cant add chat:", err);
@@ -395,6 +389,10 @@ export const addChat = (chatObject: any, navigation: any) => {
               [{ text: "OK", onPress: () => console.log("OK Pressed") }]
             );
           }
+          return {
+            success: false,
+            data: err,
+          };
         });
 
       dispatch(
@@ -402,6 +400,8 @@ export const addChat = (chatObject: any, navigation: any) => {
           submitting: false,
         })
       );
+
+      return res;
     }
   };
 };
@@ -446,13 +446,18 @@ export const joinChat = (form: any) => {
 };
 
 export const addMessage = (form: any, chat_id: string | null) => {
-  return async (dispatch: any) => {
+  return async (dispatch: any, getState: any) => {
     dispatch(
       updateApp({
         submitting: true,
       })
     );
+     
+    // const usersRef = db.collection('users').doc('id')
+    // collection(db, 'chats', chat_id)
 
+    // SEND MESSAGE
+    console.log('sending message chat_id', chat_id)
     const message = {
       ...form,
       chatID: chat_id,
@@ -471,5 +476,11 @@ export const addMessage = (form: any, chat_id: string | null) => {
 
     await addDoc(collection(doc(db, "chats", chat_id!), "messages"), message);
     console.log("SENDING MESSAGE SUCCESFULL YAYYY");
+
+    dispatch(
+      updateApp({
+        submitting: false,
+      })
+    );
   };
 };

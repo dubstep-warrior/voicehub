@@ -5,7 +5,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import config from "../../../../../Images.config";
 import { styles as globalStyles } from "../../../../../Styles.config";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { selectUser } from "../../../../store/slices/user.slice";
+import { selectUser, updateUserChat } from "../../../../store/slices/user.slice";
 import { NavigationProps } from "../../../../interfaces/NavigationProps.interface";
 import UserList from "../../../../shared/UserList";
 import { selectApp, update as updateApp } from "../../../../store/slices/app.slice";
@@ -19,6 +19,7 @@ import {
   removeRequest,
 } from "../../../../store/actions/user.actions";
 import { auth } from "../../../../../firebase";
+import StartChat from "../../../../utils/StartChat";
 
 export default function Friends({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
@@ -38,6 +39,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
           if ([0].includes(index) && selectedUser.current) {
             // Send message
             // ENABLE SEND MESSAGE OVERLAY HERE
+
             const existingChatID = Object.keys(userState.chats.dms).find((chatID) => {
               return userState.chats.dms[chatID].users.includes(
                 selectedUser.current.uid
@@ -48,31 +50,27 @@ export default function Friends({ route, navigation }: NavigationProps) {
                 updateApp({
                   home: {
                     selectedCat: "dms",
-                    selectedSubCat: "existingChatID",
+                    selectedSubCat: existingChatID,
                   },
                 })
               );
-              navigation.navigate("Main", {
-                screen: "Home",
-                params: {
-                  screen: "Chat",
-                  params: {
-                    drawerStatus: "closed",
-                    screen: "Default",
-                  },
-                },
-              });
-            } else {
-              await dispatch(
-                addChat(
-                  {
-                    type: "dms",
-                    users: [auth.currentUser?.uid, selectedUser.current.uid],
-                  },
-                  navigation
-                )
-              );
+              
+            } else { 
+              // console.log(auth.currentUser!.uid, selectedUser.current.uid)
+              StartChat(selectedUser, navigation)
+
             }
+
+            navigation.navigate("Main", {
+              screen: "Home",
+              params: {
+                screen: "Chat",
+                params: {
+                  drawerStatus: "closed",
+                  screen: "Default",
+                },
+              },
+            });
           }
           if ([1].includes(index)) {
             // Remove friend
@@ -133,6 +131,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
           }}
         >
           <UserList
+            identifier='uid'
             list={
               userState[current as keyof typeof userState].map((ref: any) => {
                 return { uid: ref.uid, ...appState.userProfiles[ref.uid] };

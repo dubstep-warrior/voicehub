@@ -105,7 +105,7 @@ export const AuthOnRender = () => {
             (profile) => {
               dispatch(
                 assignUser({
-                  user: profile.data(),
+                  user: profile.data() 
                 })
               );
             }
@@ -256,7 +256,7 @@ export const AuthOnRender = () => {
             const profiles: any = {};
             snapshot.forEach((document) => {
               const user = document.data();
-              profiles[document.id] = user;
+              profiles[document.id] = {...user, uid: document.id};
             });
 
             console.log("updating profiles here", Object.keys(profiles));

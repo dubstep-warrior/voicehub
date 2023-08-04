@@ -37,7 +37,7 @@ import {
 } from "react-native-gesture-handler";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Header, Icon } from "react-native-elements";
-import { addMessage } from "../../../store/actions/user.actions";
+import { addChat, addMessage } from "../../../store/actions/user.actions";
 import Modal from "react-native-modal";
 import { Image as ExpoImage } from "expo-image";
 import {
@@ -47,6 +47,7 @@ import {
 // import Gallery from "react-native-image-gallery";
 import AnimatedGallery from "@akumzy/react-native-animated-gallery";
 import { auth } from "../../../../firebase";
+import { MaterialIndicator } from "react-native-indicators";
 // import Gallery from "react-native-image-gallery";
 
 export default function Default({ route, navigation }: any) {
@@ -54,12 +55,19 @@ export default function Default({ route, navigation }: any) {
   const userState = useAppSelector(selectUser);
   const appState = useAppSelector(selectApp);
   const dispatch = useAppDispatch();
-  const selectedChat =
-    userState?.chats?.[
+  const [selectedChat, setSelectedChat] = useState<any>(null)
+     
+
+  
+  useEffect(() => {
+    setSelectedChat(userState?.chats?.[
       appState.home.selectedCat as keyof typeof userState.chats
-    ]?.[appState.home.selectedSubCat as string];
-  const messages = appState.messages[appState.home.selectedSubCat as any];
-  console.log("messages now", messages);
+    ]?.[appState.home.selectedSubCat as string])
+    
+    console.log('selected CHAT', selectedChat)
+  }, [userState, appState])
+
+  // console.log("messages now", messages);
   const messageLink: any = routeConfig;
   const [invalid, setFormInvalid] = useState<string | null>(null);
 
@@ -70,7 +78,8 @@ export default function Default({ route, navigation }: any) {
 
   useEffect(() => {
     reset();
-  }, [appState]);
+  }, [appState.home]);
+
   const scrollViewRef = useRef<FlatList>(null);
   const actionSheetRef = useRef<ActionSheet>(null);
   const options = (actionSheetConfig as any)[current] as (
@@ -110,7 +119,25 @@ export default function Default({ route, navigation }: any) {
   //TODO SETTLE SEND MESSAGE
   const submit = async () => {
     if (formValues && appState.home.selectedSubCat) {
-      await dispatch(addMessage(formValues, appState.home.selectedSubCat));
+      // CHECK CHAT EXIST
+      if (
+        appState.home.selectedSubCat?.includes("temp") &&
+        appState.home.selectedSubCat.split("-")[0] == "temp"
+      ) {
+        const res = await dispatch(
+          addChat({
+            users: [
+              auth.currentUser?.uid,
+              appState.home.selectedSubCat.split("-")[1],
+            ],
+            type: "dms",
+          })
+        );
+        await dispatch(addMessage(formValues, res?.data.id));
+      } else {
+        await dispatch(addMessage(formValues, appState.home.selectedSubCat));
+      }
+      reset()
       scrollViewRef.current?.scrollToEnd();
     }
   };
@@ -131,17 +158,13 @@ export default function Default({ route, navigation }: any) {
     );
     setScrollViewPosition(contentOffset.y);
   };
-
-  // useEffect(() => {
-  //   console.log(gallery);
-  //   scrollViewRef.current?.scrollTo(scrollViewPostion);
-  // }, [gallery]);
+ 
 
   useEffect(() => {
     if (closeToBottom) {
       scrollViewRef.current?.scrollToEnd();
     }
-  }, [messages]);
+  }, [appState.messages[appState.home.selectedSubCat as any]]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -302,114 +325,11 @@ export default function Default({ route, navigation }: any) {
         </SafeAreaView>
         <View style={{ flex: 1, flexDirection: "column" }}>
           <View style={{ flex: 1, backgroundColor: theme.background2 }}>
-            {/* <ScrollView
-                style={{ flex: 1 }}
-                ref={scrollViewRef}
-                onScroll={({ nativeEvent }) => {
-                  setIsCloseToBottom(nativeEvent as any);
-                }}
-                scrollEventThrottle={30}
-              >
-                {!!messages &&
-                  !!messages.length &&
-                  messages.map((message: any, index: number) => (
-                    <View
-                      key={message.id}
-                      style={[
-                        {
-                          flexDirection: "row",
-                          padding: 12,
-                          gap: 8,
-                        },
-                        index !== messages.length - 1 && {
-                          borderBottomWidth: 0.4,
-                        },
-                      ]}
-                    >
-                      <View
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 30,
-                          overflow: "hidden",
-                        }}
-                      >
-                        <Image
-                          style={{
-                            width: 60,
-                            height: 60,
-                          }}
-                          source={{
-                            uri: appState.userProfiles[message?.by].profile_img,
-                          }}
-                        ></Image>
-                      </View>
-                      <View style={{ justifyContent: "space-between" }}>
-                        <Text
-                          style={{
-                            color: "black",
-                            fontWeight: "bold",
-                            fontSize: 16,
-                            padding: 4,
-                          }}
-                        >
-                          {appState.userProfiles[message?.by].displayedName}
-                        </Text>
-                        <Text
-                          style={{
-                            color: "black",
-                            padding: 4,
-                            marginBottom: 12,
-                          }}
-                        >
-                          {message.desc}
-                        </Text>
-                         {!!message?.images?.length && (
-                          <TouchableOpacity
-                            onPress={() => {
-                              setGallery(
-                                message.images.map((image: string) => {
-                                  return { url: image };
-                                })
-                              );
-                            }}
-                            style={{
-                              flexDirection: "row",
-                              flexWrap: "wrap",
-                              width: "90%",
-                              padding: 1,
-                              gap: 1,
-                              backgroundColor: "white",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            {message?.images?.map(
-                              (image: string, index: number) => (
-                                <Image
-                                  key={index + image}
-                                  style={{
-                                    height:
-                                      message?.images?.length > 1 ? 100 : 200,
-                                    width:
-                                      message?.images?.length > 1
-                                        ? "49.5%"
-                                        : "100%",
-                                  }}
-                                  source={{ uri: image }}
-                                ></Image>
-                              )
-                            )}
-                          </TouchableOpacity>
-                        )} 
-                      </View>
-                    </View>
-                  ))}
-              </ScrollView> */}
-
-            {!!messages && !!messages.length && (
+            
+            {!!appState.messages[appState.home.selectedSubCat as any] && !!appState.messages[appState.home.selectedSubCat as any].length && (
               <FlatList
                 ref={scrollViewRef}
-                data={messages}
+                data={appState.messages[appState.home.selectedSubCat as any]}
                 renderItem={({ item, index }) => (
                   <View
                     key={item.id}
@@ -419,7 +339,7 @@ export default function Default({ route, navigation }: any) {
                         padding: 12,
                         gap: 8,
                       },
-                      index !== messages.length - 1 && {
+                      index !== appState.messages[appState.home.selectedSubCat as any].length - 1 && {
                         borderBottomWidth: 0.4,
                       },
                     ]}
@@ -485,7 +405,7 @@ export default function Default({ route, navigation }: any) {
                                   item?.images?.length > 1 ? "49.5%" : "100%",
                               }}
                               source={image.uri}
-                              cachePolicy={"memory-disk"}
+                              // cachePolicy={"memory-disk"}
                             ></ExpoImage>
                           ))}
                         </TouchableOpacity>
@@ -552,7 +472,14 @@ export default function Default({ route, navigation }: any) {
                 style={styles.buttonImage}
                 source={config["send"]}
               ></Image> */}
-                <Icon name="send" size={20} color="white" />
+                {appState.submitting ? (
+                  <MaterialIndicator
+                    color="white"
+                    size={12}
+                  ></MaterialIndicator>
+                ) : (
+                  <Icon name="send" size={20} color="white" />
+                )}
               </TouchableOpacity>
             </View>
           </View>

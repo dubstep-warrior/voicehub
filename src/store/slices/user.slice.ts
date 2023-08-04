@@ -60,6 +60,9 @@ export const userSlice = createSlice({
         Object.keys(chats).forEach((chatID) => {
           const chat = chats[chatID];
           Object.keys(chat).forEach((attributeKey) => {
+            if(!(chatID in state.chats[type as keyof typeof state.chats])) {
+              state.chats[type as keyof typeof state.chats][chatID] = {}
+            }
             state.chats[type as keyof typeof state.chats][chatID][
               attributeKey
             ] = chat[attributeKey];

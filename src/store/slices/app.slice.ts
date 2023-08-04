@@ -49,7 +49,7 @@ export const appSlice = createSlice({
     },
     updateAppMessages: (state, actions) => {
       state.messages[actions.payload.chat_id] = actions.payload.messages;
-      console.log("updated app state messages", state);
+      console.log("updated app state messages", state.messages[actions.payload.chat_id].desc, state.messages[actions.payload.chat_id].images);
     },
     addFirebaseListener: (state, actions) => {
       state.firebaseListeners.push(actions.payload.listener);

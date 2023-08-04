@@ -48,7 +48,7 @@ export default function SearchUsers({ route, navigation }: NavigationProps) {
         <SimpleForm route={route} navigation={navigation}></SimpleForm>
         {appState.users.length ? (
           <ScrollView style={{ flex: 1 }}>
-            <UserList onPress={(user)=> userSelected(user)} list={appState.users}></UserList>
+            <UserList identifier='uid' onPress={(user)=> userSelected(user)} list={appState.users}></UserList>
           </ScrollView>
         ) : (
           <></>

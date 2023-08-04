@@ -87,16 +87,19 @@ const CustomDrawerContent = ({ navigation }: any) => {
   };
 
   const selectHomeState = (cat: string | null, subcat: string | null) => {
-    console.log(cat, subcat)
+    console.log(cat, subcat);
     dispatch(
       updateApp({
         home: {
           selectedCat: cat,
-          selectedSubCat: subcat ?? (!!Object.keys(userState.chats.dms).length && Object.keys(userState.chats.dms)[0]),
+          selectedSubCat:
+            subcat ??
+            (!!Object.keys(userState.chats.dms).length &&
+              Object.keys(userState.chats.dms)[0]),
         },
       })
     );
-    if(cat == 'dms' && subcat !== null) navigation.closeDrawer()
+    if (cat == "dms" && subcat !== null) navigation.closeDrawer();
   };
 
   const actionSheetRef = useRef<ActionSheet>(null);
@@ -121,6 +124,23 @@ const CustomDrawerContent = ({ navigation }: any) => {
   const chatOptions = () => {
     actionSheetRef.current?.show();
   };
+
+  const resolveAddChat = () => {
+    setOverlay({
+      type: overlay.type,
+      visible: false,
+    })
+    navigation.navigate("Main", {
+      screen: "Home",
+      params: {
+        screen: "Chat",
+        params: {
+          drawerStatus: "closed",
+          screen: "Default",
+        },
+      },
+    });
+  }
 
   return (
     <View style={{ flexDirection: "row", flexGrow: 1 }}>
@@ -314,22 +334,27 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     </TouchableOpacity>
                   </View>
                   {/* <DrawerItemList {...props} /> */}
-                  <UserList
-                    list={Object.keys(userState?.chats?.["dms"]).map(
-                      (chatID) => {
-                        return {
-                          ...appState.userProfiles[
-                            userState?.chats?.["dms"][chatID].users.find(
-                              (userID: string) =>
-                                userID !== auth.currentUser!.uid
-                            )
-                          ],
-                          dmRef:chatID
-                        };
-                      }
-                    )}
-                    onPress={(user) => selectHomeState("dms", user.dmRef)}
-                  ></UserList>
+                  <View style={{padding: 8}}>
+                    <UserList
+                      list={Object.keys(userState?.chats?.["dms"]).map(
+                        (chatID) => {
+                          return {
+                            ...appState.userProfiles[
+                              userState?.chats?.["dms"][chatID].users.find(
+                                (userID: string) =>
+                                  userID !== auth.currentUser!.uid
+                              )
+                            ],
+                            dmRef: chatID,
+                          };
+                        }
+                      )}
+                      identifier="dmRef"
+                      selected={appState?.home?.selectedSubCat}
+                      small={true}
+                      onPress={(user) => selectHomeState("dms", user.dmRef)}
+                    ></UserList>
+                  </View>
                 </View>
               )}
               {appState.home.selectedCat &&
@@ -441,12 +466,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 </TouchableOpacity>
               </View>
               <ResolveChat
-                onSubmit={() =>
-                  setOverlay({
-                    type: overlay.type,
-                    visible: false,
-                  })
-                }
+                onSubmit={resolveAddChat}
                 navigation={navigation}
               ></ResolveChat>
             </View>
