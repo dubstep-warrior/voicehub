@@ -86,7 +86,7 @@ export default function ResolveChat(props: any) {
             owner: auth.currentUser?.uid,
             users: [auth.currentUser?.uid],
             type: "chat",
-          })
+          }, props.navigation)
         );
         if (props.onSubmit) {
           props.onSubmit();

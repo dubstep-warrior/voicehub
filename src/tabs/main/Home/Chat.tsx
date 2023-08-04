@@ -10,13 +10,15 @@ import { selectUser } from "../../../store/slices/user.slice";
 import { selectApp } from "../../../store/slices/app.slice";
 import UserList from "../../../shared/UserList";
 
-export default function Chat({ navigation }: any) {
+export default function Chat({ route, navigation }: any) {
   const Drawer = createDrawerNavigator();
-
+  if(route?.params?.drawerStatus == 'closed') {
+    navigation.closeDrawer()
+  }
   return (
     <>
       <Drawer.Navigator
-        defaultStatus="closed"
+        defaultStatus={"closed"}
         screenOptions={{
           swipeEdgeWidth: Dimensions.get("window").width/3,
           drawerStyle: {

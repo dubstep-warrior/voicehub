@@ -30,8 +30,8 @@ export default function UserList({ list = [], ...props }: IUserListProps) {
           <ExpoImage
             style={globalStyles.icon}
             source={
-              user.profile_img
-                ? user.profile_img
+              user?.profile_img
+                ? user?.profile_img
                 : config["profile-grey"]
             }
             cachePolicy={'memory-disk'}

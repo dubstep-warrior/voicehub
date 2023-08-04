@@ -8,35 +8,77 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { selectUser } from "../../../../store/slices/user.slice";
 import { NavigationProps } from "../../../../interfaces/NavigationProps.interface";
 import UserList from "../../../../shared/UserList";
-import { selectApp } from "../../../../store/slices/app.slice";
+import { selectApp, update as updateApp } from "../../../../store/slices/app.slice";
 import { useRef } from "react";
 import ActionSheet from "react-native-actionsheet";
-import { acceptRequest, rejectRequest, removeFriend, removeRequest } from "../../../../store/actions/user.actions";
+import {
+  acceptRequest,
+  addChat,
+  rejectRequest,
+  removeFriend,
+  removeRequest,
+} from "../../../../store/actions/user.actions";
+import { auth } from "../../../../../firebase";
 
 export default function Friends({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
-  const appState = useAppSelector(selectApp)
-  const dispatch = useAppDispatch()
-  const selectedUser = useRef(null)
+  const appState = useAppSelector(selectApp);
+  const dispatch = useAppDispatch();
+  const selectedUser = useRef<any>(null);
 
   const friendsConfig = {
     friends: {
       empty: "friends",
       actionSheetProps: {
         ref: useRef<ActionSheet>(null),
-        options: ["Send Message","Remove Friend", "Cancel"],
+        options: ["Send Message", "Remove Friend", "Cancel"],
         cancelButtonIndex: 2,
         onPress: async (index: number): Promise<void> => {
-          console.log(index)
-          if([0].includes(index)) {  
+          console.log(index);
+          if ([0].includes(index) && selectedUser.current) {
             // Send message
             // ENABLE SEND MESSAGE OVERLAY HERE
+            const existingChatID = Object.keys(userState.chats.dms).find((chatID) => {
+              return userState.chats.dms[chatID].users.includes(
+                selectedUser.current.uid
+              );
+            })
+            if (existingChatID) {
+              dispatch(
+                updateApp({
+                  home: {
+                    selectedCat: "dms",
+                    selectedSubCat: "existingChatID",
+                  },
+                })
+              );
+              navigation.navigate("Main", {
+                screen: "Home",
+                params: {
+                  screen: "Chat",
+                  params: {
+                    drawerStatus: "closed",
+                    screen: "Default",
+                  },
+                },
+              });
+            } else {
+              await dispatch(
+                addChat(
+                  {
+                    type: "dms",
+                    users: [auth.currentUser?.uid, selectedUser.current.uid],
+                  },
+                  navigation
+                )
+              );
+            }
           }
-          if([1].includes(index)) {  
+          if ([1].includes(index)) {
             // Remove friend
-            dispatch(removeFriend(selectedUser.current))
+            dispatch(removeFriend(selectedUser.current));
           }
-        }
+        },
       },
     },
     requests: {
@@ -46,13 +88,13 @@ export default function Friends({ route, navigation }: NavigationProps) {
         options: ["Accept Request", "Reject Request", "Cancel"],
         cancelButtonIndex: 2,
         onPress: async (index: number): Promise<void> => {
-          if([0].includes(index)) {  
+          if ([0].includes(index)) {
             // ACCEPT REQUEST
-            dispatch(acceptRequest(selectedUser.current))
+            dispatch(acceptRequest(selectedUser.current));
           }
-          if([1].includes(index)) {  
+          if ([1].includes(index)) {
             // Reject request
-            dispatch(rejectRequest(selectedUser.current))
+            dispatch(rejectRequest(selectedUser.current));
           }
         },
       },
@@ -64,20 +106,20 @@ export default function Friends({ route, navigation }: NavigationProps) {
         options: ["Remove Request", "Cancel"],
         cancelButtonIndex: 1,
         onPress: async (index: number): Promise<void> => {
-          if([0].includes(index)) {  
-            dispatch(removeRequest(selectedUser.current))
+          if ([0].includes(index)) {
+            dispatch(removeRequest(selectedUser.current));
           }
         },
       },
     },
   };
   const current = route.name.toLowerCase();
-  console.log('getting friends', userState[current as keyof typeof userState])
+  console.log("getting friends", userState[current as keyof typeof userState]);
   const currentActionSheetProps =
     friendsConfig[current as keyof typeof friendsConfig].actionSheetProps;
 
-  const tappedUser = (user: any) => { 
-    selectedUser.current = user
+  const tappedUser = (user: any) => {
+    selectedUser.current = user;
     currentActionSheetProps.ref.current!.show();
   };
 
@@ -91,7 +133,11 @@ export default function Friends({ route, navigation }: NavigationProps) {
           }}
         >
           <UserList
-            list={userState[current as keyof typeof userState].map((ref: any) => appState.userProfiles[ref.uid]) as any[]}
+            list={
+              userState[current as keyof typeof userState].map((ref: any) => {
+                return { uid: ref.uid, ...appState.userProfiles[ref.uid] };
+              }) as any[]
+            }
             onPress={(user) => tappedUser(user)}
           ></UserList>
         </ScrollView>

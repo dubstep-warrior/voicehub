@@ -39,17 +39,16 @@ import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../../../config/actionSheet-config.json";
 import Invite from "../../../pages/Invite";
 import Modal from "react-native-modal";
-import FlashMessage from "react-native-flash-message"; 
-import { Image as ExpoImage } from 'expo-image';
+import FlashMessage from "react-native-flash-message";
+import { Image as ExpoImage } from "expo-image";
+import { auth } from "../../../../firebase";
 
-
-export default function Home() {
+export default function Home({ route, navigation }: any) {
   const Drawer = createDrawerNavigator();
-
   return (
     <>
       <Drawer.Navigator
-        defaultStatus="open"
+        defaultStatus={route?.params?.drawerStatus ?? "open"}
         screenOptions={{
           swipeEdgeWidth: Dimensions.get("window").width,
           drawerStyle: {
@@ -88,14 +87,16 @@ const CustomDrawerContent = ({ navigation }: any) => {
   };
 
   const selectHomeState = (cat: string | null, subcat: string | null) => {
+    console.log(cat, subcat)
     dispatch(
       updateApp({
         home: {
           selectedCat: cat,
-          selectedSubCat: subcat,
+          selectedSubCat: subcat ?? (!!Object.keys(userState.chats.dms).length && Object.keys(userState.chats.dms)[0]),
         },
       })
     );
+    if(cat == 'dms' && subcat !== null) navigation.closeDrawer()
   };
 
   const actionSheetRef = useRef<ActionSheet>(null);
@@ -142,9 +143,9 @@ const CustomDrawerContent = ({ navigation }: any) => {
               marginBottom: 18,
               position: "relative",
             }}
-            onPress={() => selectHomeState("p2p", null)}
+            onPress={() => selectHomeState("dms", null)}
           >
-            {appState.home.selectedCat == "p2p" && (
+            {appState.home.selectedCat == "dms" && (
               <View
                 style={{
                   position: "absolute",
@@ -183,7 +184,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                   backgroundColor: theme.background,
                   alignSelf: "center",
                 },
-                appState.home.selectedCat == "p2p" && {
+                appState.home.selectedCat == "dms" && {
                   borderWidth: 2,
                   borderColor: theme.black,
                   borderRadius: 20,
@@ -247,7 +248,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                         height: 60,
                       }}
                       source={userState?.chats?.["chat"]?.[key]?.["chat_img"]}
-                      cachePolicy={'memory-disk'}
+                      cachePolicy={"memory-disk"}
                     ></ExpoImage>
                   ) : (
                     <Text style={{ fontWeight: "bold", color: "white" }}>
@@ -286,9 +287,16 @@ const CustomDrawerContent = ({ navigation }: any) => {
         <ScrollView>
           <SafeAreaView>
             <View style={{ flexDirection: "column", gap: 12 }}>
-              {appState.home.selectedCat == "home" && (
-                <View>
-                  <View style={{ padding: 8 }}>
+              {appState.home.selectedCat == "dms" && (
+                <View style={{ flex: 1 }}>
+                  <View
+                    style={{
+                      padding: 8,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
                     <Text
                       style={{
                         fontSize: 16,
@@ -298,13 +306,34 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     >
                       Direct Messages
                     </Text>
+                    <TouchableOpacity style={{ padding: 5 }}>
+                      <Image
+                        style={{ width: 15, height: 15 }}
+                        source={config["add"]}
+                      ></Image>
+                    </TouchableOpacity>
                   </View>
                   {/* <DrawerItemList {...props} /> */}
-                  <UserList list={userState.friends as any[]}></UserList>
+                  <UserList
+                    list={Object.keys(userState?.chats?.["dms"]).map(
+                      (chatID) => {
+                        return {
+                          ...appState.userProfiles[
+                            userState?.chats?.["dms"][chatID].users.find(
+                              (userID: string) =>
+                                userID !== auth.currentUser!.uid
+                            )
+                          ],
+                          dmRef:chatID
+                        };
+                      }
+                    )}
+                    onPress={(user) => selectHomeState("dms", user.dmRef)}
+                  ></UserList>
                 </View>
               )}
               {appState.home.selectedCat &&
-                appState.home.selectedCat !== "p2p" && (
+                appState.home.selectedCat !== "dms" && (
                   <View style={{ flexDirection: "column" }}>
                     <View
                       style={{
@@ -325,7 +354,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                           userState.chats.chat[
                             appState.home
                               .selectedSubCat as keyof typeof userState.chats
-                          ].name
+                          ]?.name
                         }
                       </Text>
                       <TouchableOpacity onPress={() => chatOptions()}>
@@ -418,6 +447,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     visible: false,
                   })
                 }
+                navigation={navigation}
               ></ResolveChat>
             </View>
           </Pressable>

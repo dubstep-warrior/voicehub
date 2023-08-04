@@ -1,5 +1,6 @@
 import {
   assign as assignUser,
+  clearChat,
   update as updateUser,
   updateUserChat,
   updateUserChatMessages,
@@ -10,7 +11,7 @@ import {
   clearFirebase,
   update as updateApp,
   updateAppMessages,
-} from "../slices/app.slice";
+ } from "../slices/app.slice";
 import { auth, db } from "../../../firebase";
 import {
   EmailAuthProvider,
@@ -176,19 +177,29 @@ export const AuthOnRender = () => {
           listener: onSnapshot(chatsQeury, async (snapshot) => {
             const chats: any = {
               chat: {},
-              p2p: {},
-            };
-
+              dms: {},
+            }; 
             snapshot.forEach((document) => {
               const chat = document.data();
               chats[chat.type][document.id] = { ...chat, id: document.id };
+           
             });
+            // dispatch(updateDMReferences(users))
 
             dispatch(
               updateUser({
                 chats: chats,
               })
             );
+
+            if(!!Object.keys(chats.dms).length) {
+              dispatch(updateApp({
+                home: {
+                  selectedCat: 'dms',
+                  selectedSubCat: Object.keys(chats.dms)[0]
+                }
+              }))
+            }
           }),
         })
       );
@@ -278,6 +289,9 @@ export const AuthRemove = () => {
           assignUser({
             user: {},
           })
+        );
+        dispatch(
+          clearChat()
         );
       })
       .catch((err) => {});

@@ -46,6 +46,7 @@ import {
 } from "@georstat/react-native-image-gallery";
 // import Gallery from "react-native-image-gallery";
 import AnimatedGallery from "@akumzy/react-native-animated-gallery";
+import { auth } from "../../../../firebase";
 // import Gallery from "react-native-image-gallery";
 
 export default function Default({ route, navigation }: any) {
@@ -158,15 +159,15 @@ export default function Default({ route, navigation }: any) {
 
   const GalleryImage = (image: ImageObject) => {
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ExpoImage
           style={{
-            width: '100%',
-            height: '100%'
+            width: "100%",
+            height: "100%",
           }}
           source={image.url}
           cachePolicy={"memory-disk"}
-          contentFit='contain'
+          contentFit="contain"
         ></ExpoImage>
       </View>
     );
@@ -175,29 +176,29 @@ export default function Default({ route, navigation }: any) {
   const renderHeaderComponent = () => {
     return (
       <SafeAreaView
-            style={{ position: "absolute", top: 0, width: "100%", zIndex: 7 }}
+        style={{ position: "absolute", top: 0, width: "100%", zIndex: 7 }}
+      >
+        <View
+          style={{
+            width: "100%",
+            padding: 16,
+            marginTop: 48,
+            alignItems: "flex-end",
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => setGallery(null)}
+            style={{ padding: 8, borderRadius: 16 }}
           >
-            <View
-              style={{
-                width: "100%",
-                padding: 16,
-                marginTop: 48,
-                alignItems: "flex-end",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => setGallery(null)}
-                style={{ padding: 8, borderRadius: 16 }}
-              >
-                <Image
-                  style={{ width: 20, height: 20 }}
-                  source={config["close"]}
-                ></Image>
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
-    )
-  }
+            <Image
+              style={{ width: 20, height: 20 }}
+              source={config["close"]}
+            ></Image>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  };
 
   return (
     <KeyboardAvoidingView
@@ -229,7 +230,6 @@ export default function Default({ route, navigation }: any) {
           // animated
           animationIn="slideInUp"
         >
-           
           {/* <AnimatedGallery
             imageUrls={gallery}
             disablefullScreen={false}
@@ -245,12 +245,13 @@ export default function Default({ route, navigation }: any) {
             invertGalleryDirection={false}
           /> */}
           {/* <Gallery images={gallery} imageComponent={GalleryImage}></Gallery> */}
-          <ImageGallery close={() => setGallery(null)}
-          hideThumbs
-          images={gallery}
-          isOpen={!!gallery?.length}
-          renderCustomImage={GalleryImage}
-          renderHeaderComponent={renderHeaderComponent}
+          <ImageGallery
+            close={() => setGallery(null)}
+            hideThumbs
+            images={gallery}
+            isOpen={!!gallery?.length}
+            renderCustomImage={GalleryImage}
+            renderHeaderComponent={renderHeaderComponent}
           ></ImageGallery>
         </Modal>
       )}
@@ -288,7 +289,15 @@ export default function Default({ route, navigation }: any) {
                 source={config["friends-white"]}
               ></Image>
             </TouchableOpacity>
-            <Text style={globalStyles.headerText}>{selectedChat?.name}</Text>
+            <Text style={globalStyles.headerText}>
+              {selectedChat?.type == "chat"
+                ? selectedChat?.name
+                : appState?.userProfiles?.[
+                    selectedChat?.users.find(
+                      (userID: string) => userID !== auth.currentUser!.uid
+                    )
+                  ]?.displayedName}
+            </Text>
           </View>
         </SafeAreaView>
         <View style={{ flex: 1, flexDirection: "column" }}>

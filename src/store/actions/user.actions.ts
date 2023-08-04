@@ -24,7 +24,11 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { assign as assignApp, update as updateApp, updateAppMessages } from "../slices/app.slice";
+import {
+  assign as assignApp,
+  update as updateApp,
+  updateAppMessages,
+} from "../slices/app.slice";
 import { getAuth } from "firebase/auth";
 import { Alert } from "react-native";
 import uploadImage from "../../utils/FileUploader";
@@ -54,7 +58,10 @@ export const UserUpdate = (
 
     console.log("new changes ", newChanges);
     if ("profile_img" in newChanges) {
-      const imageURI = await uploadImage(newChanges["profile_img"], 'profile-images');
+      const imageURI = await uploadImage(
+        newChanges["profile_img"],
+        "profile-images"
+      );
       newChanges["profile_img"] = imageURI;
     }
     const ref = doc(db, "userProfiles", auth.currentUser!.uid);
@@ -251,7 +258,7 @@ export const rejectRequest = (from: any) => {
 
 export const acceptRequest = (from: any) => {
   return async (dispatch: any) => {
-    console.log("dispatching accept request to:", from.uid);
+    console.log("dispatching accept request to:", from);
     if (auth.currentUser) {
       const q = query(
         collection(db, "requests"),
@@ -268,6 +275,10 @@ export const acceptRequest = (from: any) => {
           })
             .then(() => {
               deleteDoc(document.ref);
+              // dispatch(addChat({
+              //   type: 'dms',
+              //   users: [from.uid, auth.currentUser?.uid]
+              // }))
               Alert.alert(`Successfully accepted request`, undefined, [
                 { text: "OK", onPress: () => console.log("OK Pressed") },
               ]);
@@ -319,7 +330,7 @@ export const removeFriend = (friend: any) => {
   };
 };
 
-export const addChat = (chatObject: any) => {
+export const addChat = (chatObject: any, navigation: any) => {
   return async (dispatch: any) => {
     if (auth.currentUser) {
       dispatch(
@@ -329,9 +340,9 @@ export const addChat = (chatObject: any) => {
       );
 
       const chat = chatObject;
-
+      console.log('ADDING CHAT', chat)
       if ("chat_img" in chat && chat["chat_img"]) {
-        const imageURI = await uploadImage(chat["chat_img"], 'chat-images');
+        const imageURI = await uploadImage(chat["chat_img"], "chat-images");
         chat["chat_img"] = imageURI;
       }
 
@@ -339,20 +350,51 @@ export const addChat = (chatObject: any) => {
         ...chat,
       })
         .then((docRef) => {
-          dispatch(getChatSubscription(docRef.id))
+          console.log('add chat worked')
+          dispatch(getChatSubscription(docRef.id)).then(async () => {
+            await dispatch(
+              updateApp({
+                home: {
+                  selectedCat: chat.type,
+                  selectedSubCat: docRef.id,
+                },
+              })
+            );
+            navigation.navigate("Main", {
+              screen: "Home",
+              params: {
+                screen: "Chat",
+                params: {
+                  drawerStatus: "closed",
+                  screen: "Default",
+                },
+              },
+            });
+          });
 
           console.log("successfully added a chat");
-          Alert.alert(`Successfully added chat ${chat.name}`, undefined, [
-            { text: "OK", onPress: () => console.log("OK Pressed") },
-          ]);
+          if (chat.type == "chat") {
+            Alert.alert(`Successfully added chat ${chat.name}`, undefined, [
+              { text: "OK", onPress: () => console.log("OK Pressed") },
+            ]);
+          }
         })
         .catch((err) => {
           console.log("cant add chat:", err);
-          Alert.alert(
-            `Could not add chat ${chat.name}`,
-            "There was an issue with adding your chat, please try again later",
-            [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-          );
+          if (chat.type == "chat") {
+            Alert.alert(
+              `Could not add chat ${chat.name}`,
+              "There was an issue with adding your chat, please try again later",
+              [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+            );
+          }
+          if (chat.type == "dms") {
+            Alert.alert(
+              `Could not send message`,
+              "There was an issue, please try again later",
+              [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+            );
+          }
         });
 
       dispatch(
@@ -375,22 +417,24 @@ export const joinChat = (form: any) => {
 
       const ref = doc(db, "chats", form.chat_id);
       await updateDoc(ref, {
-        users: arrayUnion(auth.currentUser!.uid)
-      }).then(() => {
-        dispatch(getChatSubscription(form.chat_id))
+        users: arrayUnion(auth.currentUser!.uid),
+      })
+        .then(() => {
+          dispatch(getChatSubscription(form.chat_id));
 
-        console.log("successfully join a chat");
-        Alert.alert(`Successfully joined chat!`, undefined, [
-          { text: "OK", onPress: () => console.log("OK Pressed") },
-        ]);
-      }).catch((err) => {
-        console.log("cant join chat:", err);
-        Alert.alert(
-          `Could not join chat`,
-          "There was an issue with joining the chat, please try again later",
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-        );
-      });
+          console.log("successfully join a chat");
+          Alert.alert(`Successfully joined chat!`, undefined, [
+            { text: "OK", onPress: () => console.log("OK Pressed") },
+          ]);
+        })
+        .catch((err) => {
+          console.log("cant join chat:", err);
+          Alert.alert(
+            `Could not join chat`,
+            "There was an issue with joining the chat, please try again later",
+            [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+          );
+        });
 
       dispatch(
         updateApp({
@@ -398,10 +442,8 @@ export const joinChat = (form: any) => {
         })
       );
     }
-
   };
 };
-
 
 export const addMessage = (form: any, chat_id: string | null) => {
   return async (dispatch: any) => {
@@ -420,12 +462,14 @@ export const addMessage = (form: any, chat_id: string | null) => {
 
     if ("images" in message && message["images"]?.length > 0) {
       const imageURIs = await Promise.all(
-        message["images"].map((image: any) => uploadImage(image, 'message-images'))
+        message["images"].map((image: any) =>
+          uploadImage(image, "message-images")
+        )
       );
       message["images"] = imageURIs;
     }
 
     await addDoc(collection(doc(db, "chats", chat_id!), "messages"), message);
-    console.log('SENDING MESSAGE SUCCESFULL YAYYY')
+    console.log("SENDING MESSAGE SUCCESFULL YAYYY");
   };
 };
