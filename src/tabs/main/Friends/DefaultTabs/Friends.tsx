@@ -5,10 +5,16 @@ import { ScrollView } from "react-native-gesture-handler";
 import config from "../../../../../Images.config";
 import { styles as globalStyles } from "../../../../../Styles.config";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { selectUser, updateUserChat } from "../../../../store/slices/user.slice";
+import {
+  selectUser,
+  updateUserChat,
+} from "../../../../store/slices/user.slice";
 import { NavigationProps } from "../../../../interfaces/NavigationProps.interface";
 import UserList from "../../../../shared/UserList";
-import { selectApp, update as updateApp } from "../../../../store/slices/app.slice";
+import {
+  selectApp,
+  update as updateApp,
+} from "../../../../store/slices/app.slice";
 import { useRef } from "react";
 import ActionSheet from "react-native-actionsheet";
 import {
@@ -40,12 +46,15 @@ export default function Friends({ route, navigation }: NavigationProps) {
             // Send message
             // ENABLE SEND MESSAGE OVERLAY HERE
 
-            const existingChatID = Object.keys(userState.chats.dms).find((chatID) => {
-              return userState.chats.dms[chatID].users.includes(
-                selectedUser.current.uid
-              );
-            })
+            const existingChatID = Object.keys(userState.chats.dms).find(
+              (chatID) => {
+                return userState.chats.dms[chatID].users.includes(
+                  selectedUser.current.uid
+                );
+              }
+            );
             if (existingChatID) {
+              console.log("there is existing chat ID");
               dispatch(
                 updateApp({
                   home: {
@@ -54,25 +63,55 @@ export default function Friends({ route, navigation }: NavigationProps) {
                   },
                 })
               );
-              
-            } else { 
-              // console.log(auth.currentUser!.uid, selectedUser.current.uid)
-              StartChat(selectedUser, navigation)
 
-            }
-
-            navigation.navigate("Main", {
-              screen: "Home",
-              params: {
-                screen: "Chat",
+              navigation.navigate("Main", {
+                screen: "Home",
                 params: {
-                  drawerStatus: "closed",
-                  screen: "Default",
+                  screen: "Chat",
+                  params: {
+                    drawerStatus: "closed",
+                    screen: "Default",
+                  },
                 },
-              },
-            });
-          }
-          if ([1].includes(index)) {
+              });
+            } else {
+              // console.log(auth.currentUser!.uid, selectedUser.current.uid)
+              console.log("WE ARE CALLING START CHAT");
+              // await StartChat(selectedUser, navigation)
+              const dms: any = {};
+              dms[`temp-${selectedUser.current.uid}`] = {
+                users: [auth.currentUser!.uid, selectedUser.current.uid],
+                type: "dms",
+              };
+              dispatch(
+                updateUserChat({
+                  chat: {
+                    dms: dms,
+                  },
+                })
+              );
+              dispatch(
+                updateApp({
+                  home: {
+                    selectedCat: "dms",
+                    selectedSubCat: `temp-${selectedUser.current.uid}`,
+                  },
+                })
+              );
+
+              navigation.navigate("Main", {
+                screen: "Home",
+                params: {
+                  screen: "Chat",
+                  drawerStatus: "closed",
+                  params: {
+                    // drawerStatus: "closed",
+                    screen: "Default",
+                  },
+                },
+              });
+            }
+          } else if ([1].includes(index)) {
             // Remove friend
             dispatch(removeFriend(selectedUser.current));
           }
@@ -131,7 +170,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
           }}
         >
           <UserList
-            identifier='uid'
+            identifier="uid"
             list={
               userState[current as keyof typeof userState].map((ref: any) => {
                 return { uid: ref.uid, ...appState.userProfiles[ref.uid] };

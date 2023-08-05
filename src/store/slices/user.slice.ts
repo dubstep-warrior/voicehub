@@ -69,6 +69,7 @@ export const userSlice = createSlice({
           });
         });
       });
+      console.log('updated user chat', state.chats.dms)
     },
     clearChat: (state: UserState) => {
       state.chats = {

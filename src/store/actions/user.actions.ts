@@ -330,7 +330,7 @@ export const removeFriend = (friend: any) => {
   };
 };
 
-export const addChat = (chatObject: any) => {
+export const addChat = (chatObject: any): any => {
   return async (dispatch: any) => {
     if (auth.currentUser) {
       dispatch(
@@ -369,7 +369,7 @@ export const addChat = (chatObject: any) => {
             ]);
           }
           return {
-            succcess: true,
+            success: true,
             data: docRef,
           };
         })
@@ -402,6 +402,11 @@ export const addChat = (chatObject: any) => {
       );
 
       return res;
+    } else {
+      return {
+        success: false,
+        data: 'Not logged in'
+      }
     }
   };
 };

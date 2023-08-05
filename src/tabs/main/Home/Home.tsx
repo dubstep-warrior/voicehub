@@ -45,9 +45,11 @@ import { auth } from "../../../../firebase";
 
 export default function Home({ route, navigation }: any) {
   const Drawer = createDrawerNavigator();
+  console.log("navigated to home", route?.params?.drawerStatus);
   return (
     <>
       <Drawer.Navigator
+        key={route?.params?.drawerStatus ?? "open"}
         defaultStatus={route?.params?.drawerStatus ?? "open"}
         screenOptions={{
           swipeEdgeWidth: Dimensions.get("window").width,
@@ -129,7 +131,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
     setOverlay({
       type: overlay.type,
       visible: false,
-    })
+    });
     navigation.navigate("Main", {
       screen: "Home",
       params: {
@@ -140,7 +142,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
         },
       },
     });
-  }
+  };
 
   return (
     <View style={{ flexDirection: "row", flexGrow: 1 }}>
@@ -334,7 +336,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     </TouchableOpacity>
                   </View>
                   {/* <DrawerItemList {...props} /> */}
-                  <View style={{padding: 8}}>
+                  <View style={{ padding: 8 }}>
                     <UserList
                       list={Object.keys(userState?.chats?.["dms"]).map(
                         (chatID) => {

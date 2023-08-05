@@ -39,6 +39,7 @@ import {
   where,
 } from "firebase/firestore";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { getChatSubscription } from "../../utils/Subscribers";
 
 export const resolveAccess = (data: any, current: string) => {
   //   const dispatch = useAppDispatch();
@@ -208,44 +209,7 @@ export const AuthOnRender = () => {
       // console.log('gathered chatIDS', chatIDs)
       chats.forEach((document) => {
         const id = document.id;
-        const messagesQuery = query(
-          collection(doc(db, "chats", id), "messages"),
-          orderBy("created")
-        );
-
-        dispatch(
-          addFirebaseListener({
-            listener: onSnapshot(messagesQuery, async (snapshot) => {
-              const messages: any[] = [];
-              snapshot.forEach((messageDoc) => {
-                const message = messageDoc.data();
-                messages.push({
-                  ...message,
-                  created: new Date(
-                    messageDoc.data().created
-                  ).toLocaleDateString("en-US"),
-                  images:
-                    message?.images?.map((uri: string, index: number) => {
-                      return {
-                        id: index,
-                        uri: uri,
-                        url: uri,
-                        source: { uri: uri }, 
-                      };
-                    }) ?? [],
-                  id: messageDoc.id,
-                });
-              });
-
-              dispatch(
-                updateAppMessages({
-                  messages: messages,
-                  chat_id: id,
-                })
-              );
-            }),
-          })
-        );
+        dispatch(getChatSubscription(id))
       });
 
       const allUsers = query(collection(db, "userProfiles"));
