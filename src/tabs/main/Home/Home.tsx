@@ -41,7 +41,11 @@ import Invite from "../../../pages/Invite";
 import Modal from "react-native-modal";
 import FlashMessage from "react-native-flash-message";
 import { Image as ExpoImage } from "expo-image";
-import { auth } from "../../../../firebase";
+import { auth, db } from "../../../../firebase";
+import { collection, doc, setDoc } from "firebase/firestore";
+// import Daily from '@daily-co/react-native-daily-js';
+
+
 
 export default function Home({ route, navigation }: any) {
   const Drawer = createDrawerNavigator();
@@ -142,6 +146,15 @@ const CustomDrawerContent = ({ navigation }: any) => {
         },
       },
     });
+  }; 
+
+  const joinVoiceLounge = async (chatId: string | null) => {
+    // const call = Daily.createCallObject({
+    //   audioSource: true, // Start with audio on to get mic permission from participant at start
+    //   videoSource: false,
+    // });
+    // call.join({ url: `https://voicehub.daily.co/${chatId}` });
+
   };
 
   return (
@@ -413,7 +426,12 @@ const CustomDrawerContent = ({ navigation }: any) => {
                           Text channel
                         </Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[styles.subCatOption]}>
+                      <TouchableOpacity
+                        style={[styles.subCatOption]}
+                        onPress={() =>
+                          joinVoiceLounge(appState.home.selectedSubCat)
+                        }
+                      >
                         <Image
                           style={{ borderRadius: 0, width: 20, height: 20 }}
                           source={config["voice"]}

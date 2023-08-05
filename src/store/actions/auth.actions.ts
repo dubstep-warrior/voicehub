@@ -11,7 +11,7 @@ import {
   clearFirebase,
   update as updateApp,
   updateAppMessages,
- } from "../slices/app.slice";
+} from "../slices/app.slice";
 import { auth, db } from "../../../firebase";
 import {
   EmailAuthProvider,
@@ -106,7 +106,7 @@ export const AuthOnRender = () => {
             (profile) => {
               dispatch(
                 assignUser({
-                  user: profile.data() 
+                  user: profile.data(),
                 })
               );
             }
@@ -179,11 +179,19 @@ export const AuthOnRender = () => {
             const chats: any = {
               chat: {},
               dms: {},
-            }; 
+            };
             snapshot.forEach((document) => {
               const chat = document.data();
               chats[chat.type][document.id] = { ...chat, id: document.id };
-           
+
+              // if (
+              //   !!getState?.app?.call &&
+              //   getState?.app?.call == document.id &&
+              //   !!chat?.answer
+              // ) {
+              //   const answer = new RTCSessionDescription(chat.answer);
+              //   getState.app.RTCPeerConnection.setRemoteDescription(answer);
+              // }
             });
             // dispatch(updateDMReferences(users))
 
@@ -193,13 +201,15 @@ export const AuthOnRender = () => {
               })
             );
 
-            if(!!Object.keys(chats.dms).length) {
-              dispatch(updateApp({
-                home: {
-                  selectedCat: 'dms',
-                  selectedSubCat: Object.keys(chats.dms)[0]
-                }
-              }))
+            if (!!Object.keys(chats.dms).length) {
+              dispatch(
+                updateApp({
+                  home: {
+                    selectedCat: "dms",
+                    selectedSubCat: Object.keys(chats.dms)[0],
+                  },
+                })
+              );
             }
           }),
         })
@@ -209,7 +219,7 @@ export const AuthOnRender = () => {
       // console.log('gathered chatIDS', chatIDs)
       chats.forEach((document) => {
         const id = document.id;
-        dispatch(getChatSubscription(id))
+        dispatch(getChatSubscription(id));
       });
 
       const allUsers = query(collection(db, "userProfiles"));
@@ -220,7 +230,7 @@ export const AuthOnRender = () => {
             const profiles: any = {};
             snapshot.forEach((document) => {
               const user = document.data();
-              profiles[document.id] = {...user, uid: document.id};
+              profiles[document.id] = { ...user, uid: document.id };
             });
 
             console.log("updating profiles here", Object.keys(profiles));
@@ -254,9 +264,7 @@ export const AuthRemove = () => {
             user: {},
           })
         );
-        dispatch(
-          clearChat()
-        );
+        dispatch(clearChat());
       })
       .catch((err) => {});
 
