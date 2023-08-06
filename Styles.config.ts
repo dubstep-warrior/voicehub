@@ -22,7 +22,8 @@ export const styles = StyleSheet.create({
   },
   headingContainer: {
     padding: 12,
-    justifyContent: "flex-end",
+    minHeight: 56,
+    justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
     position: "relative",

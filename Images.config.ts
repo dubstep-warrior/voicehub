@@ -23,7 +23,8 @@ const config = {
   "voice": require("./assets/voice.png"),
   "menu": require("./assets/menu.png"),
   "photo": require("./assets/photo.png"),
-  "send": require("./assets/send.png")
+  "send": require("./assets/send.png"),
+  "arrow-down": require("./assets/arrow-down.png")
 };
 
 export default config;

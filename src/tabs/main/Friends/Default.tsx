@@ -1,4 +1,12 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, Animated } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Animated,
+  Dimensions,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import theme from "../../../../config/theme.config.json";
 import { ScrollView } from "react-native-gesture-handler";
@@ -12,6 +20,7 @@ import { selectApp } from "../../../store/slices/app.slice";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import FriendsTab from "./DefaultTabs/Friends";
 import { RootStackParamList } from "../../../interfaces/RootStackParamList.interface";
+import StandardTabPage from "../StandardTabPage";
 
 export default function Default({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
@@ -22,16 +31,9 @@ export default function Default({ route, navigation }: NavigationProps) {
     return;
   });
   return (
-    <SafeAreaView style={styles.safeAreaContainer}>
-      {/* HEADING */}
-      <View
-        style={globalStyles.headingContainer}
-      >
-        <Text
-          style={globalStyles.headerText}
-        >
-          Friends
-        </Text>
+    <StandardTabPage
+      headerName="Friends"
+      headerRight={
         <TouchableOpacity
           style={{ padding: 4 }}
           onPress={() =>
@@ -47,11 +49,11 @@ export default function Default({ route, navigation }: NavigationProps) {
             source={config["add-user"]}
           ></Image>
         </TouchableOpacity>
-      </View>
-      {/* BODY */}
+      }
+    >
       <Tab.Navigator
         initialRouteName="FriendsDefault"
-        style={{ minHeight: "100%" }}
+        style={{ minHeight: Dimensions.get("window").height - 135 }}
         screenListeners={{
           focus: () => {
             Animated.timing(av, {
@@ -75,7 +77,7 @@ export default function Default({ route, navigation }: NavigationProps) {
           component={FriendsTab}
         />
       </Tab.Navigator>
-    </SafeAreaView>
+    </StandardTabPage>
   );
 }
 

@@ -71,6 +71,8 @@ export default function Default({ route, navigation }: any) {
 
   useEffect(() => {
     reset();
+    scrollViewRef.current?.scrollToEnd()
+    setCloseToBottom(true)
   }, [appState.home]);
 
   const scrollViewRef = useRef<FlatList>(null);
@@ -139,8 +141,7 @@ export default function Default({ route, navigation }: any) {
     }
   };
 
-  const [scrollViewPostion, setScrollViewPosition] = useState();
-  const [closeToBottom, setCloseToBottom] = useState(false);
+  const [closeToBottom, setCloseToBottom] = useState(true);
   const [gallery, setGallery] = useState<any[] | null>(null);
   // const gallery = useRef<null | any[]>(null);
   const setIsCloseToBottom = ({
@@ -149,17 +150,17 @@ export default function Default({ route, navigation }: any) {
     contentSize,
   }: any) => {
     const paddingToBottom = 20;
+    // console.log(layoutMeasurement.height, contentOffset.y, contentSize.height)
     setCloseToBottom(
-      layoutMeasurement.height + contentOffset.y >=
-        contentSize.height - paddingToBottom
+      contentOffset.y < paddingToBottom
     );
-    setScrollViewPosition(contentOffset.y);
   };
 
   useEffect(() => {
-    if (closeToBottom) {
-      scrollViewRef.current?.scrollToEnd();
-    }
+    // if (closeToBottom) {
+    //   scrollViewRef.current?.scrollToEnd();
+    // }
+    scrollViewRef.current?.scrollToEnd();
   }, [appState.messages[appState.home.selectedSubCat as any]]);
 
   useEffect(() => {
@@ -298,113 +299,127 @@ export default function Default({ route, navigation }: any) {
                 ? selectedChat?.name
                 : appState?.userProfiles?.[
                     selectedChat?.users.find(
-                      (userID: string) => userID !== auth.currentUser!.uid
+                      (userID: string) => userID !== auth.currentUser?.uid
                     )
                   ]?.displayedName}
             </Text>
           </View>
         </SafeAreaView>
-        <View style={{ flex: 1, flexDirection: "column" }}>
+        <View
+          style={{ flex: 1, flexDirection: "column", position: "relative" }}
+        >
           <View style={{ flex: 1, backgroundColor: theme.background2 }}>
             {!!appState.messages[appState.home.selectedSubCat as any] &&
               !!appState.messages[appState.home.selectedSubCat as any]
                 .length && (
                 <FlatList
+                  // key={appState.home.selectedSubCat} 
+                  inverted
+                  onScroll={(event) => setIsCloseToBottom(event.nativeEvent)}
+                
                   ref={scrollViewRef}
-                  data={appState.messages[appState.home.selectedSubCat as any]}
-                  renderItem={({ item, index }) => (
-                    <View
-                      key={item.id}
-                      style={[
-                        {
-                          flexDirection: "row",
-                          padding: 12,
-                          gap: 8,
-                        },
-                        index !==
-                          appState.messages[appState.home.selectedSubCat as any]
-                            .length -
-                            1 && {
-                          borderBottomWidth: 0.4,
-                        },
-                      ]}
-                    >
+                  data={[...appState.messages[appState.home.selectedSubCat as any]].reverse()}
+                  renderItem={({ item, index }) => {
+                    console.log(item);
+                    return (
                       <View
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 30,
-                          overflow: "hidden",
-                        }}
+                        key={item?.id ?? `temp-message-${index}`}
+                        style={[
+                          {
+                            flexDirection: "row",
+                            padding: 12,
+                            gap: 8,
+                          },
+                          index !==
+                            appState.messages[
+                              appState.home.selectedSubCat as any
+                            ].length -
+                              1 && {
+                            borderBottomWidth: 0.4,
+                          },
+                        ]}
                       >
-                        <ExpoImage
+                        <View
                           style={{
                             width: 60,
                             height: 60,
-                          }}
-                          source={appState.userProfiles[item?.by].profile_img}
-                          cachePolicy={"memory-disk"}
-                        ></ExpoImage>
-                      </View>
-                      <View style={{ justifyContent: "space-between" }}>
-                        <Text
-                          style={{
-                            color: "black",
-                            fontWeight: "bold",
-                            fontSize: 16,
-                            padding: 4,
+                            borderRadius: 30,
+                            overflow: "hidden",
                           }}
                         >
-                          {appState.userProfiles[item?.by].displayedName}
-                        </Text>
-                        <Text
-                          style={{
-                            color: "black",
-                            padding: 4,
-                            marginBottom: 12,
-                          }}
-                        >
-                          {item.desc}
-                        </Text>
-                        {!!item?.images?.length && (
-                          <TouchableOpacity
-                            onPress={() => {
-                              setGallery(item.images);
-                            }}
+                          <ExpoImage
                             style={{
-                              flexDirection: "row",
-                              flexWrap: "wrap",
-                              width: "90%",
-                              padding: 1,
-                              gap: 1,
-                              backgroundColor: "white",
-                              justifyContent: "space-between",
+                              width: 60,
+                              height: 60,
+                            }}
+                            source={appState.userProfiles[item?.by]?.profile_img ?? config['profile-grey']}
+                            cachePolicy={"memory-disk"}
+                          ></ExpoImage>
+                        </View>
+                        <View style={{ justifyContent: "space-between" }}>
+                          <Text
+                            style={{
+                              color: "black",
+                              fontWeight: "bold",
+                              fontSize: 16,
+                              padding: 4,
                             }}
                           >
-                            {item?.images?.map((image: any, index: number) => {
-                              console.log(item);
-                              return (
-                                <ExpoImage
-                                  key={index + image.uri}
-                                  style={{
-                                    height:
-                                      item?.images?.length > 1 ? 100 : 200,
-                                    width:
-                                      item?.images?.length > 1
-                                        ? "49.5%"
-                                        : "100%",
-                                  }}
-                                  source={image.uri}
-                                  cachePolicy={"memory-disk"}
-                                ></ExpoImage>
-                              );
-                            })}
-                          </TouchableOpacity>
-                        )}
+                            {appState.userProfiles[item?.by]?.displayedName}
+                          </Text>
+                          <Text
+                            style={{
+                              color: "black",
+                              padding: 4,
+                              marginBottom: 12,
+                            }}
+                          >
+                            {item.desc}
+                          </Text>
+                          {!!item?.images?.length && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setGallery(item.images);
+                              }}
+                              style={{
+                                flexDirection: "row",
+                                flexWrap: "wrap",
+                                width: "90%",
+                                padding: 1,
+                                gap: 1,
+                                backgroundColor: "white",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              {item?.images?.map(
+                                (image: any, index: number) => {
+                                  console.log(item);
+                                  return (
+                                    <ExpoImage
+                                      key={index + image.uri}
+                                      style={{
+                                        height:
+                                          item?.images?.length > 1 ? 100 : 200,
+                                        width:
+                                          item?.images?.length > 1
+                                            ? "49.5%"
+                                            : "100%",
+                                      }}
+                                      source={image.uri}
+                                      cachePolicy={"memory-disk"}
+                                    ></ExpoImage>
+                                  );
+                                }
+                              )}
+                            </TouchableOpacity>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  )}
-                  keyExtractor={(message) => message.id}
+                    );
+                  }}
+                  keyExtractor={(message, index) =>
+                    message?.id ?? `temp-message-${index}`
+                  }
                 />
               )}
           </View>
@@ -470,6 +485,27 @@ export default function Default({ route, navigation }: any) {
               </TouchableOpacity>
             </View>
           </View>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              {
+                backgroundColor: "white",
+                position: "absolute",
+                bottom: 60,
+                right: 12,
+              },
+              closeToBottom && { display: "none" },
+            ]}
+            onPress={() => scrollViewRef.current?.scrollToOffset({
+               animated: true,
+               offset: 0
+            })}
+          >
+            <Image
+              style={styles.buttonImage}
+              source={config["arrow-down"]}
+            ></Image>
+          </TouchableOpacity>
         </View>
         <ActionSheet {...actionSheetProps}></ActionSheet>
       </>

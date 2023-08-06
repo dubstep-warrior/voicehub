@@ -25,6 +25,7 @@ import {
   where,
 } from "firebase/firestore";
 import {
+  addAppMessage,
   assign as assignApp,
   update as updateApp,
   updateAppMessages,
@@ -425,7 +426,16 @@ export const joinChat = (form: any) => {
         users: arrayUnion(auth.currentUser!.uid),
       })
         .then(() => {
-          dispatch(getChatSubscription(form.chat_id));
+          dispatch(getChatSubscription(form.chat_id)).then(async () => {
+            await dispatch(
+              updateApp({
+                home: {
+                  selectedCat: 'chat',
+                  selectedSubCat: form.chat_id,
+                },
+              })
+            ); 
+          });
 
           console.log("successfully join a chat");
           Alert.alert(`Successfully joined chat!`, undefined, [
@@ -450,7 +460,7 @@ export const joinChat = (form: any) => {
   };
 };
 
-export const addMessage = (form: any, chat_id: string | null) => {
+export const addMessage = (form: any, chat_id: string) => {
   return async (dispatch: any, getState: any) => {
     dispatch(
       updateApp({
@@ -458,8 +468,11 @@ export const addMessage = (form: any, chat_id: string | null) => {
       })
     );
      
+
     // const usersRef = db.collection('users').doc('id')
     // collection(db, 'chats', chat_id)
+
+     
 
     // SEND MESSAGE
     console.log('sending message chat_id', chat_id)
@@ -470,6 +483,12 @@ export const addMessage = (form: any, chat_id: string | null) => {
       created: serverTimestamp(),
     };
 
+    // console.log('CURRENT APP STATE',getState().app)
+    dispatch(addAppMessage({
+      chat_id: chat_id,
+      message: message
+    }))
+
     if ("images" in message && message["images"]?.length > 0) {
       const imageURIs = await Promise.all(
         message["images"].map((image: any) =>
@@ -479,7 +498,10 @@ export const addMessage = (form: any, chat_id: string | null) => {
       message["images"] = imageURIs;
     }
 
-    await addDoc(collection(doc(db, "chats", chat_id!), "messages"), message);
+    await addDoc(collection(doc(db, "chats", chat_id!), "messages"), message)
+    // .then(() => {
+      
+    // });
     console.log("SENDING MESSAGE SUCCESFULL YAYYY");
 
     dispatch(

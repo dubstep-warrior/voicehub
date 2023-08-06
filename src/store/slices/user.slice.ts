@@ -70,13 +70,7 @@ export const userSlice = createSlice({
         });
       });
       console.log('updated user chat', state.chats.dms)
-    },
-    clearChat: (state: UserState) => {
-      state.chats = {
-        chat: {},
-        dms: {}
-      };
-    },
+    }, 
     updateUserChatMessages: (state: UserState, actions) => {
       const { messages, chat_type, chat_id } = actions.payload;
       console.log(
@@ -91,8 +85,7 @@ export const userSlice = createSlice({
 
 export const {
   assign,
-  update,
-  clearChat,
+  update, 
   updateUserChat,
   updateUserChatMessages,
 } = userSlice.actions;

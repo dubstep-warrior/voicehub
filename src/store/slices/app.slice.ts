@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import { Unsubscribe } from "firebase/auth";
-import { Call } from "../../utils/Call";
+// import { Call } from "../../utils/Call";
 
 // Define a type for the slice state
 interface App {
@@ -15,6 +15,7 @@ interface App {
   userProfiles: any;
   call: any;
   firebaseListeners: Unsubscribe[];
+  notifications: any;
   // RTCPeerConnection: RTCPeerConnection
   // localMediaStream?: any
 }
@@ -31,6 +32,7 @@ const initialState: App = {
   userProfiles: {},
   call: null,
   firebaseListeners: [],
+  notifications: [],
   // RTCPeerConnection: new RTCPeerConnection({
   //   iceServers: [
   //     {
@@ -74,6 +76,10 @@ export const appSlice = createSlice({
       });
       state.firebaseListeners = [];
     }, 
+    addAppMessage: (state, actions) => {
+      state.messages[actions.payload.chat_id].push(actions.payload.message)
+      console.log("updated app state messages");
+    },
   },
 });
 
@@ -83,6 +89,7 @@ export const {
   updateAppMessages,
   addFirebaseListener,
   clearFirebase, 
+  addAppMessage
 } = appSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type

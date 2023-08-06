@@ -1,6 +1,5 @@
 import {
-  assign as assignUser,
-  clearChat,
+  assign as assignUser, 
   update as updateUser,
   updateUserChat,
   updateUserChatMessages,
@@ -201,7 +200,8 @@ export const AuthOnRender = () => {
               })
             );
 
-            if (!!Object.keys(chats.dms).length) {
+            if (!!getState().app.home.selectedSubCat && !!Object.keys(chats.dms).length) {
+              console.log('yes this is true we are setting dms')
               dispatch(
                 updateApp({
                   home: {
@@ -260,11 +260,29 @@ export const AuthRemove = () => {
       .then((res) => {
         dispatch(clearFirebase());
         dispatch(
-          assignUser({
-            user: {},
+          updateApp({
+            submitting: false,
+            users: [],
+            home: {
+              selectedCat: "dms",
+              selectedSubCat: null,
+            },
+            messages: {},
+            userProfiles: {},
+            call: null,
+            firebaseListeners: [],
+            notifications: []
           })
         );
-        dispatch(clearChat());
+        dispatch(updateUser({
+          profile_img: null,
+          username: "",
+          displayedName: "",
+          chats: {
+            chat: {},
+            dms: {},
+          },
+        }));
       })
       .catch((err) => {});
 

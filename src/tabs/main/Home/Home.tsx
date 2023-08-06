@@ -135,17 +135,8 @@ const CustomDrawerContent = ({ navigation }: any) => {
     setOverlay({
       type: overlay.type,
       visible: false,
-    });
-    navigation.navigate("Main", {
-      screen: "Home",
-      params: {
-        screen: "Chat",
-        params: {
-          drawerStatus: "closed",
-          screen: "Default",
-        },
-      },
-    });
+    }); 
+    // navigation.closeDrawer()
   }; 
 
   const joinVoiceLounge = async (chatId: string | null) => {
@@ -357,7 +348,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                             ...appState.userProfiles[
                               userState?.chats?.["dms"][chatID].users.find(
                                 (userID: string) =>
-                                  userID !== auth.currentUser!.uid
+                                  userID !== auth.currentUser?.uid
                               )
                             ],
                             dmRef: chatID,
