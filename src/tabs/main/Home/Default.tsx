@@ -48,6 +48,7 @@ import {
 import AnimatedGallery from "@akumzy/react-native-animated-gallery";
 import { auth } from "../../../../firebase";
 import { MaterialIndicator } from "react-native-indicators";
+import MessageText from "../../../shared/MessageText";
 // import Gallery from "react-native-image-gallery";
 
 export default function Default({ route, navigation }: any) {
@@ -71,7 +72,10 @@ export default function Default({ route, navigation }: any) {
 
   useEffect(() => {
     reset();
-    scrollViewRef.current?.scrollToEnd()
+    scrollViewRef.current?.scrollToOffset({
+      animated: true,
+      offset: 0
+   })
     setCloseToBottom(true)
   }, [appState.home]);
 
@@ -137,7 +141,10 @@ export default function Default({ route, navigation }: any) {
         await dispatch(addMessage(formValues, appState.home.selectedSubCat));
       }
       reset();
-      scrollViewRef.current?.scrollToEnd();
+      scrollViewRef.current?.scrollToOffset({
+        animated: true,
+        offset: 0
+     })
     }
   };
 
@@ -160,15 +167,24 @@ export default function Default({ route, navigation }: any) {
     // if (closeToBottom) {
     //   scrollViewRef.current?.scrollToEnd();
     // }
-    scrollViewRef.current?.scrollToEnd();
+    scrollViewRef.current?.scrollToOffset({
+      animated: true,
+      offset: 0
+   })
   }, [appState.messages[appState.home.selectedSubCat as any]]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-      scrollViewRef.current?.scrollToEnd();
+      scrollViewRef.current?.scrollToOffset({
+        animated: true,
+        offset: 0
+     })
     });
     const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-      scrollViewRef.current?.scrollToEnd();
+      scrollViewRef.current?.scrollToOffset({
+        animated: true,
+        offset: 0
+     })
     });
 
     return () => {
@@ -366,16 +382,8 @@ export default function Default({ route, navigation }: any) {
                             }}
                           >
                             {appState.userProfiles[item?.by]?.displayedName}
-                          </Text>
-                          <Text
-                            style={{
-                              color: "black",
-                              padding: 4,
-                              marginBottom: 12,
-                            }}
-                          >
-                            {item.desc}
-                          </Text>
+                          </Text> 
+                          <MessageText text={item.desc}></MessageText>
                           {!!item?.images?.length && (
                             <TouchableOpacity
                               onPress={() => {

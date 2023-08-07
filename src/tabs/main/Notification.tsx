@@ -12,9 +12,15 @@ import { FlatList } from "react-native-gesture-handler";
 import { useAppSelector } from "../../store/hooks";
 import { selectApp } from "../../store/slices/app.slice";
 import StandardTabPage from "./StandardTabPage";
+import { selectUser } from "../../store/slices/user.slice";
+import { Image as ExpoImage } from "expo-image";
+
 
 export default function Notification() {
   const appState = useAppSelector(selectApp);
+  const userState = useAppSelector(selectUser)
+
+
   return (
     <StandardTabPage headerName="Notifications">
       <View style={styles.safeAreaContainer}>
@@ -22,9 +28,30 @@ export default function Notification() {
           <FlatList
             data={appState.notifications}
             renderItem={({ item, index }) => (
-              <View key={index + item.id}>
-                <Text style={{ color: "white" }}>{item.desc}</Text>
-              </View>
+              <TouchableOpacity key={index + item.id}
+                style={{ backgroundColor: theme.smoothGrey, gap: 12, alignItems: 'center', padding: 8, borderRadius: 4, flexDirection: 'row' }}>
+                <View>
+                  <ExpoImage
+                    style={{ 
+                      width: 50,
+                      height: 50,
+                      borderRadius: 25
+                    }}
+                    source={userState?.chats?.["chat"]?.[item.chatID]?.["chat_img"]}
+                    cachePolicy={"memory-disk"}
+                  ></ExpoImage>
+                </View>
+                <View style={{ flex: 1, gap: 4 }}>
+                  <View style={{ flexDirection: 'row'}}>
+                    <Text style={[{ fontWeight: 'bold', flex: 1, flexWrap: 'wrap', color: theme.lightGrey }]}>
+                      <Text style={styles.text}>{appState.userProfiles[item.by].displayedName}</Text>
+                      {` tagged you in `}
+                      <Text style={styles.text}>{userState.chats['chat']?.[item.chatID].name}</Text>
+                    </Text>
+                  </View>
+                  <Text style={{color: theme.lightGrey}}>{item.desc}</Text>
+                </View>
+              </TouchableOpacity>
             )}
           ></FlatList>
         ) : (
@@ -63,5 +90,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.background2,
     flex: 1,
     minHeight: Dimensions.get("window").height - 135,
+    padding: 8
   },
+  text: {
+    color: "white",
+    textDecorationLine: 'underline'
+  }
 });
