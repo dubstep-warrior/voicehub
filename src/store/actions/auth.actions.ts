@@ -67,7 +67,7 @@ export const resolveAccess = (data: any, current: string) => {
 
         // const profile = await getDoc(doc(db, "userProfiles", user.uid!));
 
-        dispatch(AuthOnRender);
+        await dispatch(AuthOnRender);
 
         return {
           success: true,

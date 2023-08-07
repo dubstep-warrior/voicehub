@@ -33,8 +33,7 @@ export const getChatSubscription = (id: string) => {
             const message = messageDoc.data();
 
             if (
-              message.by !== auth.currentUser?.uid &&
-              message.chatID in getState().user.chats.chat &&
+              message.by !== auth.currentUser?.uid && 
               message.desc.includes("@")
             ) {
               const tags = message.desc
@@ -47,16 +46,7 @@ export const getChatSubscription = (id: string) => {
               ) {
                 notifications.push({
                   ...message,
-                  created: message.created.toDate(),
-                  images:
-                    message?.images?.map((uri: string, index: number) => {
-                      return {
-                        id: index,
-                        uri: uri,
-                        url: uri,
-                        source: { uri: uri },
-                      };
-                    }) ?? [],
+                  created: message.created.toDate(), 
                   id: messageDoc.id,
                 });
               }

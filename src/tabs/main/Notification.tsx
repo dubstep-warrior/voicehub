@@ -20,16 +20,18 @@ import { useEffect, useState } from "react";
 export default function Notification() {
   const appState = useAppSelector(selectApp);
   const userState = useAppSelector(selectUser)
-  const [notifications, setNotifications] = useState<any[]>([]) 
-   
+  const [notifications, setNotifications] = useState<any[]>([])
+
 
   useEffect(() => {
-    let localNotifications: any[] = []
-    Object.keys(appState.notifications).forEach(chat_notifications_id => {
-      localNotifications = [...localNotifications, ...appState.notifications[chat_notifications_id]]
-     }) 
-     setNotifications(localNotifications.sort((a,b) => {return a.created - b.created}))
-  }, [appState.notifications])
+    if (!!Object.keys(appState?.notifications).length) {
+      let localNotifications: any[] = []
+      Object.keys(appState.notifications).forEach(chat_notifications_id => {
+        localNotifications = [...localNotifications, ...appState.notifications[chat_notifications_id]]
+      })
+      setNotifications(localNotifications.sort((a, b) => { return a.created - b.created }))
+    }
+  }, [appState?.notifications])
 
   console.log('YAY NOTIFICATIONS', notifications)
 
@@ -45,7 +47,7 @@ export default function Notification() {
                 style={{ backgroundColor: theme.smoothGrey, gap: 12, alignItems: 'center', padding: 8, borderRadius: 4, flexDirection: 'row' }}>
                 <View>
                   <ExpoImage
-                    style={{ 
+                    style={{
                       width: 50,
                       height: 50,
                       borderRadius: 25
@@ -55,14 +57,14 @@ export default function Notification() {
                   ></ExpoImage>
                 </View>
                 <View style={{ flex: 1, gap: 4 }}>
-                  <View style={{ flexDirection: 'row'}}>
+                  <View style={{ flexDirection: 'row' }}>
                     <Text style={[{ fontWeight: 'bold', flex: 1, flexWrap: 'wrap', color: theme.lightGrey }]}>
-                      <Text style={styles.text}>{appState.userProfiles[item.by].displayedName}</Text>
+                      <Text style={styles.text}>{appState.userProfiles?.[item.by]?.displayedName}</Text>
                       {` tagged you in `}
-                      <Text style={styles.text}>{userState.chats['chat']?.[item.chatID].name}</Text>
+                      <Text style={styles.text}>{userState.chats['chat']?.[item.chatID]?.name}</Text>
                     </Text>
                   </View>
-                  <Text style={{color: theme.lightGrey}}>{item.desc}</Text>
+                  <Text style={{ color: theme.lightGrey }}>{item.desc}</Text>
                 </View>
               </TouchableOpacity>
             )}
