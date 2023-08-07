@@ -9,6 +9,7 @@ import {
   addFirebaseListener,
   update as updateApp,
   updateAppMessages,
+  updateAppNotifications,
 } from "../store/slices/app.slice";
 import { auth, db } from "../../firebase";
 import { useAppSelector } from "../store/hooks";
@@ -46,9 +47,7 @@ export const getChatSubscription = (id: string) => {
               ) {
                 notifications.push({
                   ...message,
-                  created: new Date(
-                    messageDoc.data().created
-                  ).toLocaleDateString("en-US"),
+                  created: message.created.toDate(),
                   images:
                     message?.images?.map((uri: string, index: number) => {
                       return {
@@ -65,9 +64,7 @@ export const getChatSubscription = (id: string) => {
 
             messages.push({
               ...message,
-              created: new Date(messageDoc.data().created).toLocaleDateString(
-                "en-US"
-              ),
+              created: message.created.toDate(),
               images:
                 message?.images?.map((uri: string, index: number) => {
                   return {
@@ -80,10 +77,11 @@ export const getChatSubscription = (id: string) => {
               id: messageDoc.id,
             });
           });
-
+          // TODO FIX THIS
           dispatch(
-            updateApp({
+            updateAppNotifications({
               notifications: notifications,
+              chat_id: id,
             })
           );
 

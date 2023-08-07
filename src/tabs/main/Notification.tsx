@@ -14,19 +14,32 @@ import { selectApp } from "../../store/slices/app.slice";
 import StandardTabPage from "./StandardTabPage";
 import { selectUser } from "../../store/slices/user.slice";
 import { Image as ExpoImage } from "expo-image";
+import { useEffect, useState } from "react";
 
 
 export default function Notification() {
   const appState = useAppSelector(selectApp);
   const userState = useAppSelector(selectUser)
+  const [notifications, setNotifications] = useState<any[]>([]) 
+   
+
+  useEffect(() => {
+    let localNotifications: any[] = []
+    Object.keys(appState.notifications).forEach(chat_notifications_id => {
+      localNotifications = [...localNotifications, ...appState.notifications[chat_notifications_id]]
+     }) 
+     setNotifications(localNotifications.sort((a,b) => {return a.created - b.created}))
+  }, [appState.notifications])
+
+  console.log('YAY NOTIFICATIONS', notifications)
 
 
   return (
     <StandardTabPage headerName="Notifications">
       <View style={styles.safeAreaContainer}>
-        {!!appState.notifications?.length ? (
+        {!!notifications?.length ? (
           <FlatList
-            data={appState.notifications}
+            data={notifications}
             renderItem={({ item, index }) => (
               <TouchableOpacity key={index + item.id}
                 style={{ backgroundColor: theme.smoothGrey, gap: 12, alignItems: 'center', padding: 8, borderRadius: 4, flexDirection: 'row' }}>

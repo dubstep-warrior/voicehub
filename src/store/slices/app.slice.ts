@@ -32,7 +32,7 @@ const initialState: App = {
   userProfiles: {},
   call: null,
   firebaseListeners: [],
-  notifications: [],
+  notifications: {},
   // RTCPeerConnection: new RTCPeerConnection({
   //   iceServers: [
   //     {
@@ -80,6 +80,11 @@ export const appSlice = createSlice({
       state.messages[actions.payload.chat_id].push(actions.payload.message)
       console.log("updated app state messages");
     },
+    updateAppNotifications: (state, actions) => {
+      // state.notifications = [...state.notifications, ...actions.payload.notifications]
+      // console.log("updated app state notifications");
+      state.notifications[actions.payload.chat_id] = actions.payload.notifications;
+    },
   },
 });
 
@@ -89,7 +94,8 @@ export const {
   updateAppMessages,
   addFirebaseListener,
   clearFirebase, 
-  addAppMessage
+  addAppMessage,
+  updateAppNotifications
 } = appSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
