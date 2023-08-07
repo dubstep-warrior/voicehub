@@ -53,7 +53,7 @@ export default function Default({ route, navigation }: NavigationProps) {
     >
       <Tab.Navigator
         initialRouteName="FriendsDefault"
-        style={{ minHeight: Dimensions.get("window").height - 135 }}
+        style={{ minHeight: '100%'}}
         screenListeners={{
           focus: () => {
             Animated.timing(av, {

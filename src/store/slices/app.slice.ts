@@ -5,6 +5,7 @@ import { Unsubscribe } from "firebase/auth";
 
 // Define a type for the slice state
 interface App {
+  loading: boolean;
   submitting: boolean;
   users: any[];
   home: {
@@ -22,6 +23,7 @@ interface App {
 
 // Define the initial state using that type
 const initialState: App = {
+  loading: false,
   submitting: false,
   users: [],
   home: {

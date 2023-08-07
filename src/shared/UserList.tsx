@@ -17,11 +17,11 @@ export default function UserList({ list = [], ...props }: IUserListProps) {
   console.log(list);
   return (
     <>
-      {list.map((user) => {
+      {list.map((user, index) => {
         console.log(props?.selected, props.identifier ,user?.[props.identifier])
         return (
           <TouchableOpacity
-            key={user?.[props.identifier]}
+            key={props.identifier ? user?.[props.identifier] : index}
             style={[
               {
                 flexDirection: "row",

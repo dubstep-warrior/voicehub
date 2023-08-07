@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import theme from "../../../../../config/theme.config.json";
 import { ScrollView } from "react-native-gesture-handler";
@@ -166,7 +166,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
         <ScrollView
           style={{
             flex: 1,
-            backgroundColor: theme.smoothGrey,
+            backgroundColor: theme.smoothGrey 
           }}
         >
           <UserList

@@ -20,10 +20,10 @@ export default function MessageText(props: any) {
 
     return (
         <Text style={styles.text}>
-            {text.map((text: string) => {
+            {text.map((text: string, index: number) => {
                 if (text.startsWith('@') && users.map((user: any) => user.displayedName).includes(text.replace('@', ''))) {
                     return (
-                        <Text onPress={() => {
+                        <Text key={text + index} onPress={() => {
                             console.log('this works')
                         }} style={[styles.text, { fontWeight: 'bold', color: 'blue', textDecorationLine: 'underline' }]}>
                             {`${text} `}

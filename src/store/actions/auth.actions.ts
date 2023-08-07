@@ -94,6 +94,11 @@ export const AuthOnRender = () => {
   console.log("auth on render calle0");
   return async (dispatch: any, getState: any) => {
     console.log("auth on render called");
+
+    dispatch(updateApp({
+      loading: true
+    }))
+
     if (auth.currentUser) {
       // const profile = await getDoc(
       //   doc(db, "userProfiles", auth.currentUser.uid!)
@@ -200,7 +205,7 @@ export const AuthOnRender = () => {
               })
             );
 
-            if (!!getState().app.home.selectedSubCat && !!Object.keys(chats.dms).length) {
+            if (!!Object.keys(chats.dms).length) {
               console.log('yes this is true we are setting dms')
               dispatch(
                 updateApp({
@@ -245,6 +250,11 @@ export const AuthOnRender = () => {
     } else {
       console.log("but no auth current user");
     }
+
+    dispatch(updateApp({
+      loading: false
+    }))
+
   };
 };
 

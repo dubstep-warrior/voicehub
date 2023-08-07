@@ -444,7 +444,7 @@ export default function Default({ route, navigation }: any) {
                   <View style={{ flexDirection: "row", gap: 8 }}>
                     {formValues.images.map((image: any, index: number) => (
                       <Image
-                        key={index}
+                        key={image.uri + index}
                         style={{ width: 120, height: 100 }}
                         source={{ uri: image.uri }}
                       ></Image>

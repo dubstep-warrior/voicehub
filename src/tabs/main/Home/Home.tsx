@@ -44,6 +44,7 @@ import { Image as ExpoImage } from "expo-image";
 import { auth, db } from "../../../../firebase";
 import { collection, doc, setDoc } from "firebase/firestore";
 // import Daily from '@daily-co/react-native-daily-js';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 
 
@@ -526,6 +527,11 @@ const CustomDrawerContent = ({ navigation }: any) => {
         </Modal>
       )}
       <ActionSheet {...actionSheetProps}></ActionSheet>
+      <Spinner
+          visible={appState.loading}
+          textContent={'Loading...'} 
+          textStyle={styles.spinnerTextStyle}
+        />
     </View>
   );
 };
@@ -546,4 +552,7 @@ const styles = StyleSheet.create({
     color: theme.heading,
     textTransform: "uppercase",
   },
+  spinnerTextStyle: {
+    color: 'white'
+  }
 });
