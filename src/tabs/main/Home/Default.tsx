@@ -74,9 +74,9 @@ export default function Default({ route, navigation }: any) {
     reset();
     scrollViewRef.current?.scrollToOffset({
       animated: true,
-      offset: 0
-   })
-    setCloseToBottom(true)
+      offset: 0,
+    });
+    setCloseToBottom(true);
   }, [appState.home]);
 
   const scrollViewRef = useRef<FlatList>(null);
@@ -143,8 +143,8 @@ export default function Default({ route, navigation }: any) {
       reset();
       scrollViewRef.current?.scrollToOffset({
         animated: true,
-        offset: 0
-     })
+        offset: 0,
+      });
     }
   };
 
@@ -158,9 +158,7 @@ export default function Default({ route, navigation }: any) {
   }: any) => {
     const paddingToBottom = 20;
     // console.log(layoutMeasurement.height, contentOffset.y, contentSize.height)
-    setCloseToBottom(
-      contentOffset.y < paddingToBottom
-    );
+    setCloseToBottom(contentOffset.y < paddingToBottom);
   };
 
   useEffect(() => {
@@ -169,22 +167,22 @@ export default function Default({ route, navigation }: any) {
     // }
     scrollViewRef.current?.scrollToOffset({
       animated: true,
-      offset: 0
-   })
+      offset: 0,
+    });
   }, [appState.messages[appState.home.selectedSubCat as any]]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       scrollViewRef.current?.scrollToOffset({
         animated: true,
-        offset: 0
-     })
+        offset: 0,
+      });
     });
     const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
       scrollViewRef.current?.scrollToOffset({
         animated: true,
-        offset: 0
-     })
+        offset: 0,
+      });
     });
 
     return () => {
@@ -192,6 +190,34 @@ export default function Default({ route, navigation }: any) {
       hideSubscription.remove();
     };
   }, []);
+
+  const [tagSelection, setTagSelection] = useState([]);
+  const parseInput = (desc: string) => {
+    console.log("parsing input:", desc);
+    const inputArr = desc.split(" ");
+    if (!!inputArr.length) {
+      const lastWord = inputArr[inputArr.length - 1];
+      if (lastWord[0] == "@") {
+        const toBeParsed = lastWord.replace("@", "");
+        setTagSelection(
+          selectedChat.users
+            .map((uid: string) => appState.userProfiles[uid])
+            .filter((profile: any) =>
+              profile.displayedName.includes(toBeParsed)
+            )
+        );
+      } else {
+        setTagSelection([])
+      }
+    }
+  };
+
+  const openUserModal = (displayedName: string) => {
+    const profile = Object.keys(appState.userProfiles)
+      .map((uid) => appState.userProfiles[uid])
+      .find((profile) => profile.displayedName == displayedName);
+    console.log("@openusermodal", profile);
+  };
 
   const GalleryImage = (image: ImageObject) => {
     return (
@@ -276,247 +302,291 @@ export default function Default({ route, navigation }: any) {
           ></ImageGallery>
         </Modal>
       )}
-      <>
-        <SafeAreaView style={[styles.safeAreaContainer]}>
-          {/* Header */}
-          <View
-            style={[
-              globalStyles.headingContainer,
-              { justifyContent: "space-between" },
-            ]}
-          >
-            <TouchableOpacity
-              style={{ padding: 8, zIndex: 5 }}
-              onPress={() => {
-                Keyboard.dismiss();
-                route.params.leftNavigation.openDrawer();
-              }}
+      {appState.home.selectedCat && appState.home.selectedSubCat ? (
+        <>
+          <SafeAreaView style={[styles.safeAreaContainer]}>
+            {/* Header */}
+            <View
+              style={[
+                globalStyles.headingContainer,
+                { justifyContent: "space-between" },
+              ]}
             >
-              <Image
-                style={{ width: 32, height: 24 }}
-                source={config["menu"]}
-              ></Image>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={{ padding: 8, zIndex: 5 }}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  route.params.leftNavigation.openDrawer();
+                }}
+              >
+                <Image
+                  style={{ width: 32, height: 24 }}
+                  source={config["menu"]}
+                ></Image>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={{ padding: 8, zIndex: 5 }}
-              onPress={() => {
-                Keyboard.dismiss();
-                navigation.openDrawer();
-              }}
-            >
-              <Image
-                style={{ width: 32, height: 24 }}
-                source={config["friends-white"]}
-              ></Image>
-            </TouchableOpacity>
-            <Text style={globalStyles.headerText}>
-              {selectedChat?.type == "chat"
-                ? selectedChat?.name
-                : appState?.userProfiles?.[
-                    selectedChat?.users.find(
-                      (userID: string) => userID !== auth.currentUser?.uid
-                    )
-                  ]?.displayedName}
-            </Text>
-          </View>
-        </SafeAreaView>
-        <View
-          style={{ flex: 1, flexDirection: "column", position: "relative" }}
-        >
-          <View style={{ flex: 1, backgroundColor: theme.background2 }}>
-            {!!appState.messages[appState.home.selectedSubCat as any] &&
-              !!appState.messages[appState.home.selectedSubCat as any]
-                .length && (
-                <FlatList
-                  // key={appState.home.selectedSubCat} 
-                  inverted
-                  onScroll={(event) => setIsCloseToBottom(event.nativeEvent)}
-                
-                  ref={scrollViewRef}
-                  data={[...appState.messages[appState.home.selectedSubCat as any]].reverse()}
-                  renderItem={({ item, index }) => {
-                    console.log(item);
-                    return (
-                      <View
-                        key={item?.id ?? `temp-message-${index}`}
-                        style={[
-                          {
-                            flexDirection: "row",
-                            padding: 12,
-                            gap: 8,
-                          },
-                          index !==
-                            appState.messages[
-                              appState.home.selectedSubCat as any
-                            ].length -
-                              1 && {
-                            borderBottomWidth: 0.4,
-                          },
-                        ]}
-                      >
+              <TouchableOpacity
+                style={{ padding: 8, zIndex: 5 }}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  navigation.openDrawer();
+                }}
+              >
+                <Image
+                  style={{ width: 32, height: 24 }}
+                  source={config["friends-white"]}
+                ></Image>
+              </TouchableOpacity>
+              <Text style={globalStyles.headerText}>
+                {selectedChat?.type == "chat"
+                  ? selectedChat?.name
+                  : appState?.userProfiles?.[
+                      selectedChat?.users.find(
+                        (userID: string) => userID !== auth.currentUser?.uid
+                      )
+                    ]?.displayedName}
+              </Text>
+            </View>
+          </SafeAreaView>
+          <View
+            style={{ flex: 1, flexDirection: "column", position: "relative" }}
+          >
+            <View style={{ flex: 1, backgroundColor: theme.background2 }}>
+              {!!appState.messages[appState.home.selectedSubCat as any] &&
+                !!appState.messages[appState.home.selectedSubCat as any]
+                  .length && (
+                  <FlatList
+                    // key={appState.home.selectedSubCat}
+                    inverted
+                    onScroll={(event) => setIsCloseToBottom(event.nativeEvent)}
+                    ref={scrollViewRef}
+                    data={[
+                      ...appState.messages[appState.home.selectedSubCat as any],
+                    ].reverse()}
+                    renderItem={({ item, index }) => {
+                      console.log(item);
+                      return (
                         <View
-                          style={{
-                            width: 60,
-                            height: 60,
-                            borderRadius: 30,
-                            overflow: "hidden",
-                          }}
+                          key={item?.id ?? `temp-message-${index}`}
+                          style={[
+                            {
+                              flexDirection: "row",
+                              padding: 12,
+                              gap: 8,
+                            },
+                            index !==
+                              appState.messages[
+                                appState.home.selectedSubCat as any
+                              ].length -
+                                1 && {
+                              borderBottomWidth: 0.4,
+                            },
+                          ]}
                         >
-                          <ExpoImage
+                          <View
                             style={{
                               width: 60,
                               height: 60,
-                            }}
-                            source={appState.userProfiles[item?.by]?.profile_img ?? config['profile-grey']}
-                            cachePolicy={"memory-disk"}
-                          ></ExpoImage>
-                        </View>
-                        <View style={{ justifyContent: "space-between" }}>
-                          <Text
-                            style={{
-                              color: "black",
-                              fontWeight: "bold",
-                              fontSize: 16,
-                              padding: 4,
+                              borderRadius: 30,
+                              overflow: "hidden",
                             }}
                           >
-                            {appState.userProfiles[item?.by]?.displayedName}
-                          </Text> 
-                          <MessageText text={item.desc}></MessageText>
-                          {!!item?.images?.length && (
-                            <TouchableOpacity
-                              onPress={() => {
-                                setGallery(item.images);
-                              }}
+                            <ExpoImage
                               style={{
-                                flexDirection: "row",
-                                flexWrap: "wrap",
-                                width: "90%",
-                                padding: 1,
-                                gap: 1,
-                                backgroundColor: "white",
-                                justifyContent: "space-between",
+                                width: 60,
+                                height: 60,
+                              }}
+                              source={
+                                appState.userProfiles[item?.by]?.profile_img ??
+                                config["profile-grey"]
+                              }
+                              cachePolicy={"memory-disk"}
+                            ></ExpoImage>
+                          </View>
+                          <View style={{ justifyContent: "space-between" }}>
+                            <Text
+                              style={{
+                                color: "black",
+                                fontWeight: "bold",
+                                fontSize: 16,
+                                padding: 4,
                               }}
                             >
-                              {item?.images?.map(
-                                (image: any, index: number) => {
-                                  console.log(item);
-                                  return (
-                                    <ExpoImage
-                                      key={index + image.uri}
-                                      style={{
-                                        height:
-                                          item?.images?.length > 1 ? 100 : 200,
-                                        width:
-                                          item?.images?.length > 1
-                                            ? "49.5%"
-                                            : "100%",
-                                      }}
-                                      source={image.uri}
-                                      cachePolicy={"memory-disk"}
-                                    ></ExpoImage>
-                                  );
-                                }
-                              )}
-                            </TouchableOpacity>
-                          )}
+                              {appState.userProfiles[item?.by]?.displayedName}
+                            </Text>
+                            <MessageText
+                              tappedText={(text: string) => openUserModal(text)}
+                              text={item.desc}
+                            ></MessageText>
+                            {!!item?.images?.length && (
+                              <TouchableOpacity
+                                onPress={() => {
+                                  setGallery(item.images);
+                                }}
+                                style={{
+                                  flexDirection: "row",
+                                  flexWrap: "wrap",
+                                  width: "90%",
+                                  padding: 1,
+                                  gap: 1,
+                                  backgroundColor: "white",
+                                  justifyContent: "space-between",
+                                }}
+                              >
+                                {item?.images?.map(
+                                  (image: any, index: number) => {
+                                    console.log(item);
+                                    return (
+                                      <ExpoImage
+                                        key={index + image.uri}
+                                        style={{
+                                          height:
+                                            item?.images?.length > 1
+                                              ? 100
+                                              : 200,
+                                          width:
+                                            item?.images?.length > 1
+                                              ? "49.5%"
+                                              : "100%",
+                                        }}
+                                        source={image.uri}
+                                        cachePolicy={"memory-disk"}
+                                      ></ExpoImage>
+                                    );
+                                  }
+                                )}
+                              </TouchableOpacity>
+                            )}
+                          </View>
                         </View>
-                      </View>
-                    );
-                  }}
-                  keyExtractor={(message, index) =>
-                    message?.id ?? `temp-message-${index}`
-                  }
-                />
-              )}
-          </View>
-          <View
-            style={{
-              backgroundColor: theme.background,
-              padding: 12,
-            }}
-          >
-            {/* ADD CAROUSEL HERE? */}
-            {!!formValues.images.length && (
-              <View style={{ marginBottom: 12 }}>
-                <ScrollView horizontal={true}>
-                  <View style={{ flexDirection: "row", gap: 8 }}>
-                    {formValues.images.map((image: any, index: number) => (
-                      <Image
-                        key={image.uri + index}
-                        style={{ width: 120, height: 100 }}
-                        source={{ uri: image.uri }}
-                      ></Image>
-                    ))}
-                  </View>
-                </ScrollView>
-              </View>
-            )}
+                      );
+                    }}
+                    keyExtractor={(message, index) =>
+                      message?.id ?? `temp-message-${index}`
+                    }
+                  />
+                )}
+            </View>
             <View
               style={{
-                flexDirection: "row",
-                gap: 8,
-                zIndex: 3,
-                alignItems: "flex-end",
+                backgroundColor: theme.background,
+                padding: 12,
               }}
             >
-              <TouchableOpacity
-                onPress={() => actionSheetRef.current?.show()}
-                style={styles.button}
+              {/* ADD CAROUSEL HERE? */}
+              {!!formValues.images.length && (
+                <View style={{ marginBottom: 12 }}>
+                  <ScrollView horizontal={true}>
+                    <View style={{ flexDirection: "row", gap: 8 }}>
+                      {formValues.images.map((image: any, index: number) => (
+                        <Image
+                          key={image.uri + index}
+                          style={{ width: 120, height: 100 }}
+                          source={{ uri: image.uri }}
+                        ></Image>
+                      ))}
+                    </View>
+                  </ScrollView>
+                </View>
+              )}
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 8,
+                  zIndex: 3,
+                  alignItems: "flex-end",
+                }}
               >
-                <Image
-                  style={styles.buttonImage}
-                  source={config["photo"]}
-                ></Image>
-              </TouchableOpacity>
-              <View style={{ flex: 1 }}>
-                <Input
-                  name="Type your message here"
-                  formKey="desc"
-                  handleFormValueChange={handleFormValueChange}
-                  value={formValues["desc"]}
-                  style="minimal"
-                  background="white"
-                  multiline={true}
-                ></Input>
+                <TouchableOpacity
+                  onPress={() => actionSheetRef.current?.show()}
+                  style={styles.button}
+                >
+                  <Image
+                    style={styles.buttonImage}
+                    source={config["photo"]}
+                  ></Image>
+                </TouchableOpacity>
+                <View style={{ flex: 1 }}>
+                  <Input
+                    name="Type your message here"
+                    formKey="desc"
+                    handleFormValueChange={handleFormValueChange}
+                    value={formValues["desc"]}
+                    style="minimal"
+                    background="white"
+                    multiline={true}
+                    onTextChange={parseInput}
+                  ></Input>
+                </View>
+                <TouchableOpacity style={[styles.button]} onPress={submit}>
+                  {appState.submitting ? (
+                    <MaterialIndicator
+                      color="white"
+                      size={12}
+                    ></MaterialIndicator>
+                  ) : (
+                    <Icon name="send" size={20} color="white" />
+                  )}
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={[styles.button]} onPress={submit}>
-                {appState.submitting ? (
-                  <MaterialIndicator
-                    color="white"
-                    size={12}
-                  ></MaterialIndicator>
-                ) : (
-                  <Icon name="send" size={20} color="white" />
-                )}
-              </TouchableOpacity>
             </View>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                {
+                  backgroundColor: "white",
+                  position: "absolute",
+                  bottom: 60,
+                  right: 12,
+                },
+                closeToBottom && { display: "none" },
+              ]}
+              onPress={() =>
+                scrollViewRef.current?.scrollToOffset({
+                  animated: true,
+                  offset: 0,
+                })
+              }
+            >
+              <Image
+                style={styles.buttonImage}
+                source={config["arrow-down"]}
+              ></Image>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              {
-                backgroundColor: "white",
-                position: "absolute",
-                bottom: 60,
-                right: 12,
-              },
-              closeToBottom && { display: "none" },
-            ]}
-            onPress={() => scrollViewRef.current?.scrollToOffset({
-               animated: true,
-               offset: 0
-            })}
+          <ActionSheet {...actionSheetProps}></ActionSheet>
+        </>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme.background,
+            gap: 16,
+          }}
+        >
+          <Image
+            style={globalStyles.icon}
+            source={config["logo-wordless-white"]}
+          ></Image>
+          <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
+            WELCOME TO VOICEHUB
+          </Text>
+          <Text
+            style={{
+              color: theme.heading,
+              maxWidth: "80%",
+              textAlign: "center",
+              fontWeight: "600",
+              textTransform: "uppercase",
+            }}
           >
-            <Image
-              style={styles.buttonImage}
-              source={config["arrow-down"]}
-            ></Image>
-          </TouchableOpacity>
+            Select a chat to start messaging, if not you can begin by adding a
+            text channel, or adding users to message.
+          </Text>
         </View>
-        <ActionSheet {...actionSheetProps}></ActionSheet>
-      </>
+      )}
     </KeyboardAvoidingView>
   );
 }

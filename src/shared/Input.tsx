@@ -14,10 +14,18 @@ export interface IInput {
   numberOfLines?: number,
   secureTextEntry?: boolean,
   background?: string
+  onTextChange?: (text: string) => void
 }
 
 export default function Input({ style = 'input' ,...props}: IInput) {
   const { name, handleFormValueChange, formKey, ...textInputProps } = props;
+
+  const textChanged = (text: string) => {
+    // console.log('text is changing:', text)
+    if(props.onTextChange) {
+      props.onTextChange(text)
+    }
+  }
 
   return (
     <View style={{ width: "100%" }}>
@@ -32,6 +40,7 @@ export default function Input({ style = 'input' ,...props}: IInput) {
         defaultValue={props.value ?? ''}
         multiline={props.multiline ?? false}
         numberOfLines={props.numberOfLines ?? 1}
+        onChangeText={textChanged}
       />
     </View>
   );

@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
+import { browserLocalPersistence, connectAuthEmulator, getAuth, setPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 // import { getMessaging } from "firebase/messaging";
@@ -31,13 +31,14 @@ const firebaseConfig =
   storageBucket: "voicehub-70b3c.appspot.com",
   messagingSenderId: "279002342078",
   appId: "1:279002342078:web:de11c0b6905a5de1e434ef",
-  measurementId: "G-0V5VPD8BP6"
+  measurementId: "G-0V5VPD8BP6",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app)
+// connectAuthEmulator(auth, '127.0.0.1:9099', { disableWarnings: true })
 const db = getFirestore(app);
 const storage = getStorage(app);
 // const messaging = getMessaging(app);

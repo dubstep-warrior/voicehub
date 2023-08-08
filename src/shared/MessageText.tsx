@@ -16,6 +16,13 @@ export default function MessageText(props: any) {
         return { ...appState.userProfiles[id], uid: id };
     }) 
 
+    const tappedText = (text: string) => {
+        const displayedName = text.replace('@', '')
+        if(props.tappedText) {
+            props.tappedText(displayedName)
+        }
+    }
+
 
 
     return (
@@ -24,7 +31,7 @@ export default function MessageText(props: any) {
                 if (text.startsWith('@') && users.map((user: any) => user.displayedName).includes(text.replace('@', ''))) {
                     return (
                         <Text key={text + index} onPress={() => {
-                            console.log('this works')
+                            tappedText(text)
                         }} style={[styles.text, { fontWeight: 'bold', color: 'blue', textDecorationLine: 'underline' }]}>
                             {`${text} `}
                         </Text>

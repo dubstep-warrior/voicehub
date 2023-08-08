@@ -28,27 +28,20 @@ import { ScrollView } from "react-native-gesture-handler";
 import { auth } from "../../../../firebase";
 import ButtonBody from "../../../shared/Button";
 import { selectApp } from "../../../store/slices/app.slice";
-import {
-  BallIndicator,
-  BarIndicator,
-  DotIndicator,
-  MaterialIndicator,
-  PacmanIndicator,
-  PulseIndicator,
-  SkypeIndicator,
-  UIActivityIndicator,
-  WaveIndicator,
+import { 
+  MaterialIndicator, 
 } from "react-native-indicators";
+import { Image as ExpoImage } from "expo-image";
+import ProfileOverview from "../../../shared/ProfileOverview";
+
 
 export default function Default({ route, navigation }: NavigationProps) {
   console.log(route);
 
-  const [editMode, setEditMode] = useState(false);
-  const userState = useAppSelector(selectUser);
+   const userState = useAppSelector(selectUser);
 
   const dispatch = useAppDispatch();
-  const appState = useAppSelector(selectApp);
-
+ 
   const userRef = {
     ...auth.currentUser,
     ...Object(userState),
@@ -56,58 +49,8 @@ export default function Default({ route, navigation }: NavigationProps) {
   const logout = async () => {
     dispatch(AuthRemove());
   };
-
-  const messageLink: any = routeConfig;
-  const current = "profile";
-  const options = (actionSheetConfig as any)[current]["profile_img"] as (
-    | string
-    | React.ReactNode
-  )[]
-  const actionSheetRef = useRef<ActionSheet>(null);
-  const actionSheetProps = {
-    ref: actionSheetRef,
-    options:  options,
-    cancelButtonIndex: options.length - 1,
-    onPress: async (index: number): Promise<void> => {
-      if(![0,1].includes(index)) return;
-      const permissionResult =
-        await ImagePicker.requestCameraPermissionsAsync();
-
-      if (permissionResult.granted === false) return;
-
-      const result = await (index == 0
-        ? ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 0,
-          })
-        : ImagePicker.launchCameraAsync());
-
-      if (!result.canceled) {
-        handleFormValueChange("profile_img", result.assets[0]);
-      }
-    },
-  };
-
-  const [invalid, setFormInvalid] = useState(false);
-  const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
-    messageLink[current].form,
-    setFormInvalid,
-    Object(userState)
-  );
-
-  useEffect(() => {
-    if (editMode == false) return;
-    reset();
-  }, [editMode]);
-
-  const submitProfileForm = async () => {
-    if (invalid) return;
-    console.log("clear invalid check, time to run dispatch", Object(userState));
-    dispatch(UserUpdate(formValues, Object(userState), setEditMode));
-  };
-
+ 
+  const current = "profile"; 
   const updateField = (key: any) => {
     navigation.navigate("UpdateField", {
       ...key,
@@ -119,179 +62,11 @@ export default function Default({ route, navigation }: NavigationProps) {
       <SafeAreaView style={styles.safeAreaContainer}>
         <ScrollView>
           <View style={styles.container}>
-            <View style={styles.profileBanner}>
-              <View style={styles.bannerLeft}>
-                <View
-                  style={{
-                    position: "relative",
-                    borderRadius: 50,
-                    overflow: "hidden",
-                    width: 80,
-                    height: 80,
-                  }}
-                >
-                  <Image
-                    style={styles.image}
-                    source={
-                      userState.profile_img || formValues.profile_img
-                        ? {
-                            uri:
-                              formValues.profile_img?.uri ??
-                              userState.profile_img
-                              , cache: !!userState?.profile_img ? 'force-cache' : 'default'
-                          }
-                        : config["profile-white"]
-                    }
-                  ></Image>
-                  {editMode && (
-                    <TouchableOpacity
-                      style={styles.profilePicOverlay}
-                      onPress={() => {
-                        actionSheetRef.current?.show();
-                      }}
-                    >
-                      <Image
-                        style={[
-                          styles.image,
-                          {
-                            margin: 20,
-                          },
-                        ]}
-                        source={config["upload-image"]}
-                      ></Image>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                <View
-                  style={[
-                    styles.profileTextContainer,
-                    { marginTop: editMode ? 0 : 4 },
-                  ]}
-                >
-                  {editMode ? (
-                    <>
-                      <Input
-                        name="Username"
-                        formKey="username"
-                        handleFormValueChange={handleFormValueChange}
-                        value={formValues["username"]}
-                        style="minimal"
-                      />
-                      <Input
-                        name="Display Name"
-                        formKey="displayedName"
-                        handleFormValueChange={handleFormValueChange}
-                        value={formValues["displayedName"]}
-                        style="minimal"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <Text
-                        style={[
-                          styles.text,
-                          { fontSize: 24, fontWeight: "bold", color: "white" },
-                        ]}
-                      >
-                        {userState.username}
-                      </Text>
-                      <Text
-                        style={[styles.text, { fontSize: 16, color: "white" }]}
-                      >
-                        {userState.displayedName ?? ""}
-                      </Text>
-                    </>
-                  )}
-                </View>
-              </View>
+            <ProfileOverview
+            user={userState}
+            readOnly={false}
+            ></ProfileOverview> 
 
-              <View style={{ gap: 4 }}>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: theme.black,
-                    width: 30,
-                    height: 30,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 20,
-                  }}
-                  onPress={() => setEditMode(!editMode)}
-                >
-                  <Image
-                    style={{ width: 12, height: 12 }}
-                    source={config[editMode ? "close" : "edit"]}
-                  ></Image>
-                </TouchableOpacity>
-                {editMode && (
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: theme.black,
-                      width: 30,
-                      height: 30,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 20,
-                    }}
-                    onPress={() => submitProfileForm()}
-                  >
-                    {appState.submitting ? (
-                      <MaterialIndicator
-                        color="white"
-                        size={12}
-                      ></MaterialIndicator>
-                    ) : (
-                      <Image
-                        style={{ width: 12, height: 12 }}
-                        source={config["green-tick"]}
-                      ></Image>
-                    )}
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-            <View style={{ width: "100%", flex: 1 }}>
-              <View style={{ margin: 12 }}>
-                <Text style={styles.text}>STATUS</Text>
-              </View>
-              <Pressable
-                onPress={() => setEditMode(!editMode)}
-                style={{
-                  backgroundColor: theme.smoothGrey,
-                  flex: 1,
-                  padding: 12,
-                  position: "relative",
-                  minHeight: 150,
-                }}
-              >
-                {editMode ? (
-                  <Input
-                    name="Status"
-                    formKey="status"
-                    handleFormValueChange={handleFormValueChange}
-                    value={formValues["status"]}
-                    style="minimalTextarea"
-                    multiline={true}
-                    numberOfLines={4}
-                  />
-                ) : (
-                  <>
-                    <Text style={{ color: "white" }}>
-                      {userState.status ?? ""}
-                    </Text>
-                    <Image
-                      style={{
-                        width: 12,
-                        height: 12,
-                        position: "absolute",
-                        bottom: 12,
-                        right: 12,
-                      }}
-                      source={config["edit"]}
-                    ></Image>
-                  </>
-                )}
-              </Pressable>
-            </View>
             {routeConfig[current].sections.map((section) => (
               <View
                 style={{ width: "100%", marginBottom: 8 }}
@@ -361,8 +136,7 @@ export default function Default({ route, navigation }: NavigationProps) {
             </View>
           </View>
         </ScrollView>
-        <ActionSheet {...actionSheetProps}></ActionSheet>
-      </SafeAreaView>
+       </SafeAreaView>
     )
   );
 }

@@ -44,12 +44,11 @@ import { Image as ExpoImage } from "expo-image";
 import { auth, db } from "../../../../firebase";
 import { collection, doc, setDoc } from "firebase/firestore";
 // import Daily from '@daily-co/react-native-daily-js';
-import Spinner from 'react-native-loading-spinner-overlay';
-
-
+import Spinner from "react-native-loading-spinner-overlay";
 
 export default function Home({ route, navigation }: any) {
   const Drawer = createDrawerNavigator();
+  const appState = useAppSelector(selectApp);
   console.log("navigated to home", route?.params?.drawerStatus);
   return (
     <>
@@ -67,10 +66,16 @@ export default function Home({ route, navigation }: any) {
         }}
         drawerContent={(props) => <CustomDrawerContent {...props} />}
       >
-        <Drawer.Screen
-          name={"Chat" as keyof RootStackParamList}
-          component={Chat}
-        />
+        {appState?.home?.selectedCat && appState?.home?.selectedSubCat ? 
+          <Drawer.Screen
+            name={"Chat" as keyof RootStackParamList}
+            component={Chat}
+          /> :
+          <Drawer.Screen
+            name={"Default" as keyof RootStackParamList}
+            component={Default}
+          />
+        }
       </Drawer.Navigator>
     </>
   );
@@ -136,9 +141,9 @@ const CustomDrawerContent = ({ navigation }: any) => {
     setOverlay({
       type: overlay.type,
       visible: false,
-    }); 
+    });
     // navigation.closeDrawer()
-  }; 
+  };
 
   const joinVoiceLounge = async (chatId: string | null) => {
     // const call = Daily.createCallObject({
@@ -146,7 +151,6 @@ const CustomDrawerContent = ({ navigation }: any) => {
     //   videoSource: false,
     // });
     // call.join({ url: `https://voicehub.daily.co/${chatId}` });
-
   };
 
   return (
@@ -528,10 +532,10 @@ const CustomDrawerContent = ({ navigation }: any) => {
       )}
       <ActionSheet {...actionSheetProps}></ActionSheet>
       <Spinner
-          visible={appState.loading}
-          textContent={'Loading...'} 
-          textStyle={styles.spinnerTextStyle}
-        />
+        visible={appState.loading}
+        textContent={"Loading..."}
+        textStyle={styles.spinnerTextStyle}
+      />
     </View>
   );
 };
@@ -553,6 +557,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   spinnerTextStyle: {
-    color: 'white'
-  }
+    color: "white",
+  },
 });
