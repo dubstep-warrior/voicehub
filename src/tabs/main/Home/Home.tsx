@@ -45,6 +45,7 @@ import { auth, db } from "../../../../firebase";
 import { collection, doc, setDoc } from "firebase/firestore";
 // import Daily from '@daily-co/react-native-daily-js';
 import Spinner from "react-native-loading-spinner-overlay";
+import ProfileOverview from "../../../shared/ProfileOverview";
 
 export default function Home({ route, navigation }: any) {
   const Drawer = createDrawerNavigator();
@@ -66,16 +67,17 @@ export default function Home({ route, navigation }: any) {
         }}
         drawerContent={(props) => <CustomDrawerContent {...props} />}
       >
-        {appState?.home?.selectedCat && appState?.home?.selectedSubCat ? 
+        {appState?.home?.selectedCat && appState?.home?.selectedSubCat ? (
           <Drawer.Screen
             name={"Chat" as keyof RootStackParamList}
             component={Chat}
-          /> :
+          />
+        ) : (
           <Drawer.Screen
             name={"Default" as keyof RootStackParamList}
             component={Default}
           />
-        }
+        )}
       </Drawer.Navigator>
     </>
   );
@@ -87,7 +89,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
   const current = "leftDrawer";
   // const [visible, setVisible] = useState(false);
   const [overlay, setOverlay] = useState({
-    type: "add",
+    type: "",
     visible: false,
   });
   const dispatch = useAppDispatch();
@@ -450,7 +452,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
             Keyboard.isVisible()
               ? Keyboard.dismiss()
               : setOverlay({
-                  type: overlay.type,
+                  type: "",
                   visible: false,
                 })
           }
@@ -470,7 +472,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 <TouchableOpacity
                   onPress={() =>
                     setOverlay({
-                      type: overlay.type,
+                      type: "",
                       visible: false,
                     })
                   }
@@ -489,47 +491,75 @@ const CustomDrawerContent = ({ navigation }: any) => {
           </Pressable>
         </Overlay>
       ) : (
-        <Modal
-          isVisible={overlay.visible}
-          style={{
-            // flex: 0.2,
-            // position: 'absolute',
-            // bottom: 0,
-            // width: '100%',
-            margin: 0,
-            // borderRadius: 20,
-            backgroundColor: "rgba(0,0,0,0.2)",
-            position: "relative",
-          }}
-          presentationStyle="overFullScreen"
-          onBackdropPress={() => {
-            setOverlay({
-              type: overlay.type,
-              visible: false,
-            });
-          }}
-          // transparent={false}
-          // hasBackdrop={false}
-          // animated
-          animationIn="slideInUp"
-        >
-          {overlay.visible && <FlashMessage position="top" />}
-
-          <Invite
-            chat={
-              userState.chats.chat[
-                appState.home.selectedSubCat as keyof typeof userState.chats
-              ]
-            }
-            onClose={() => {
+        <>
+          <Modal
+            isVisible={overlay.visible}
+            style={{
+              margin: 0,
+              backgroundColor: "rgba(0,0,0,0.2)",
+              position: "relative",
+            }}
+            presentationStyle="overFullScreen"
+            onBackdropPress={() => {
               setOverlay({
-                type: overlay.type,
+                type: "",
                 visible: false,
               });
             }}
-          ></Invite>
-        </Modal>
+            animationIn="slideInUp"
+          >
+            {overlay.visible && <FlashMessage position="top" />}
+
+            <Invite
+              chat={
+                userState.chats.chat[
+                  appState.home.selectedSubCat as keyof typeof userState.chats
+                ]
+              }
+              onClose={() => {
+                setOverlay({
+                  type: "",
+                  visible: false,
+                });
+              }}
+            ></Invite>
+          </Modal>
+        </>
       )}
+      <Modal
+        isVisible={!!appState.openProfileModal}
+        style={{
+          margin: 0,
+          backgroundColor: "rgba(0,0,0,0.2)",
+          position: "relative",
+        }}
+        presentationStyle="overFullScreen"
+        onBackdropPress={() => {
+          dispatch(
+            updateApp({
+              openProfileModal: "",
+            })
+          );
+        }}
+        animationIn="slideInUp"
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: theme.background,
+            position: "absolute",
+            width: "100%",
+            bottom: 0,
+          }}
+        >
+          {!!appState.openProfileModal && (
+            <ProfileOverview
+              user={appState.userProfiles[appState.openProfileModal]}
+              readOnly={true}
+            ></ProfileOverview>
+          )}
+        </View>
+      </Modal>
       <ActionSheet {...actionSheetProps}></ActionSheet>
       <Spinner
         visible={appState.loading}

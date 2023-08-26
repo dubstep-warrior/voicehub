@@ -22,7 +22,7 @@ import { NavigationProps } from "../../../interfaces/NavigationProps.interface";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectUser } from "../../../store/slices/user.slice";
-import { selectApp } from "../../../store/slices/app.slice";
+import { selectApp, update as updateApp } from "../../../store/slices/app.slice";
 import Input from "../../../shared/Input";
 import routeConfig from "../../../../config/route-config.json";
 import React, { useState, useRef, useEffect, Ref } from "react";
@@ -207,16 +207,16 @@ export default function Default({ route, navigation }: any) {
             )
         );
       } else {
-        setTagSelection([])
+        setTagSelection([]);
       }
     }
   };
 
-  const openUserModal = (displayedName: string) => {
-    const profile = Object.keys(appState.userProfiles)
-      .map((uid) => appState.userProfiles[uid])
-      .find((profile) => profile.displayedName == displayedName);
-    console.log("@openusermodal", profile);
+  const openUserModal = (id: string) => { 
+    console.log("@openusermodal ", id);
+    dispatch(updateApp({
+      openProfileModal: id
+    }))
   };
 
   const GalleryImage = (image: ImageObject) => {
@@ -383,13 +383,14 @@ export default function Default({ route, navigation }: any) {
                             },
                           ]}
                         >
-                          <View
+                          <TouchableOpacity
                             style={{
                               width: 60,
                               height: 60,
                               borderRadius: 30,
                               overflow: "hidden",
                             }}
+                            onPress={()=>openUserModal(item?.by)}
                           >
                             <ExpoImage
                               style={{
@@ -402,18 +403,22 @@ export default function Default({ route, navigation }: any) {
                               }
                               cachePolicy={"memory-disk"}
                             ></ExpoImage>
-                          </View>
+                          </TouchableOpacity>
                           <View style={{ justifyContent: "space-between" }}>
-                            <Text
-                              style={{
-                                color: "black",
-                                fontWeight: "bold",
-                                fontSize: 16,
-                                padding: 4,
-                              }}
+                            <TouchableOpacity
+                            onPress={()=>openUserModal(item?.by)}
                             >
-                              {appState.userProfiles[item?.by]?.displayedName}
-                            </Text>
+                              <Text
+                                style={{
+                                  color: "black",
+                                  fontWeight: "bold",
+                                  fontSize: 16,
+                                  padding: 4,
+                                }}
+                              >
+                                {appState.userProfiles[item?.by]?.displayedName}
+                              </Text>
+                            </TouchableOpacity>
                             <MessageText
                               tappedText={(text: string) => openUserModal(text)}
                               text={item.desc}

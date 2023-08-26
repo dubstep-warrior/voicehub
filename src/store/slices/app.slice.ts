@@ -17,6 +17,7 @@ interface App {
   call: any;
   firebaseListeners: Unsubscribe[];
   notifications: any;
+  openProfileModal: string;
   // RTCPeerConnection: RTCPeerConnection
   // localMediaStream?: any
 }
@@ -35,6 +36,7 @@ const initialState: App = {
   call: null,
   firebaseListeners: [],
   notifications: {},
+  openProfileModal: ''
   // RTCPeerConnection: new RTCPeerConnection({
   //   iceServers: [
   //     {
@@ -61,7 +63,7 @@ export const appSlice = createSlice({
     },
     update: (state, actions) => {
       Object.keys(actions.payload).forEach((key) => {
-        state[key as keyof typeof state] = actions.payload[key];
+        (state[key as keyof App] as any) = actions.payload[key];
       });
       console.log("updated app state", state);
     },
