@@ -25,7 +25,6 @@ export default function Access({ route, navigation }: NavigationProps) {
   const current = route.name.toLowerCase();
   const dispatch = useAppDispatch();
   const messageLink: any = routeConfig;
-  console.log(route);
   const [invalid, setFormInvalid] = useState("");
   const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
     messageLink[current].form,
@@ -33,10 +32,8 @@ export default function Access({ route, navigation }: NavigationProps) {
   );
 
   const submitForm = async (data?: any) => {
-    console.log("submitted:", formValues);
 
     if (Object.keys(formValues).some((key) => !Boolean(formValues[key]))) {
-      console.log("Form values is not valid");
       setFormInvalid("Please fill up all fields");
       return;
     }
@@ -49,7 +46,6 @@ export default function Access({ route, navigation }: NavigationProps) {
     }
 
     const res = await dispatch(resolveAccess(formValues, current));
-    console.log("response returned:", res);
     if (res && !res.success) {
       setFormInvalid("User credentials are invalid");
     }

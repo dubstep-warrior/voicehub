@@ -60,8 +60,7 @@ export default function Default({ route, navigation }: any) {
     userState?.chats?.[
       appState.home.selectedCat as keyof typeof userState.chats
     ]?.[appState.home.selectedSubCat as string];
-
-  // console.log("messages now", messages);
+ 
   const messageLink: any = routeConfig;
   const [invalid, setFormInvalid] = useState<string | null>(null);
 
@@ -131,10 +130,8 @@ export default function Default({ route, navigation }: any) {
             ],
             type: "dms",
           })
-        );
-        console.log("SUCCESSFULLY ADDED CHAT", res);
-        if (res && res?.success) {
-          console.log("SUCCESSFUL CHAT 2");
+        ); 
+        if (res && res?.success) { 
           await dispatch(addMessage(formValues, res?.data.id));
         }
       } else {
@@ -157,14 +154,10 @@ export default function Default({ route, navigation }: any) {
     contentSize,
   }: any) => {
     const paddingToBottom = 20;
-    // console.log(layoutMeasurement.height, contentOffset.y, contentSize.height)
-    setCloseToBottom(contentOffset.y < paddingToBottom);
+     setCloseToBottom(contentOffset.y < paddingToBottom);
   };
 
-  useEffect(() => {
-    // if (closeToBottom) {
-    //   scrollViewRef.current?.scrollToEnd();
-    // }
+  useEffect(() => { 
     scrollViewRef.current?.scrollToOffset({
       animated: true,
       offset: 0,
@@ -192,8 +185,7 @@ export default function Default({ route, navigation }: any) {
   }, []);
 
   const [tagSelection, setTagSelection] = useState([]);
-  const parseInput = (desc: string) => {
-    console.log("parsing input:", desc);
+  const parseInput = (desc: string) => { 
     const inputArr = desc.split(" ");
     if (!!inputArr.length) {
       const lastWord = inputArr[inputArr.length - 1];
@@ -212,8 +204,7 @@ export default function Default({ route, navigation }: any) {
     }
   };
 
-  const openUserModal = (id: string) => { 
-    console.log("@openusermodal ", id);
+  const openUserModal = (id: string) => {  
     dispatch(updateApp({
       openProfileModal: id
     }))
@@ -363,8 +354,7 @@ export default function Default({ route, navigation }: any) {
                     data={[
                       ...appState.messages[appState.home.selectedSubCat as any],
                     ].reverse()}
-                    renderItem={({ item, index }) => {
-                      console.log(item);
+                    renderItem={({ item, index }) => { 
                       return (
                         <View
                           key={item?.id ?? `temp-message-${index}`}
@@ -440,8 +430,7 @@ export default function Default({ route, navigation }: any) {
                               >
                                 {item?.images?.map(
                                   (image: any, index: number) => {
-                                    console.log(item);
-                                    return (
+                                     return (
                                       <ExpoImage
                                         key={index + image.uri}
                                         style={{

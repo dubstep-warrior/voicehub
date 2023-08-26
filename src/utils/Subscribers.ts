@@ -13,9 +13,7 @@ import {
 } from "../store/slices/app.slice";
 import { auth, db } from "../../firebase";
 import { useAppSelector } from "../store/hooks";
-import { selectUser } from "../store/slices/user.slice";
-
-// const userState = useAppSelector(selectUser);
+import { selectUser } from "../store/slices/user.slice"; 
 
 export const getChatSubscription = (id: string) => {
   return async (dispatch: any, getState: any) => {

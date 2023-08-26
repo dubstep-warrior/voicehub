@@ -56,8 +56,7 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     assign: (state, actions) => {
-      // console.log('redux store has been updated in state slice: ', actions.payload)
-
+ 
       state.submitting = actions.payload.submitting ?? false;
       state.users = actions.payload.users ?? [];
     },
@@ -65,12 +64,10 @@ export const appSlice = createSlice({
       Object.keys(actions.payload).forEach((key) => {
         (state[key as keyof App] as any) = actions.payload[key];
       });
-      console.log("updated app state", state);
-    },
+     },
     updateAppMessages: (state, actions) => {
       state.messages[actions.payload.chat_id] = actions.payload.messages;
-      console.log("updated app state messages", state.messages[actions.payload.chat_id].desc, state.messages[actions.payload.chat_id].images);
-    },
+     },
     addFirebaseListener: (state, actions) => {
       state.firebaseListeners.push(actions.payload.listener);
     },
@@ -82,11 +79,8 @@ export const appSlice = createSlice({
     }, 
     addAppMessage: (state, actions) => {
       state.messages[actions.payload.chat_id].push(actions.payload.message)
-      console.log("updated app state messages");
-    },
-    updateAppNotifications: (state, actions) => {
-      // state.notifications = [...state.notifications, ...actions.payload.notifications]
-      // console.log("updated app state notifications");
+     },
+    updateAppNotifications: (state, actions) => { 
       state.notifications[actions.payload.chat_id] = actions.payload.notifications;
     },
   },

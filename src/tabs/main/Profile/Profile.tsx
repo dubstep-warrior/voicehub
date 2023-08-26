@@ -56,21 +56,25 @@ import UpdateField from "../../../pages/UpdateField";
 // export default createAppContainer(SwipeTabs);
 
 export default function Profile({ route }: NavigationProps) {
-  // console.log(route.name);
-  const Stack = createStackNavigator(); 
+  const Stack = createStackNavigator();
   const userState = useAppSelector(selectUser);
 
   return (
     userState && (
       <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
+        screenOptions={{
+          headerShown: false,
+        }}
       >
-        <Stack.Screen name={"Default" as keyof RootStackParamList} component={Default as any} /> 
-        <Stack.Screen name={"UpdateField" as keyof RootStackParamList} component={UpdateField as any} /> 
+        <Stack.Screen
+          name={"Default" as keyof RootStackParamList}
+          component={Default as any}
+        />
+        <Stack.Screen
+          name={"UpdateField" as keyof RootStackParamList}
+          component={UpdateField as any}
+        />
       </Stack.Navigator>
     )
   );
 }
- 

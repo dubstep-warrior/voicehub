@@ -80,7 +80,6 @@ export default function ProfileOverview(props: any) {
   
     const submitProfileForm = async () => {
       if (invalid) return;
-      console.log("clear invalid check, time to run dispatch", Object(userState));
       dispatch(UserUpdate(formValues, Object(userState), setEditMode));
     }; 
 

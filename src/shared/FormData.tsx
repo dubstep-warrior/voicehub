@@ -48,7 +48,6 @@ export const FormData = (formConfig: any, setFormInvalid: any, values?: any) => 
     } else form = {...formConfig}
     setFormValues(form)
 
-    console.log('resetted', formValues)
   }
 
   return [

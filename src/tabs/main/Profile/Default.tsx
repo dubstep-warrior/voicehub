@@ -28,20 +28,15 @@ import { ScrollView } from "react-native-gesture-handler";
 import { auth } from "../../../../firebase";
 import ButtonBody from "../../../shared/Button";
 import { selectApp } from "../../../store/slices/app.slice";
-import { 
-  MaterialIndicator, 
-} from "react-native-indicators";
+import { MaterialIndicator } from "react-native-indicators";
 import { Image as ExpoImage } from "expo-image";
 import ProfileOverview from "../../../shared/ProfileOverview";
 
-
 export default function Default({ route, navigation }: NavigationProps) {
-  console.log(route);
-
-   const userState = useAppSelector(selectUser);
+  const userState = useAppSelector(selectUser);
 
   const dispatch = useAppDispatch();
- 
+
   const userRef = {
     ...auth.currentUser,
     ...Object(userState),
@@ -49,8 +44,8 @@ export default function Default({ route, navigation }: NavigationProps) {
   const logout = async () => {
     dispatch(AuthRemove());
   };
- 
-  const current = "profile"; 
+
+  const current = "profile";
   const updateField = (key: any) => {
     navigation.navigate("UpdateField", {
       ...key,
@@ -63,9 +58,9 @@ export default function Default({ route, navigation }: NavigationProps) {
         <ScrollView>
           <View style={styles.container}>
             <ProfileOverview
-            user={userState}
-            readOnly={false}
-            ></ProfileOverview> 
+              user={userState}
+              readOnly={false}
+            ></ProfileOverview>
 
             {routeConfig[current].sections.map((section) => (
               <View
@@ -136,7 +131,7 @@ export default function Default({ route, navigation }: NavigationProps) {
             </View>
           </View>
         </ScrollView>
-       </SafeAreaView>
+      </SafeAreaView>
     )
   );
 }

@@ -31,10 +31,7 @@ export default function Notification() {
       })
       setNotifications(localNotifications.sort((a, b) => { return a.created - b.created }))
     }
-  }, [appState?.notifications])
-
-  console.log('YAY NOTIFICATIONS', notifications)
-
+  }, [appState?.notifications]) 
 
   return (
     <StandardTabPage headerName="Notifications">

@@ -41,8 +41,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
         options: ["Send Message", "Remove Friend", "Cancel"],
         cancelButtonIndex: 2,
         onPress: async (index: number): Promise<void> => {
-          console.log(index);
-          if ([0].includes(index) && selectedUser.current) {
+           if ([0].includes(index) && selectedUser.current) {
             // Send message
             // ENABLE SEND MESSAGE OVERLAY HERE
 
@@ -53,8 +52,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
                 );
               }
             );
-            if (existingChatID) {
-              console.log("there is existing chat ID");
+            if (existingChatID) { 
               dispatch(
                 updateApp({
                   home: {
@@ -74,10 +72,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
                   },
                 },
               });
-            } else {
-              // console.log(auth.currentUser!.uid, selectedUser.current.uid)
-              console.log("WE ARE CALLING START CHAT");
-              // await StartChat(selectedUser, navigation)
+            } else { 
               const dms: any = {};
               dms[`temp-${selectedUser.current.uid}`] = {
                 users: [auth.currentUser!.uid, selectedUser.current.uid],
@@ -104,15 +99,13 @@ export default function Friends({ route, navigation }: NavigationProps) {
                 params: {
                   screen: "Chat",
                   drawerStatus: "closed",
-                  params: {
-                    // drawerStatus: "closed",
+                  params: { 
                     screen: "Default",
                   },
                 },
               });
             }
-          } else if ([1].includes(index)) {
-            // Remove friend
+          } else if ([1].includes(index)) { 
             dispatch(removeFriend(selectedUser.current));
           }
         },
@@ -151,7 +144,6 @@ export default function Friends({ route, navigation }: NavigationProps) {
     },
   };
   const current = route.name.toLowerCase();
-  console.log("getting friends", userState[current as keyof typeof userState]);
   const currentActionSheetProps =
     friendsConfig[current as keyof typeof friendsConfig].actionSheetProps;
 

@@ -54,10 +54,7 @@ export const UserUpdate = (
         JSON.stringify(changes[key])
       )
         newChanges[key] = changes[key];
-    });
-    console.log("user action being run");
-
-    console.log("new changes ", newChanges);
+    }); 
     if ("profile_img" in newChanges) {
       const imageURI = await uploadImage(
         newChanges["profile_img"],
@@ -87,8 +84,7 @@ export const UserUpdate = (
           error: error,
         };
       });
-
-    console.log("response", res);
+ 
     if (setEditMode) {
       setEditMode(false);
     }
@@ -120,9 +116,7 @@ export const SearchUsers = (changes: any, currentUser: any) => {
 
     // TODO use cloud functions
     // const currentUser = getState().user
-    if (changes.username) {
-      console.log("retrieving users");
-      console.log("query: ", changes.username, currentUser);
+    if (changes.username) { 
       const q = query(
         collection(db, "userProfiles"),
         where(documentId(), "!=", auth.currentUser?.uid)
@@ -130,8 +124,7 @@ export const SearchUsers = (changes: any, currentUser: any) => {
       const res = await getDocs(q);
       const users: any[] = [];
       if (res) {
-        res.forEach((doc) => {
-          console.log("res:", doc.data());
+        res.forEach((doc) => { 
           const user = doc.data();
           // const filter = [...getState().user.friends,]
           if (
@@ -143,8 +136,7 @@ export const SearchUsers = (changes: any, currentUser: any) => {
             users.push({ ...doc.data(), uid: doc.id });
           }
         });
-      }
-      // console.log('query retrieved: ', users)
+      } 
       dispatch(
         updateApp({
           users: users,
@@ -162,16 +154,13 @@ export const SearchUsers = (changes: any, currentUser: any) => {
 };
 
 export const addUser = (to: any) => {
-  return async (dispatch: any) => {
-    console.log("dispatching add user from:", auth.currentUser?.uid);
-    console.log("dispatching add user to:", to.uid);
+  return async (dispatch: any) => { 
     if (auth.currentUser) {
       addDoc(collection(db, "requests"), {
         from: auth.currentUser?.uid,
         to: to.uid,
       })
-        .then(() => {
-          console.log("successfully sent a request");
+        .then(() => { 
           Alert.alert(
             `Successfully sent a request to ${to.username}`,
             undefined,
@@ -179,24 +168,15 @@ export const addUser = (to: any) => {
           );
         })
         .catch((err) => {
-          console.log("cant add user:", err);
-          // Alert.alert(`Failed to send a request to ${to.username}`,undefined, [
-          //   {text: 'OK', onPress: () => console.log('OK Pressed')},
-          // ]);
+          console.log("cant add user:", err); 
         });
     }
   };
 };
 
 export const removeRequest = (to: any) => {
-  return async (dispatch: any) => {
-    console.log("dispatching delete request from:", auth.currentUser?.uid);
-    console.log("dispatching delete request to:", to.uid);
-    if (auth.currentUser) {
-      // addDoc(collection(db, "requests"), {
-      //   from: auth.currentUser?.uid,
-      //   to: to.uid
-      // })
+  return async (dispatch: any) => { 
+    if (auth.currentUser) { 
       const q = query(
         collection(db, "requests"),
         and(
@@ -207,30 +187,21 @@ export const removeRequest = (to: any) => {
       getDocs(q)
         .then((snapshot) => {
           snapshot.forEach((doc) => deleteDoc(doc.ref));
-
-          console.log("successfully sent a delete request");
+ 
           Alert.alert(`Successfully deleted request`, undefined, [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
         })
         .catch((err) => {
-          console.log("cant delete user:", err);
-          // Alert.alert(`Failed to send a request to ${to.username}`,undefined, [
-          //   {text: 'OK', onPress: () => console.log('OK Pressed')},
-          // ]);
+          console.log("cant delete user:", err); 
         });
     }
   };
 };
 
 export const rejectRequest = (from: any) => {
-  return async (dispatch: any) => {
-    console.log("dispatching reject request to:", from.uid);
-    if (auth.currentUser) {
-      // addDoc(collection(db, "requests"), {
-      //   from: auth.currentUser?.uid,
-      //   to: to.uid
-      // })
+  return async (dispatch: any) => { 
+    if (auth.currentUser) { 
       const q = query(
         collection(db, "requests"),
         and(
@@ -240,26 +211,20 @@ export const rejectRequest = (from: any) => {
       );
       getDocs(q)
         .then((snapshot) => {
-          snapshot.forEach((doc) => deleteDoc(doc.ref));
-
-          console.log("successfully sent a rejection");
+          snapshot.forEach((doc) => deleteDoc(doc.ref)); 
           Alert.alert(`Successfully rejected request`, undefined, [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
         })
         .catch((err) => {
-          console.log("cant delete user:", err);
-          // Alert.alert(`Failed to send a request to ${to.username}`,undefined, [
-          //   {text: 'OK', onPress: () => console.log('OK Pressed')},
-          // ]);
+          console.log("cant delete user:", err); 
         });
     }
   };
 };
 
 export const acceptRequest = (from: any) => {
-  return async (dispatch: any) => {
-    console.log("dispatching accept request to:", from);
+  return async (dispatch: any) => { 
     if (auth.currentUser) {
       const q = query(
         collection(db, "requests"),
@@ -269,17 +234,12 @@ export const acceptRequest = (from: any) => {
         )
       );
       getDocs(q).then((snapshot) => {
-        snapshot.forEach(async (document) => {
-          console.log("retrieved", document.id);
+        snapshot.forEach(async (document) => { 
           setDoc(doc(db, "friends", document.id), {
             group: [from.uid, auth.currentUser?.uid],
           })
             .then(() => {
-              deleteDoc(document.ref);
-              // dispatch(addChat({
-              //   type: 'dms',
-              //   users: [from.uid, auth.currentUser?.uid]
-              // }))
+              deleteDoc(document.ref); 
               Alert.alert(`Successfully accepted request`, undefined, [
                 { text: "OK", onPress: () => console.log("OK Pressed") },
               ]);
@@ -293,40 +253,26 @@ export const acceptRequest = (from: any) => {
               );
             });
         });
-
-        // console.log('successfully sent a rejection')
-      });
-      // addDoc(collection(db, "friends"), {
-      //   from: auth.currentUser?.uid,
-      //   to: to.uid
-      // })
+ 
+      }); 
     }
   };
 };
 
 export const removeFriend = (friend: any) => {
   return async (dispatch: any) => {
-    if (auth.currentUser) {
-      console.log("removing friend", friend);
+    if (auth.currentUser) { 
       await deleteDoc(doc(db, "friends", friend.friendshipID))
         .then(() => {
           Alert.alert(`Successfully deleted friend`, undefined, [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
         })
-        .catch((err) => {
-          console.log(`Request unsuccessful`, err);
+        .catch((err) => { 
           Alert.alert(`Request unsuccessful`, "Please try again later", [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
-        });
-
-      // console.log('successfully sent a rejection')
-
-      // addDoc(collection(db, "friends"), {
-      //   from: auth.currentUser?.uid,
-      //   to: to.uid
-      // })
+        }); 
     }
   };
 };
@@ -340,8 +286,7 @@ export const addChat = (chatObject: any): any => {
         })
       );
 
-      const chat = chatObject;
-      console.log("ADDING CHAT", chat);
+      const chat = chatObject; 
       if ("chat_img" in chat && chat["chat_img"]) {
         const imageURI = await uploadImage(chat["chat_img"], "chat-images");
         chat["chat_img"] = imageURI;
@@ -350,8 +295,7 @@ export const addChat = (chatObject: any): any => {
       const res = await addDoc(collection(db, "chats"), {
         ...chat,
       })
-        .then((docRef) => {
-          console.log("add chat worked");
+        .then((docRef) => { 
           dispatch(getChatSubscription(docRef.id)).then(async () => {
             await dispatch(
               updateApp({
@@ -362,8 +306,7 @@ export const addChat = (chatObject: any): any => {
               })
             ); 
           });
-
-          console.log("successfully added a chat");
+ 
           if (chat.type == "chat") {
             Alert.alert(`Successfully added chat ${chat.name}`, undefined, [
               { text: "OK", onPress: () => console.log("OK Pressed") },
@@ -436,8 +379,7 @@ export const joinChat = (form: any) => {
               })
             ); 
           });
-
-          console.log("successfully join a chat");
+ 
           Alert.alert(`Successfully joined chat!`, undefined, [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
@@ -466,11 +408,7 @@ export const addMessage = (form: any, chat_id: string) => {
       updateApp({
         submitting: true,
       })
-    );
-     
-
-    // const usersRef = db.collection('users').doc('id')
-    // collection(db, 'chats', chat_id)
+    ); 
 
      
 
@@ -482,8 +420,7 @@ export const addMessage = (form: any, chat_id: string) => {
       by: auth.currentUser?.uid,
       created: serverTimestamp(),
     };
-
-    // console.log('CURRENT APP STATE',getState().app)
+ 
     dispatch(addAppMessage({
       chat_id: chat_id,
       message: message
@@ -499,10 +436,7 @@ export const addMessage = (form: any, chat_id: string) => {
     }
 
     await addDoc(collection(doc(db, "chats", chat_id!), "messages"), message)
-    // .then(() => {
-      
-    // });
-    console.log("SENDING MESSAGE SUCCESFULL YAYYY");
+   
 
     dispatch(
       updateApp({

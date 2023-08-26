@@ -41,9 +41,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { getChatSubscription } from "../../utils/Subscribers";
 
 export const resolveAccess = (data: any, current: string) => {
-  //   const dispatch = useAppDispatch();
   return async (dispatch: any) => {
-    console.log("logging in");
 
     dispatch(
       assignApp({
@@ -91,18 +89,13 @@ export const resolveAccess = (data: any, current: string) => {
 };
 
 export const AuthOnRender = () => {
-  console.log("auth on render calle0");
   return async (dispatch: any, getState: any) => {
-    console.log("auth on render called");
 
     dispatch(updateApp({
       loading: true
     }))
 
-    if (auth.currentUser) {
-      // const profile = await getDoc(
-      //   doc(db, "userProfiles", auth.currentUser.uid!)
-      // );
+    if (auth.currentUser) { 
       dispatch(
         addFirebaseListener({
           listener: onSnapshot(
@@ -206,7 +199,6 @@ export const AuthOnRender = () => {
             );
 
             if (!!Object.keys(chats.dms).length) {
-              console.log('yes this is true we are setting dms')
               dispatch(
                 updateApp({
                   home: {
@@ -221,7 +213,6 @@ export const AuthOnRender = () => {
       );
 
       const chats = await getDocs(chatsQeury);
-      // console.log('gathered chatIDS', chatIDs)
       chats.forEach((document) => {
         const id = document.id;
         dispatch(getChatSubscription(id));
@@ -238,7 +229,6 @@ export const AuthOnRender = () => {
               profiles[document.id] = { ...user, uid: document.id };
             });
 
-            console.log("updating profiles here", Object.keys(profiles));
             dispatch(
               updateApp({
                 userProfiles: profiles,
@@ -332,13 +322,10 @@ export const AuthUpdate = (
         //password
         if (formValues["newPassword"] !== formValues["confirmNewPassword"]) {
           setFormInvalid("Ensure your new passwords match!");
-          console.log("password no match");
         } else {
-          console.log("updaing password");
           updatePassword(auth.currentUser!, formValues["newPassword"])
             .then(() => navigation.goBack())
             .catch((err) => {
-              console.log(err.code);
               setFormInvalid("There was an issue updating your password");
             });
         }
@@ -346,7 +333,6 @@ export const AuthUpdate = (
         //email
         updateEmail(auth.currentUser!, formValues["email"]!)
           .then(() => {
-            console.log("success");
             navigation.goBack();
           })
           .catch((error) => {

@@ -34,24 +34,17 @@ export const userSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    assign: (state, actions) => {
-      console.log(
-        "redux store has been updated in user slice: ",
-        actions.payload
-      );
-      // state = actions.payload.user
+    assign: (state, actions) => {  
       const user = actions.payload.user;
       state.displayedName = user.displayedName;
       state.username = user.username;
       state.status = user.status;
-      state.profile_img = user.profile_img;
-      console.log(state);
+      state.profile_img = user.profile_img; 
     },
     update: (state: UserState, actions) => {
       Object.keys(actions.payload).forEach((key) => {
         (state[key as keyof UserState] as any) = actions.payload[key];
-      });
-      console.log("updated store", state);
+      }); 
     },
     updateUserChat: (state: UserState, actions) => {
       const chatObj = actions.payload.chat;
@@ -68,15 +61,11 @@ export const userSlice = createSlice({
             ] = chat[attributeKey];
           });
         });
-      });
-      console.log('updated user chat', state.chats.dms)
+      }); 
     }, 
     updateUserChatMessages: (state: UserState, actions) => {
       const { messages, chat_type, chat_id } = actions.payload;
-      console.log(
-        "updating messages",
-        state.chats[chat_type as keyof typeof state.chats][chat_id]
-      );
+      
       state.chats[chat_type as keyof typeof state.chats][chat_id].messages =
         messages;
     },

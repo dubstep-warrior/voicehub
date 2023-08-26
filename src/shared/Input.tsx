@@ -21,7 +21,6 @@ export default function Input({ style = 'input' ,...props}: IInput) {
   const { name, handleFormValueChange, formKey, ...textInputProps } = props;
 
   const textChanged = (text: string) => {
-    // console.log('text is changing:', text)
     if(props.onTextChange) {
       props.onTextChange(text)
     }

@@ -22,7 +22,6 @@ import FlashMessage, { showMessage } from 'react-native-flash-message';
 
 
 export default function Invite(props: any) {
-    console.log(props.chat)
 
     const copyString = async (string: any) => {
         await Clipboard.setStringAsync(string).then(() => {

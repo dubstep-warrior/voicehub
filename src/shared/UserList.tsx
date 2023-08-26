@@ -14,11 +14,9 @@ export interface IUserListProps {
 }
 
 export default function UserList({ list = [], ...props }: IUserListProps) {
-  console.log(list);
   return (
     <>
       {list.map((user, index) => {
-        console.log(props?.selected, props.identifier ,user?.[props.identifier])
         return (
           <TouchableOpacity
             key={props.identifier ? user?.[props.identifier] : index}

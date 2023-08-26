@@ -55,7 +55,6 @@ const CustomDrawerContent = ({ navigation }: any) => {
     userState?.chats?.[
       appState.home.selectedCat as keyof typeof userState.chats
     ]?.[appState.home.selectedSubCat as string];
-  console.log("user selected chat: ", selectedChat);
 
   const dispatch = useAppDispatch();
 
@@ -66,7 +65,6 @@ const CustomDrawerContent = ({ navigation }: any) => {
     options: ["Send Message", "Cancel"],
     cancelButtonIndex: 1,
     onPress: async (index: number): Promise<void> => {
-      console.log(index);
       if ([0].includes(index) && selectedUser.current) {
         // Send message
         // ENABLE SEND MESSAGE OVERLAY HERE
@@ -88,7 +86,6 @@ const CustomDrawerContent = ({ navigation }: any) => {
             })
           );
         } else {
-          // console.log(auth.currentUser!.uid, selectedUser.current.uid)
           StartChat(selectedUser, navigation);
         }
 
@@ -117,9 +114,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
       <ScrollView
         style={{
           flex: 1,
-          backgroundColor: theme.smoothGrey,
-          // flexDirection: "column",
-          // gap: 12,
+          backgroundColor: theme.smoothGrey, 
         }}
         showsVerticalScrollIndicator={false}
       >

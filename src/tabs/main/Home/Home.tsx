@@ -50,7 +50,6 @@ import ProfileOverview from "../../../shared/ProfileOverview";
 export default function Home({ route, navigation }: any) {
   const Drawer = createDrawerNavigator();
   const appState = useAppSelector(selectApp);
-  console.log("navigated to home", route?.params?.drawerStatus);
   return (
     <>
       <Drawer.Navigator
@@ -101,7 +100,6 @@ const CustomDrawerContent = ({ navigation }: any) => {
   };
 
   const selectHomeState = (cat: string | null, subcat: string | null) => {
-    console.log(cat, subcat);
     dispatch(
       updateApp({
         home: {

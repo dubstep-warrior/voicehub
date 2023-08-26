@@ -39,7 +39,6 @@ export default function ResolveChat(props: any) {
   }, [chatType]);
 
   useEffect(() => {
-    console.log("yay new form", chatType, formValues);
   }, [formValues]);
 
   const actionSheetRef = useRef<ActionSheet>(null);
@@ -74,10 +73,8 @@ export default function ResolveChat(props: any) {
   };
 
   const submit = async () => {
-    console.log("submit called on chat resolve");
     if (chatType == "new") {
       if (!formValues["name"]) {
-        console.log("please fill in name");
         setFormInvalid("Please fill in your chat's name");
       } else {
         await dispatch(
@@ -93,9 +90,7 @@ export default function ResolveChat(props: any) {
         }
       }
     } else if (chatType == "existing") {
-      console.log("exisitng called");
       if (!formValues["chat_id"]) {
-        console.log("please fill in chatid");
         setFormInvalid("Please fill in the chat ID");
       } else {
         await dispatch(joinChat(formValues));

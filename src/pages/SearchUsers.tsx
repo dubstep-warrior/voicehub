@@ -38,7 +38,6 @@ export default function SearchUsers({ route, navigation }: NavigationProps) {
   };
 
   const userSelected = (user: any) => {
-    console.log(user)
     selectedUser.current = user
     actionSheetRef.current?.show()
   }
