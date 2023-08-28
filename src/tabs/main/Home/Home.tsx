@@ -46,6 +46,7 @@ import { collection, doc, setDoc } from "firebase/firestore";
 // import Daily from '@daily-co/react-native-daily-js';
 import Spinner from "react-native-loading-spinner-overlay";
 import ProfileOverview from "../../../shared/ProfileOverview";
+import Call from "../../../utils/Call";
 
 export default function Home({ route, navigation }: any) {
   const Drawer = createDrawerNavigator();
@@ -145,12 +146,13 @@ const CustomDrawerContent = ({ navigation }: any) => {
     // navigation.closeDrawer()
   };
 
-  const joinVoiceLounge = async (chatId: string | null) => {
-    // const call = Daily.createCallObject({
-    //   audioSource: true, // Start with audio on to get mic permission from participant at start
-    //   videoSource: false,
-    // });
-    // call.join({ url: `https://voicehub.daily.co/${chatId}` });
+  const joinVoiceLounge = async (chatId: string | null) => { 
+    console.log('join lounge attempt')
+    if (chatId && auth.currentUser?.uid) {
+      console.log('ok its cleared')
+      Call.join(chatId,
+        userState.chats.chat[chatId].users.findIndex((uid: string) => uid == auth.currentUser?.uid))
+    }
   };
 
   return (
@@ -264,11 +266,11 @@ const CustomDrawerContent = ({ navigation }: any) => {
                       overflow: "hidden",
                     },
                     appState.home.selectedCat == "chat" &&
-                      appState.home.selectedSubCat == key && {
-                        borderWidth: 2,
-                        borderColor: theme.black,
-                        borderRadius: 20,
-                      },
+                    appState.home.selectedSubCat == key && {
+                      borderWidth: 2,
+                      borderColor: theme.black,
+                      borderRadius: 20,
+                    },
                   ]}
                 >
                   {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] ? (
@@ -351,10 +353,10 @@ const CustomDrawerContent = ({ navigation }: any) => {
                         (chatID) => {
                           return {
                             ...appState.userProfiles[
-                              userState?.chats?.["dms"][chatID].users.find(
-                                (userID: string) =>
-                                  userID !== auth.currentUser?.uid
-                              )
+                            userState?.chats?.["dms"][chatID].users.find(
+                              (userID: string) =>
+                                userID !== auth.currentUser?.uid
+                            )
                             ],
                             dmRef: chatID,
                           };
@@ -436,6 +438,18 @@ const CustomDrawerContent = ({ navigation }: any) => {
                           Voice lounge
                         </Text>
                       </TouchableOpacity>
+                      {
+                        !!appState?.voiceChat.size &&
+                        <View>
+                          <UserList
+                            list={[...appState?.voiceChat].map(
+                              (userID) => appState.userProfiles[userID]
+                            )}
+                            identifier="uid"
+                            small={true}
+                          ></UserList>
+                        </View>
+                      }
                     </View>
                   </View>
                 )}
@@ -450,9 +464,9 @@ const CustomDrawerContent = ({ navigation }: any) => {
             Keyboard.isVisible()
               ? Keyboard.dismiss()
               : setOverlay({
-                  type: "",
-                  visible: false,
-                })
+                type: "",
+                visible: false,
+              })
           }
           backdropStyle={{ backgroundColor: "rgba(255,255,255,0.4)" }}
           overlayStyle={{ backgroundColor: theme.background, borderRadius: 15 }}
@@ -511,7 +525,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
             <Invite
               chat={
                 userState.chats.chat[
-                  appState.home.selectedSubCat as keyof typeof userState.chats
+                appState.home.selectedSubCat as keyof typeof userState.chats
                 ]
               }
               onClose={() => {

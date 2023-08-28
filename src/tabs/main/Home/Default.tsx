@@ -33,10 +33,9 @@ import * as ImagePicker from "expo-image-picker";
 import {
   FlatList,
   ScrollView,
-  TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { Header, Icon } from "react-native-elements";
+import { Icon } from "react-native-elements";
 import { addChat, addMessage } from "../../../store/actions/user.actions";
 import Modal from "react-native-modal";
 import { Image as ExpoImage } from "expo-image";
@@ -44,12 +43,9 @@ import {
   ImageGallery,
   ImageObject,
 } from "@georstat/react-native-image-gallery";
-// import Gallery from "react-native-image-gallery";
-import AnimatedGallery from "@akumzy/react-native-animated-gallery";
 import { auth } from "../../../../firebase";
 import { MaterialIndicator } from "react-native-indicators";
 import MessageText from "../../../shared/MessageText";
-// import Gallery from "react-native-image-gallery";
 
 export default function Default({ route, navigation }: any) {
   const current = "message";
@@ -58,9 +54,9 @@ export default function Default({ route, navigation }: any) {
   const dispatch = useAppDispatch();
   const selectedChat =
     userState?.chats?.[
-      appState.home.selectedCat as keyof typeof userState.chats
+    appState.home.selectedCat as keyof typeof userState.chats
     ]?.[appState.home.selectedSubCat as string];
- 
+
   const messageLink: any = routeConfig;
   const [invalid, setFormInvalid] = useState<string | null>(null);
 
@@ -98,11 +94,11 @@ export default function Default({ route, navigation }: any) {
 
       const result = await (index == 0
         ? ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 0,
-          })
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 0,
+        })
         : ImagePicker.launchCameraAsync());
 
       if (!result.canceled) {
@@ -130,8 +126,8 @@ export default function Default({ route, navigation }: any) {
             ],
             type: "dms",
           })
-        ); 
-        if (res && res?.success) { 
+        );
+        if (res && res?.success) {
           await dispatch(addMessage(formValues, res?.data.id));
         }
       } else {
@@ -154,10 +150,10 @@ export default function Default({ route, navigation }: any) {
     contentSize,
   }: any) => {
     const paddingToBottom = 20;
-     setCloseToBottom(contentOffset.y < paddingToBottom);
+    setCloseToBottom(contentOffset.y < paddingToBottom);
   };
 
-  useEffect(() => { 
+  useEffect(() => {
     scrollViewRef.current?.scrollToOffset({
       animated: true,
       offset: 0,
@@ -185,7 +181,7 @@ export default function Default({ route, navigation }: any) {
   }, []);
 
   const [tagSelection, setTagSelection] = useState([]);
-  const parseInput = (desc: string) => { 
+  const parseInput = (desc: string) => {
     const inputArr = desc.split(" ");
     if (!!inputArr.length) {
       const lastWord = inputArr[inputArr.length - 1];
@@ -204,7 +200,7 @@ export default function Default({ route, navigation }: any) {
     }
   };
 
-  const openUserModal = (id: string) => {  
+  const openUserModal = (id: string) => {
     dispatch(updateApp({
       openProfileModal: id
     }))
@@ -265,12 +261,7 @@ export default function Default({ route, navigation }: any) {
           onSwipeComplete={() => setGallery(null)}
           swipeDirection="up"
           style={{
-            // flex: 0.2,
-            // position: 'absolute',
-            // bottom: 0,
-            // width: '100%',
             margin: 0,
-            // borderRadius: 20,
             backgroundColor: "rgba(0,0,0,0.2)",
             position: "relative",
           }}
@@ -278,9 +269,6 @@ export default function Default({ route, navigation }: any) {
           onBackdropPress={() => {
             setGallery(null);
           }}
-          // transparent={false}
-          // hasBackdrop={false}
-          // animated
           animationIn="slideInUp"
         >
           <ImageGallery
@@ -332,10 +320,10 @@ export default function Default({ route, navigation }: any) {
                 {selectedChat?.type == "chat"
                   ? selectedChat?.name
                   : appState?.userProfiles?.[
-                      selectedChat?.users.find(
-                        (userID: string) => userID !== auth.currentUser?.uid
-                      )
-                    ]?.displayedName}
+                    selectedChat?.users.find(
+                      (userID: string) => userID !== auth.currentUser?.uid
+                    )
+                  ]?.displayedName}
               </Text>
             </View>
           </SafeAreaView>
@@ -354,7 +342,7 @@ export default function Default({ route, navigation }: any) {
                     data={[
                       ...appState.messages[appState.home.selectedSubCat as any],
                     ].reverse()}
-                    renderItem={({ item, index }) => { 
+                    renderItem={({ item, index }) => {
                       return (
                         <View
                           key={item?.id ?? `temp-message-${index}`}
@@ -365,10 +353,10 @@ export default function Default({ route, navigation }: any) {
                               gap: 8,
                             },
                             index !==
-                              appState.messages[
-                                appState.home.selectedSubCat as any
-                              ].length -
-                                1 && {
+                            appState.messages[
+                              appState.home.selectedSubCat as any
+                            ].length -
+                            1 && {
                               borderBottomWidth: 0.4,
                             },
                           ]}
@@ -380,7 +368,7 @@ export default function Default({ route, navigation }: any) {
                               borderRadius: 30,
                               overflow: "hidden",
                             }}
-                            onPress={()=>openUserModal(item?.by)}
+                            onPress={() => openUserModal(item?.by)}
                           >
                             <ExpoImage
                               style={{
@@ -396,7 +384,7 @@ export default function Default({ route, navigation }: any) {
                           </TouchableOpacity>
                           <View style={{ justifyContent: "space-between" }}>
                             <TouchableOpacity
-                            onPress={()=>openUserModal(item?.by)}
+                              onPress={() => openUserModal(item?.by)}
                             >
                               <Text
                                 style={{
@@ -430,7 +418,7 @@ export default function Default({ route, navigation }: any) {
                               >
                                 {item?.images?.map(
                                   (image: any, index: number) => {
-                                     return (
+                                    return (
                                       <ExpoImage
                                         key={index + image.uri}
                                         style={{

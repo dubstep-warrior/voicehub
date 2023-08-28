@@ -1,146 +1,85 @@
-// import {
-//   ScreenCapturePickerView,
-//   RTCPeerConnection,
-//   RTCIceCandidate,
-//   RTCSessionDescription,
-//   RTCView,
-//   MediaStream,
-//   MediaStreamTrack,
-//   mediaDevices,
-//   registerGlobals,
-// } from "react-native-webrtc";
+// import AgoraRTC, { IAgoraRTCClient, IAgoraRTCRemoteUser, IMicrophoneAudioTrack } from "agora-rtc-sdk-ng"
+import RtcEngine, { IRtcEngine, RtcConnection, createAgoraRtcEngine } from 'react-native-agora';
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { addVoiceChatMember, removeVoiceChatMember } from "../store/slices/app.slice";
+import { selectUser } from '../store/slices/user.slice';
 
-// export class Call {
-//   localMediaStream: MediaStream | null;
-//   peerConstraints = {
-//     iceServers: [
-//       {
-//         urls: "stun:stun.l.google.com:19302",
-//       },
-//     ],
-//   };
-//   sessionConstraints = {
-//     mandatory: {
-//       OfferToReceiveAudio: true,
-//       OfferToReceiveVideo: true,
-//       VoiceActivityDetection: true,
-//     },
-//   };
-//   peerConnection: RTCPeerConnection;
-//   constructor() {
-//     this.localMediaStream = null;
-//     this.peerConnection = new RTCPeerConnection(this.peerConstraints);
-//     this.peerConnection.addEventListener(
-//       "connectionstatechange",
-//       (event) => {}
-//     );
-//     this.peerConnection.addEventListener("icecandidate", (event) => {});
-//     this.peerConnection.addEventListener("icecandidateerror", (event) => {});
-//     this.peerConnection.addEventListener(
-//       "iceconnectionstatechange",
-//       (event) => {}
-//     );
-//     this.peerConnection.addEventListener(
-//       "icegatheringstatechange",
-//       (event) => {}
-//     );
-//     this.peerConnection.addEventListener("negotiationneeded", (event) => {});
-//     this.peerConnection.addEventListener("signalingstatechange", (event) => {});
-//     this.peerConnection.addEventListener("track", (event) => {});
-//   }
-
-//   getMediaStream = async () => {
-//     let mediaConstraints = {
-//       audio: true,
-//       video: {
-//         frameRate: 30,
-//         facingMode: "user",
-//       },
-//     };
-
-//     let isVoiceOnly = false;
-
-//     try {
-//       const mediaStream = await mediaDevices.getUserMedia(mediaConstraints);
-
-//       if (isVoiceOnly) {
-//         let videoTrack = mediaStream.getVideoTracks()[0];
-//         videoTrack.enabled = false;
-//       }
-
-//       this.localMediaStream = mediaStream;
-//       if (this.localMediaStream) {
-//         this.localMediaStream
-//           .getTracks()
-//           .forEach((track) =>
-//             this.peerConnection.addTrack(
-//               track,
-//               this.localMediaStream as MediaStream
-//             )
-//           );
-//       }
-//     } catch (err) {
-//       // Handle Error
-//     }
-//   };
-
-//   destroyMediaStreams = () => {
-//     if (this.localMediaStream) {
-//       this.localMediaStream.getTracks().forEach((track) => track.stop());
-
-//       this.localMediaStream = null;
-//     }
-//   }
-
-//   destroyPeerConnection = () => {
-//     if (this.peerConnection) {
-//       this.peerConnection.close();
-//       this.peerConnection = new RTCPeerConnection(this.peerConstraints);
-//     }
-//   }
-
-//   createOffer = async () => {
-//     try {
-//       const offerDescription = await this.peerConnection.createOffer(
-//         this.sessionConstraints
-//       );
-//       await this.peerConnection.setLocalDescription(offerDescription);
-
-//       // Send the offerDescription to the other participant.
-//       return {
-//         success: true,
-//         data: offerDescription
-//     }
-//     } catch (err) {
-//       // Handle Errors
-
-//       return {
-//         success: false,
-//         data: err
-//     }
-//     }
-//   };
-
-
-//   createAnswer = async (offerDescription: any) => {
-//     try {
-//         // Use the received offerDescription 
-//         await this.peerConnection.setRemoteDescription(  new RTCSessionDescription( offerDescription ) );
-    
-//         const answerDescription = await this.peerConnection.createAnswer();
-//         await this.peerConnection.setLocalDescription( answerDescription );
-        
-//         return {
-//             success: true,
-//             data: answerDescription
-//         }
-//         // Send the answerDescription back as a response to the offerDescription.
-//     } catch( err ) {
-//         // Handle Errors
-//         return {
-//             success: false,
-//             data: err
-//         }
-//     };
-//   }
+// interface AudioTracks {
+//     localAudioTrack: IMicrophoneAudioTrack | null,
+//     remoteAudioTracks: any
 // }
+
+const dispatch = useAppDispatch()
+const userState = useAppSelector(selectUser);
+
+class Call {
+    appid = "56abe9f94a6f4ccc95f862dae383ce98"
+    token = ''
+
+    // audioTracks: AudioTracks = {
+    //     localAudioTrack: null,
+    //     remoteAudioTracks: {},
+    // };
+
+
+    _engine: IRtcEngine = createAgoraRtcEngine();
+
+    // _channel?: 
+
+
+    constructor() {
+        this._engine.initialize({ appId: "56abe9f94a6f4ccc95f862dae383ce98" });
+
+    }
+
+    join = async (roomId: string, rtcUid: number) => {
+        this._engine.joinChannel(this.token, roomId, rtcUid, {
+            publishMicrophoneTrack: true,
+            publishCameraTrack: false
+        })
+
+
+        this._engine.addListener('onUserJoined', (connection: RtcConnection, uid) => { this.handleUserJoined(roomId, uid) })
+        this._engine.addListener('onUserOffline', (connection: RtcConnection, uid) => { this.handleUserLeft(roomId,uid) })
+        console.log('joined channel', roomId, rtcUid)
+        // this.audioTracks.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+        // await this._rtcInstance.publish(this.audioTracks.localAudioTrack);
+    }
+
+
+    leave = async () => { 
+        this._engine.leaveChannel()
+        this._engine.removeAllListeners()
+    }
+
+
+    handleUserJoined = async (roomId: string, index: number) => {
+        //add user.uid to app state
+        dispatch(addVoiceChatMember({
+            uid: userState.chats.chat[roomId].users[index]
+        }))
+    }
+
+
+    // handleUserPublished = async (user: IAgoraRTCRemoteUser, mediaType: "audio" | "video") => {
+    //     //4
+    //     await this._rtcInstance.subscribe(user, mediaType);
+
+    //     //5
+    //     if (mediaType == "audio") {
+    //         this.audioTracks.remoteAudioTracks[user.uid] = [user.audioTrack]
+    //         user.audioTrack?.play();
+    //     }
+    // }
+
+
+    handleUserLeft = async (roomId: string, index: number) => {
+        //remove user.uid from app state 
+        dispatch(removeVoiceChatMember({
+            uid: userState.chats.chat[roomId].users[index]
+        }))
+    }
+}
+
+// const Call = new Call()
+export default new Call()
