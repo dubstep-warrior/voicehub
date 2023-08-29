@@ -46,7 +46,7 @@ import { collection, doc, setDoc } from "firebase/firestore";
 // import Daily from '@daily-co/react-native-daily-js';
 import Spinner from "react-native-loading-spinner-overlay";
 import ProfileOverview from "../../../shared/ProfileOverview";
-import Call from "../../../utils/Call";
+// import Call from "../../../utils/Call";
 
 export default function Home({ route, navigation }: any) {
   const Drawer = createDrawerNavigator();
@@ -148,11 +148,11 @@ const CustomDrawerContent = ({ navigation }: any) => {
 
   const joinVoiceLounge = async (chatId: string | null) => { 
     console.log('join lounge attempt')
-    if (chatId && auth.currentUser?.uid) {
-      console.log('ok its cleared')
-      Call.join(chatId,
-        userState.chats.chat[chatId].users.findIndex((uid: string) => uid == auth.currentUser?.uid))
-    }
+    // if (chatId && auth.currentUser?.uid) {
+    //   console.log('ok its cleared')
+    //   Call.join(chatId,
+    //     userState.chats.chat[chatId].users.findIndex((uid: string) => uid == auth.currentUser?.uid))
+    // }
   };
 
   return (

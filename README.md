@@ -32,13 +32,8 @@ npm start
 
 - ![TypeScript](https://img.shields.io/badge/-TypeScript-007ACC?logo=typescript&logoColor=white)
 - ![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?logo=javascript&logoColor=black)
-- ![React Native](https://img.shields.io/badge/-React%20Native-61DAFB?logo=react&logoColor=black)
-- ![Express](https://img.shields.io/badge/-Express-000000?logo=express&logoColor=white)
-- ![NodeJS](https://img.shields.io/badge/-Node.js-339933?logo=node.js&logoColor=white)
-- ![WebSockets](https://img.shields.io/badge/-WebSockets-777777?logo=socket.io&logoColor=white)
-- ![Firebase](https://img.shields.io/badge/-Firebase-FFCA28?logo=firebase&logoColor=black)
-- ![Redis](https://img.shields.io/badge/-Redis-DC382D?logo=redis&logoColor=white)
-- ![MongoDB](https://img.shields.io/badge/-MongoDB-47A248?logo=mongodb&logoColor=white)
+- ![React Native](https://img.shields.io/badge/-React%20Native-61DAFB?logo=react&logoColor=black) 
+- ![Firebase](https://img.shields.io/badge/-Firebase-FFCA28?logo=firebase&logoColor=black) 
 
 ## License
 
