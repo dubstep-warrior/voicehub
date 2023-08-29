@@ -28,7 +28,8 @@
         "UIBackgroundModes": [
           "voip"
         ]
-      }
+      },
+      "bundleIdentifier": "com.anonymous.voicehubfrontend"
     },
     "android": {
       "adaptiveIcon": {
