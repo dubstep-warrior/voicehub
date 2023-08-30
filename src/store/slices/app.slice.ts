@@ -16,8 +16,7 @@ interface App {
   call: any;
   firebaseListeners: Unsubscribe[];
   notifications: any;
-  openProfileModal: string; 
-  voiceChat: Set<string>
+  openProfileModal: string;  
 }
 
 // Define the initial state using that type
@@ -34,8 +33,7 @@ const initialState: App = {
   call: null,
   firebaseListeners: [],
   notifications: {},
-  openProfileModal: '' , 
-  voiceChat: new Set()
+  openProfileModal: '' ,  
 };
 
 export const appSlice = createSlice({
@@ -53,8 +51,8 @@ export const appSlice = createSlice({
         (state[key as keyof App] as any) = actions.payload[key];
       });
      },
-    updateAppMessages: (state, actions) => {
-      state.messages[actions.payload.chat_id] = actions.payload.messages;
+    updateAppMessages: (state, actions) => { 
+      state.messages[actions.payload.chat_id] = actions.payload.messages; 
      },
     addFirebaseListener: (state, actions) => {
       state.firebaseListeners.push(actions.payload.listener);
@@ -70,13 +68,7 @@ export const appSlice = createSlice({
      },
     updateAppNotifications: (state, actions) => { 
       state.notifications[actions.payload.chat_id] = actions.payload.notifications;
-    }, 
-    addVoiceChatMember:  (state, actions) => { 
-      state.voiceChat.add(actions.payload.uid)
-    }, 
-    removeVoiceChatMember:  (state, actions) => { 
-      state.voiceChat.delete(actions.payload.uid)
-    }, 
+    } 
   },
 });
 
@@ -87,9 +79,7 @@ export const {
   addFirebaseListener,
   clearFirebase, 
   addAppMessage,
-  updateAppNotifications,
-  addVoiceChatMember,
-  removeVoiceChatMember
+  updateAppNotifications, 
 } = appSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type

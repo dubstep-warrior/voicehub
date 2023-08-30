@@ -9,6 +9,8 @@ import {
   View,
   TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { NavigationProps } from "../interfaces/NavigationProps.interface";
 import Input from "../shared/Input";
@@ -47,13 +49,13 @@ export default function Access({ route, navigation }: NavigationProps) {
 
     const res = await dispatch(resolveAccess(formValues, current));
     if (res && !res.success) {
-      setFormInvalid("User credentials are invalid");
+      setFormInvalid((current == "login" ? "User credentials are invalid" : "Invalid email"));
     }
   };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.select({ android: undefined, ios: "height" })} style={styles.container}>
         <View>
           <Image
             style={styles.logo}
@@ -101,7 +103,7 @@ export default function Access({ route, navigation }: NavigationProps) {
         </View>
         {Boolean(invalid) && <Error message={invalid}></Error>}
         <StatusBar style="auto" />
-      </View>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 }

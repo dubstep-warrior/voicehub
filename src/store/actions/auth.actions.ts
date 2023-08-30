@@ -44,7 +44,7 @@ export const resolveAccess = (data: any, current: string) => {
   return async (dispatch: any) => {
 
     dispatch(
-      assignApp({
+      updateApp({
         submitting: true,
       })
     );
@@ -80,7 +80,7 @@ export const resolveAccess = (data: any, current: string) => {
       })) as { success: boolean; data: any };
 
     dispatch(
-      assignApp({
+      updateApp({
         submitting: false,
       })
     );

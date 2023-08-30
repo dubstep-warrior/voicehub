@@ -7,38 +7,11 @@ import { StyleSheet } from "react-native";
 
 
 export default function MessageText(props: any) {
-    const text = props.text.split(' ');
-    const appState = useAppSelector(selectApp)
-    const userState = useAppSelector(selectUser)
-    const users = userState?.chats?.[
-        appState.home.selectedCat as keyof typeof userState.chats
-    ]?.[appState.home.selectedSubCat as string].users.map((id: string) => {
-        return { ...appState.userProfiles[id], uid: id };
-    }) 
-
-    const tappedText = (text: string) => {
-        const displayedName = text.replace('@', '')
-        if(props.tappedText) {
-            props.tappedText(displayedName)
-        }
-    }
-
-
+    const {text} = props  
 
     return (
         <Text style={styles.text}>
-            {text.map((text: string, index: number) => {
-                if (text.startsWith('@') && users.map((user: any) => user.displayedName).includes(text.replace('@', ''))) {
-                    return (
-                        <Text key={text + index} onPress={() => {
-                            tappedText(text)
-                        }} style={[styles.text, { fontWeight: 'bold', color: 'blue', textDecorationLine: 'underline' }]}>
-                            {`${text} `}
-                        </Text>
-                    );
-                }
-                return `${text} `;
-            })}
+            {text}
         </Text>
     );
 };

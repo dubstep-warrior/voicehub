@@ -23,14 +23,14 @@
         "Cancel"
     ],
     "leftDrawer": {
-        "call": [
+        "owner": [
             "Invite to chat",
-            "Leave call",
+            "Delete chat",
             "Cancel"
         ],
         "norm": [
             "Invite to chat",
-            "Join call",
+            "Leave chat",
             "Cancel"
         ]
     }

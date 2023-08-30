@@ -66,12 +66,12 @@ export const getChatSubscription = (id: string) => {
             });
           });
           // TODO FIX THIS
-          dispatch(
-            updateAppNotifications({
-              notifications: notifications,
-              chat_id: id,
-            })
-          );
+          // dispatch(
+          //   updateAppNotifications({
+          //     notifications: notifications,
+          //     chat_id: id,
+          //   })
+          // );
 
           dispatch(
             updateAppMessages({

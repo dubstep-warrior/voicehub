@@ -9,6 +9,7 @@ import {
   FieldPath,
   addDoc,
   and,
+  arrayRemove,
   arrayUnion,
   collection,
   deleteDoc,
@@ -443,5 +444,59 @@ export const addMessage = (form: any, chat_id: string) => {
         submitting: false,
       })
     );
+  };
+};
+
+
+export const leaveChat = (chat_id: string) => {
+  return async (dispatch: any, getState: any) => {
+    const ref = doc(db, "chats", chat_id);
+    await updateDoc(ref, {
+      users: arrayRemove(auth.currentUser!.uid),
+    }).then(() => { 
+      Alert.alert(`Successfully left chat!`, undefined, [
+        { text: "OK", onPress: () => console.log("OK Pressed") },
+      ]);
+      dispatch( updateApp({
+        home: {
+          selectedCat: 'dms',
+          selectedSubCat:( !!Object.keys(getState?.user?.chats?.dms ?? {}).length ? Object.keys(getState.user.chats.dms)[0] : null),
+        },
+      }))
+    })
+    .catch((err) => {
+      console.log("cant join chat:", err);
+      Alert.alert(
+        `Could not leave chat`,
+        "There was an issue with leaving the chat, please try again later",
+        [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+      );
+    });
+  };
+};
+
+
+export const deleteChat = (chat_id: string) => {
+  return async (dispatch: any, getState: any) => {
+    const ref = doc(db, "chats", chat_id);
+    await deleteDoc(ref).then(() => { 
+      Alert.alert(`Successfully deleted chat!`, undefined, [
+        { text: "OK", onPress: () => console.log("OK Pressed") },
+      ]);
+      dispatch( updateApp({
+        home: {
+          selectedCat: 'dms',
+          selectedSubCat:( !!Object.keys(getState?.user?.chats?.dms ?? {}).length ? Object.keys(getState.user.chats.dms)[0] : null),
+        },
+      }))
+    })
+    .catch((err) => {
+      console.log("cant delete chat:", err);
+      Alert.alert(
+        `Could not delete chat`,
+        "There was an issue with deleting the chat, please try again later",
+        [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+      );
+    });
   };
 };

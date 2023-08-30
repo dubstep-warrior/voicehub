@@ -33,7 +33,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import ResolveChat from "../../../pages/ResolveChat";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Button, Overlay } from "react-native-elements";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Chat from "./Chat";
 import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../../../config/actionSheet-config.json";
@@ -46,6 +46,7 @@ import { collection, doc, setDoc } from "firebase/firestore";
 // import Daily from '@daily-co/react-native-daily-js';
 import Spinner from "react-native-loading-spinner-overlay";
 import ProfileOverview from "../../../shared/ProfileOverview";
+import { deleteChat, leaveChat } from "../../../store/actions/user.actions";
 // import Call from "../../../utils/Call";
 
 export default function Home({ route, navigation }: any) {
@@ -116,10 +117,13 @@ const CustomDrawerContent = ({ navigation }: any) => {
   };
 
   const actionSheetRef = useRef<ActionSheet>(null);
+  const owner =
+    !!appState.home.selectedSubCat &&
+    auth.currentUser?.uid ==
+      userState.chats.chat[appState.home.selectedSubCat]?.owner;
   const options = (actionSheetConfig as any)[current][
-    !!appState?.call ? "call" : "norm"
+    owner ? "owner" : "norm"
   ] as (string | React.ReactNode)[];
-  // options[1] = !!appState.call ? "Leave call" : "Join call";
   const actionSheetProps = {
     ref: actionSheetRef,
     options: options,
@@ -131,8 +135,19 @@ const CustomDrawerContent = ({ navigation }: any) => {
           visible: !overlay.visible,
         });
       }
+      if (index == 1) {
+        if (appState.home.selectedSubCat) {
+          if (owner) {
+            dispatch(deleteChat(appState.home.selectedSubCat))
+          } else {
+            dispatch(leaveChat(appState.home.selectedSubCat))
+          }
+        }
+       }
     },
   };
+
+  useEffect(() => {}, [appState.home.selectedSubCat]);
 
   const chatOptions = () => {
     actionSheetRef.current?.show();
@@ -144,15 +159,6 @@ const CustomDrawerContent = ({ navigation }: any) => {
       visible: false,
     });
     // navigation.closeDrawer()
-  };
-
-  const joinVoiceLounge = async (chatId: string | null) => { 
-    console.log('join lounge attempt')
-    // if (chatId && auth.currentUser?.uid) {
-    //   console.log('ok its cleared')
-    //   Call.join(chatId,
-    //     userState.chats.chat[chatId].users.findIndex((uid: string) => uid == auth.currentUser?.uid))
-    // }
   };
 
   return (
@@ -266,11 +272,11 @@ const CustomDrawerContent = ({ navigation }: any) => {
                       overflow: "hidden",
                     },
                     appState.home.selectedCat == "chat" &&
-                    appState.home.selectedSubCat == key && {
-                      borderWidth: 2,
-                      borderColor: theme.black,
-                      borderRadius: 20,
-                    },
+                      appState.home.selectedSubCat == key && {
+                        borderWidth: 2,
+                        borderColor: theme.black,
+                        borderRadius: 20,
+                      },
                   ]}
                 >
                   {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] ? (
@@ -353,10 +359,10 @@ const CustomDrawerContent = ({ navigation }: any) => {
                         (chatID) => {
                           return {
                             ...appState.userProfiles[
-                            userState?.chats?.["dms"][chatID].users.find(
-                              (userID: string) =>
-                                userID !== auth.currentUser?.uid
-                            )
+                              userState?.chats?.["dms"][chatID]?.users.find(
+                                (userID: string) =>
+                                  userID !== auth.currentUser?.uid
+                              )
                             ],
                             dmRef: chatID,
                           };
@@ -424,32 +430,6 @@ const CustomDrawerContent = ({ navigation }: any) => {
                           Text channel
                         </Text>
                       </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.subCatOption]}
-                        onPress={() =>
-                          joinVoiceLounge(appState.home.selectedSubCat)
-                        }
-                      >
-                        <Image
-                          style={{ borderRadius: 0, width: 20, height: 20 }}
-                          source={config["voice"]}
-                        ></Image>
-                        <Text style={[styles.subCatOptionText]}>
-                          Voice lounge
-                        </Text>
-                      </TouchableOpacity>
-                      {
-                        !!appState?.voiceChat.size &&
-                        <View>
-                          <UserList
-                            list={[...appState?.voiceChat].map(
-                              (userID) => appState.userProfiles[userID]
-                            )}
-                            identifier="uid"
-                            small={true}
-                          ></UserList>
-                        </View>
-                      }
                     </View>
                   </View>
                 )}
@@ -464,9 +444,9 @@ const CustomDrawerContent = ({ navigation }: any) => {
             Keyboard.isVisible()
               ? Keyboard.dismiss()
               : setOverlay({
-                type: "",
-                visible: false,
-              })
+                  type: "",
+                  visible: false,
+                })
           }
           backdropStyle={{ backgroundColor: "rgba(255,255,255,0.4)" }}
           overlayStyle={{ backgroundColor: theme.background, borderRadius: 15 }}
@@ -525,7 +505,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
             <Invite
               chat={
                 userState.chats.chat[
-                appState.home.selectedSubCat as keyof typeof userState.chats
+                  appState.home.selectedSubCat as keyof typeof userState.chats
                 ]
               }
               onClose={() => {

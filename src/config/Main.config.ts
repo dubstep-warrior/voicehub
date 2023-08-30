@@ -16,13 +16,7 @@ const MainTab = [
       component: Friends,
       image: config['friends-grey'],
       imageSelected: config['friends-white'],
-    },
-    {
-      name: "Notification",
-      component: Notification,
-      image: config['notification-grey'],
-      imageSelected: config['notification-white'],
-    },
+    }, 
     {
       name: "Profile",
       component: Profile,
