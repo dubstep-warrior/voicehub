@@ -2,8 +2,13 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import { User, UserCredential } from "firebase/auth";
+import { Chat, ChatID, TempChat } from "../../interfaces/Chat.interface";
 
 // Define a type for the slice state
+type ChatCollection = {
+  [key: string]: Chat | TempChat 
+}
+
 interface UserState extends User {
   profile_img: any;
   username: string;
@@ -57,26 +62,19 @@ export const userSlice = createSlice({
               state.chats[type as keyof typeof state.chats][chatID] = {}
             }
             state.chats[type as keyof typeof state.chats][chatID][
-              attributeKey
+              attributeKey as keyof Chat
             ] = chat[attributeKey];
           });
         });
       }); 
-    }, 
-    updateUserChatMessages: (state: UserState, actions) => {
-      const { messages, chat_type, chat_id } = actions.payload;
-      
-      state.chats[chat_type as keyof typeof state.chats][chat_id].messages =
-        messages;
-    },
+    } 
   },
 });
 
 export const {
   assign,
   update, 
-  updateUserChat,
-  updateUserChatMessages,
+  updateUserChat, 
 } = userSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type

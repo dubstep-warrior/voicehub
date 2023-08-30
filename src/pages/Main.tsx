@@ -1,12 +1,10 @@
 import * as React from "react";
 import { StyleSheet, Image } from "react-native";
 import { NavigationProps } from "../interfaces/NavigationProps.interface";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
 import  MainTab from './../config/Main.config'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import theme from "./../../config/theme.config.json";
 import { RootStackParamList } from "../interfaces/RootStackParamList.interface";
-import UpdateField from "../shared/SimpleForm";
 
 export default function Main({ route, navigation }: NavigationProps) {
   const Tab = createBottomTabNavigator(); 

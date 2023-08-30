@@ -1,10 +1,17 @@
 import Friends from "../tabs/main/Friends/Friends";
-import Home from "../tabs/main/Home/Home";
-import Notification from "../tabs/main/Notification";
+import Home from "../tabs/main/Home/Home"; 
 import Profile from "../tabs/main/Profile/Profile";
 import config from "./../../Images.config"
+import { Image, ImageSourcePropType } from "react-native";
 
-const MainTab = [
+type TabConfig = {
+  name: string,
+  component: ({ route, navigation }: any) => JSX.Element,
+  image: ImageSourcePropType
+  imageSelected: ImageSourcePropType
+}
+
+const MainTab: TabConfig[] = [
     {
       name: "Home",
       component: Home,

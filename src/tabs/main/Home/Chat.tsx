@@ -71,7 +71,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
 
         const existingChatID = Object.keys(userState.chats.dms).find(
           (chatID) => {
-            return userState.chats.dms[chatID].users.includes(
+            return (userState.chats.dms[chatID].users ?? []).includes(
               selectedUser.current.uid
             );
           }
@@ -130,7 +130,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
             onPress={(user) => {
               tappedUser(user);
             }}
-            list={selectedChat?.users.map((id: string) => {
+            list={(selectedChat?.users ?? []).map((id: string) => {
               return { ...appState.userProfiles[id], uid: id };
             })}
           ></UserList>

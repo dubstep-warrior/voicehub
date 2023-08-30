@@ -22,10 +22,7 @@ import { NavigationProps } from "../../../interfaces/NavigationProps.interface";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectUser } from "../../../store/slices/user.slice";
-import {
-  selectApp,
-  update as updateApp,
-} from "../../../store/slices/app.slice";
+import { selectApp, update as updateApp } from "../../../store/slices/app.slice";
 import Input from "../../../shared/Input";
 import routeConfig from "../../../../config/route-config.json";
 import React, { useState, useRef, useEffect, Ref } from "react";
@@ -33,7 +30,10 @@ import { FormData } from "../../../shared/FormData";
 import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../../../config/actionSheet-config.json";
 import * as ImagePicker from "expo-image-picker";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
+import {
+  FlatList,
+  ScrollView,
+} from "react-native-gesture-handler";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Icon } from "react-native-elements";
 import { addChat, addMessage } from "../../../store/actions/user.actions";
@@ -54,7 +54,7 @@ export default function Default({ route, navigation }: any) {
   const dispatch = useAppDispatch();
   const selectedChat =
     userState?.chats?.[
-      appState.home.selectedCat as keyof typeof userState.chats
+    appState.home.selectedCat as keyof typeof userState.chats
     ]?.[appState.home.selectedSubCat as string];
 
   const messageLink: any = routeConfig;
@@ -94,11 +94,11 @@ export default function Default({ route, navigation }: any) {
 
       const result = await (index == 0
         ? ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 0,
-          })
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 0,
+        })
         : ImagePicker.launchCameraAsync());
 
       if (!result.canceled) {
@@ -189,7 +189,7 @@ export default function Default({ route, navigation }: any) {
         const toBeParsed = lastWord.replace("@", "");
         setTagSelection(
           selectedChat.users
-            ?.map((uid: string) => appState.userProfiles[uid])
+            .map((uid: string) => appState.userProfiles[uid])
             .filter((profile: any) =>
               profile.displayedName.includes(toBeParsed)
             )
@@ -201,11 +201,9 @@ export default function Default({ route, navigation }: any) {
   };
 
   const openUserModal = (id: string) => {
-    dispatch(
-      updateApp({
-        openProfileModal: id,
-      })
-    );
+    dispatch(updateApp({
+      openProfileModal: id
+    }))
   };
 
   const GalleryImage = (image: ImageObject) => {
@@ -322,10 +320,10 @@ export default function Default({ route, navigation }: any) {
                 {selectedChat?.type == "chat"
                   ? selectedChat?.name
                   : appState?.userProfiles?.[
-                      selectedChat?.users?.find(
-                        (userID: string) => userID !== auth.currentUser?.uid
-                      )
-                    ]?.displayedName}
+                    selectedChat?.users.find(
+                      (userID: string) => userID !== auth.currentUser?.uid
+                    )
+                  ]?.displayedName}
               </Text>
             </View>
           </SafeAreaView>
@@ -355,10 +353,10 @@ export default function Default({ route, navigation }: any) {
                               gap: 8,
                             },
                             index !==
-                              appState.messages[
-                                appState.home.selectedSubCat as any
-                              ].length -
-                                1 && {
+                            appState.messages[
+                              appState.home.selectedSubCat as any
+                            ].length -
+                            1 && {
                               borderBottomWidth: 0.4,
                             },
                           ]}
@@ -414,30 +412,31 @@ export default function Default({ route, navigation }: any) {
                                   width: "90%",
                                   padding: 1,
                                   gap: 1,
-                                  backgroundColor: "white", 
+                                  backgroundColor: "white",
+                                  justifyContent: "space-between",
                                 }}
                               >
-                                {(item.images.length > 4
-                                  ? item?.images.slice(0, 4)
-                                  : item?.images
-                                )?.map((image: any, index: number) => {
-                                  return (
-                                    <ExpoImage
-                                      key={index + image.uri}
-                                      style={{
-                                        height:
-                                          item?.images?.length > 1 ? 100 : 200,
-                                        width:
-                                          item?.images?.length > 1
-                                            ? "49.5%"
-                                            : "100%",
-                                        flexGrow: 1
-                                      }}
-                                      source={image.uri}
-                                      cachePolicy={"memory-disk"}
-                                    ></ExpoImage>
-                                  );
-                                })}
+                                {item?.images?.map(
+                                  (image: any, index: number) => {
+                                    return (
+                                      <ExpoImage
+                                        key={index + image.uri}
+                                        style={{
+                                          height:
+                                            item?.images?.length > 1
+                                              ? 100
+                                              : 200,
+                                          width:
+                                            item?.images?.length > 1
+                                              ? "49.5%"
+                                              : "100%",
+                                        }}
+                                        source={image.uri}
+                                        cachePolicy={"memory-disk"}
+                                      ></ExpoImage>
+                                    );
+                                  }
+                                )}
                               </TouchableOpacity>
                             )}
                           </View>

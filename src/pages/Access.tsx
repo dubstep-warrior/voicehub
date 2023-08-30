@@ -18,22 +18,22 @@ import { FormData } from "../shared/FormData";
 import routeConfig from "../../config/route-config.json";
 import { useAppDispatch } from "./../store/hooks";
 import { resolveAccess } from "../store/actions/auth.actions";
-import theme from "./../../config/theme.config.json";
-import { styles as globalStyles } from "../../Styles.config";
+import theme from "./../../config/theme.config.json"; 
 import Error from "../shared/Error";
 import ButtonBody from "../shared/Button";
+import { RouteConfiguration } from "../interfaces/RouteConfiguration.interface";
 
 export default function Access({ route, navigation }: NavigationProps) {
   const current = route.name.toLowerCase();
   const dispatch = useAppDispatch();
-  const messageLink: any = routeConfig;
+  const messageLink: RouteConfiguration = routeConfig;
   const [invalid, setFormInvalid] = useState("");
   const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
     messageLink[current].form,
     setFormInvalid
   );
 
-  const submitForm = async (data?: any) => {
+  const submitForm = async () => {
 
     if (Object.keys(formValues).some((key) => !Boolean(formValues[key]))) {
       setFormInvalid("Please fill up all fields");

@@ -1,9 +1,6 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, Text, View } from "react-native";
 import theme from "../../../../../config/theme.config.json";
-import { ScrollView } from "react-native-gesture-handler";
-import config from "../../../../../Images.config";
-import { styles as globalStyles } from "../../../../../Styles.config";
+import { ScrollView } from "react-native-gesture-handler"; 
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import {
   selectUser,
@@ -18,14 +15,12 @@ import {
 import { useRef } from "react";
 import ActionSheet from "react-native-actionsheet";
 import {
-  acceptRequest,
-  addChat,
+  acceptRequest, 
   rejectRequest,
   removeFriend,
   removeRequest,
 } from "../../../../store/actions/user.actions";
-import { auth } from "../../../../../firebase";
-import StartChat from "../../../../utils/StartChat";
+import { auth } from "../../../../../firebase"; 
 
 export default function Friends({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
@@ -47,7 +42,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
 
             const existingChatID = Object.keys(userState.chats.dms).find(
               (chatID) => {
-                return userState.chats.dms[chatID].users.includes(
+                return (userState.chats.dms[chatID]?.users ?? []).includes(
                   selectedUser.current.uid
                 );
               }

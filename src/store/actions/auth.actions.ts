@@ -1,8 +1,7 @@
 import {
   assign as assignUser, 
   update as updateUser,
-  updateUserChat,
-  updateUserChatMessages,
+  updateUserChat, 
 } from "../slices/user.slice";
 import {
   addFirebaseListener,
