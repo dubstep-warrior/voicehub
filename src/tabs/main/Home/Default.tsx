@@ -46,16 +46,19 @@ import {
 import { auth } from "../../../../firebase";
 import { MaterialIndicator } from "react-native-indicators";
 import MessageText from "../../../shared/MessageText";
+import { UID } from "../../../interfaces/VHUser";
+import { ChatID, TempChat } from "../../../interfaces/Chat.interface";
+import { ActionSheetConfig } from "../../../interfaces/ActionSheet.interface";
 
 export default function Default({ route, navigation }: any) {
   const current = "message";
   const userState = useAppSelector(selectUser);
   const appState = useAppSelector(selectApp);
   const dispatch = useAppDispatch();
-  const selectedChat =
+  const selectedChat: TempChat =
     userState?.chats?.[
     appState.home.selectedCat as keyof typeof userState.chats
-    ]?.[appState.home.selectedSubCat as string];
+    ]?.[appState.home.selectedSubCat as ChatID];
 
   const messageLink: any = routeConfig;
   const [invalid, setFormInvalid] = useState<string | null>(null);
@@ -76,10 +79,7 @@ export default function Default({ route, navigation }: any) {
 
   const scrollViewRef = useRef<FlatList>(null);
   const actionSheetRef = useRef<ActionSheet>(null);
-  const options = (actionSheetConfig as any)[current] as (
-    | string
-    | React.ReactNode
-  )[];
+  const options = (actionSheetConfig as ActionSheetConfig)[current]['image'];
 
   const actionSheetProps = {
     ref: actionSheetRef,
@@ -111,7 +111,7 @@ export default function Default({ route, navigation }: any) {
   };
 
   //TODO SETTLE SEND MESSAGE
-  const submit = async () => {
+  const submit = async (): Promise<void> => {
     if (formValues && appState.home.selectedSubCat) {
       // CHECK CHAT EXIST
       if (
@@ -142,7 +142,7 @@ export default function Default({ route, navigation }: any) {
   };
 
   const [closeToBottom, setCloseToBottom] = useState(true);
-  const [gallery, setGallery] = useState<any[] | null>(null);
+  const [gallery, setGallery] = useState<ImageObject[] | null>(null);
   // const gallery = useRef<null | any[]>(null);
   const setIsCloseToBottom = ({
     layoutMeasurement,
@@ -179,26 +179,7 @@ export default function Default({ route, navigation }: any) {
       hideSubscription.remove();
     };
   }, []);
-
-  const [tagSelection, setTagSelection] = useState([]);
-  const parseInput = (desc: string) => {
-    const inputArr = desc.split(" ");
-    if (!!inputArr.length) {
-      const lastWord = inputArr[inputArr.length - 1];
-      if (lastWord[0] == "@") {
-        const toBeParsed = lastWord.replace("@", "");
-        setTagSelection(
-          selectedChat.users
-            .map((uid: string) => appState.userProfiles[uid])
-            .filter((profile: any) =>
-              profile.displayedName.includes(toBeParsed)
-            )
-        );
-      } else {
-        setTagSelection([]);
-      }
-    }
-  };
+ 
 
   const openUserModal = (id: string) => {
     dispatch(updateApp({
@@ -221,6 +202,14 @@ export default function Default({ route, navigation }: any) {
       </View>
     );
   };
+
+  const header = selectedChat?.type == "chat"
+  ? selectedChat?.name
+  : (!!selectedChat?.users?.length ? appState?.userProfiles?.[
+    selectedChat?.users.find(
+      (userID: string) => userID !== auth.currentUser?.uid
+    ) as UID
+  ]?.displayedName : '')
 
   const renderHeaderComponent = () => {
     return (
@@ -317,13 +306,7 @@ export default function Default({ route, navigation }: any) {
                 ></Image>
               </TouchableOpacity>
               <Text style={globalStyles.headerText}>
-                {selectedChat?.type == "chat"
-                  ? selectedChat?.name
-                  : appState?.userProfiles?.[
-                    selectedChat?.users.find(
-                      (userID: string) => userID !== auth.currentUser?.uid
-                    )
-                  ]?.displayedName}
+                {header}
               </Text>
             </View>
           </SafeAreaView>
@@ -334,8 +317,7 @@ export default function Default({ route, navigation }: any) {
               {!!appState.messages[appState.home.selectedSubCat as any] &&
                 !!appState.messages[appState.home.selectedSubCat as any]
                   .length && (
-                  <FlatList
-                    // key={appState.home.selectedSubCat}
+                  <FlatList 
                     inverted
                     onScroll={(event) => setIsCloseToBottom(event.nativeEvent)}
                     ref={scrollViewRef}
@@ -497,8 +479,7 @@ export default function Default({ route, navigation }: any) {
                     value={formValues["desc"]}
                     style="minimal"
                     background="white"
-                    multiline={true}
-                    onTextChange={parseInput}
+                    multiline={true} 
                   ></Input>
                 </View>
                 <TouchableOpacity style={[styles.button]} onPress={submit}>

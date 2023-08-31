@@ -2,12 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import { User, UserCredential } from "firebase/auth";
-import { Chat, ChatID, TempChat } from "../../interfaces/Chat.interface";
+import { UserStateChats } from "../../interfaces/Chat.interface";
 
 // Define a type for the slice state
-type ChatCollection = {
-  [key: string]: Chat | TempChat 
-}
+ 
 
 interface UserState extends User {
   profile_img: any;
@@ -17,10 +15,7 @@ interface UserState extends User {
   friends?: UserState[];
   requests?: UserState[];
   pending?: UserState[];
-  chats: {
-    chat: any;
-    dms: any;
-  };
+  chats: UserStateChats;
 }
 
 // Define the initial state using that type
@@ -56,17 +51,15 @@ export const userSlice = createSlice({
       Object.keys(chatObj).forEach((type) => {
         const chats = chatObj[type];
         Object.keys(chats).forEach((chatID) => {
-          const chat = chats[chatID];
-          Object.keys(chat).forEach((attributeKey) => {
-            if(!(chatID in state.chats[type as keyof typeof state.chats])) {
-              state.chats[type as keyof typeof state.chats][chatID] = {}
-            }
-            state.chats[type as keyof typeof state.chats][chatID][
-              attributeKey as keyof Chat
-            ] = chat[attributeKey];
-          });
+          const chat = chats[chatID]; 
+          if(!(chatID in state.chats[type as keyof typeof state.chats])) {
+            state.chats[type as keyof typeof state.chats][chatID] = chat
+          }
         });
+        
       }); 
+
+      
     } 
   },
 });

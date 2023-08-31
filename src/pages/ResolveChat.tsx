@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -9,7 +8,6 @@ import theme from "../../config/theme.config.json";
 import { styles as globalStyles } from "../../Styles.config";
 import Error from "../shared/Error";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Button from "../shared/Button";
 import config from "../../Images.config";
 import ActionSheet from "react-native-actionsheet";
 import actionSheetConfig from "../../config/actionSheet-config.json";
@@ -19,6 +17,7 @@ import { addChat, joinChat } from "../store/actions/user.actions";
 import { auth } from "../../firebase";
 import { selectApp } from "../store/slices/app.slice";
 import { DotIndicator } from "react-native-indicators";
+import { ActionSheetConfig } from "../interfaces/ActionSheet.interface";
 
 export default function ResolveChat(props: any) {
   const dispatch = useAppDispatch();
@@ -36,16 +35,10 @@ export default function ResolveChat(props: any) {
 
   useEffect(() => {
     replaceForm(messageLink[current][chatType].form);
-  }, [chatType]);
-
-  useEffect(() => {
-  }, [formValues]);
+  }, [chatType]); 
 
   const actionSheetRef = useRef<ActionSheet>(null);
-  const options = (actionSheetConfig as any)[current] as (
-    | string
-    | React.ReactNode
-  )[];
+  const options = (actionSheetConfig as ActionSheetConfig)[current]['image'];
   const actionSheetProps = {
     ref: actionSheetRef,
     options: options,

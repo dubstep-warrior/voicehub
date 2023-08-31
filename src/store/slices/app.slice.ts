@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import { Unsubscribe } from "firebase/auth"; 
+import { ChatCollection, ChatID, MessagesCollection, UserStateChats } from "../../interfaces/Chat.interface";
 
 // Define a type for the slice state
 interface App {
@@ -8,10 +9,10 @@ interface App {
   submitting: boolean;
   users: any[];
   home: {
-    selectedCat: string | null;
-    selectedSubCat: string | null;
+    selectedCat: keyof UserStateChats | null;
+    selectedSubCat: ChatID | null;
   };
-  messages: any;
+  messages: MessagesCollection;
   userProfiles: any;
   call: any;
   firebaseListeners: Unsubscribe[];

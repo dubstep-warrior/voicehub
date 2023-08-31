@@ -12,16 +12,20 @@
             "Cancel"
         ]
     },
-    "createchat": [
-        "Select from Gallery",
-        "Use Camera",
-        "Cancel"
-    ],
-    "message": [
-        "Select from Gallery",
-        "Use Camera",
-        "Cancel"
-    ],
+    "createchat": {
+        "image": [
+            "Select from Gallery",
+            "Use Camera",
+            "Cancel"
+        ]
+    },
+    "message": {
+        "image":  [
+            "Select from Gallery",
+            "Use Camera",
+            "Cancel"
+        ]
+    },
     "leftDrawer": {
         "owner": [
             "Invite to chat",

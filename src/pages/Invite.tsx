@@ -6,6 +6,7 @@ import * as Clipboard from "expo-clipboard";
 import { showMessage } from "react-native-flash-message";
 
 export default function Invite(props: any) {
+  
   const copyString = async (string: string) => {
     await Clipboard.setStringAsync(string).then(() => {
       showMessage({
@@ -15,23 +16,8 @@ export default function Invite(props: any) {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: theme.background,
-        position: "absolute",
-        width: "100%",
-        bottom: 0,
-      }}
-    >
-      <View
-        style={{
-          padding: 16,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+    <View style={styles.container}>
+      <View style={[styles.flexRow, { padding: 16 }]}>
         <Text
           style={{ fontSize: 24, fontWeight: "bold", color: "white" }}
         >{`Invite users to ${[props.chat.name]}`}</Text>
@@ -42,9 +28,6 @@ export default function Invite(props: any) {
           ></Image>
         </TouchableOpacity>
       </View>
-      {/* <View>
-                <Text>Hello invite</Text>
-            </View> */}
       <View style={{ padding: 16, gap: 8, marginBottom: 24 }}>
         <Text
           style={{ fontSize: 16, fontWeight: "bold", color: theme.heading }}
@@ -52,13 +35,13 @@ export default function Invite(props: any) {
           Send your chat ID to your friend
         </Text>
         <View
-          style={{
-            padding: 4,
-            backgroundColor: theme.background2,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
+          style={[
+            {
+              padding: 4,
+              backgroundColor: theme.background2,
+            },
+            styles.flexRow,
+          ]}
         >
           <Text style={{ padding: 12, fontSize: 18, color: "black" }}>
             {props.chat.id}
@@ -76,7 +59,6 @@ export default function Invite(props: any) {
           >
             <Text style={{ fontWeight: "bold" }}>Copy</Text>
           </TouchableOpacity>
-          {/* <Button text=></Button> */}
         </View>
       </View>
     </View>
@@ -84,16 +66,18 @@ export default function Invite(props: any) {
 }
 
 const styles = StyleSheet.create({
-  //   profilePicOverlay: {
-  //     justifyContent: "center",
-  //     alignItems: "center",
-  //     position: "absolute",
-  //     top: 0,
-  //     left: 0,
-  //     right: 0,
-  //     bottom: 0,
-  //     backgroundColor: "rgba(255,255,255,0.4)",
-  //   },
+  container: {
+    flex: 1,
+    backgroundColor: theme.background,
+    position: "absolute",
+    width: "100%",
+    bottom: 0,
+  },
+  flexRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   //   image: {
   //     resizeMode: "contain",
   //     borderRadius: 50,

@@ -47,6 +47,7 @@ import { collection, doc, setDoc } from "firebase/firestore";
 import Spinner from "react-native-loading-spinner-overlay";
 import ProfileOverview from "../../../shared/ProfileOverview";
 import { deleteChat, leaveChat } from "../../../store/actions/user.actions";
+import { UID } from "../../../interfaces/VHUser";
 // import Call from "../../../utils/Call";
 
 export default function Home({ route, navigation }: any) {
@@ -138,12 +139,12 @@ const CustomDrawerContent = ({ navigation }: any) => {
       if (index == 1) {
         if (appState.home.selectedSubCat) {
           if (owner) {
-            dispatch(deleteChat(appState.home.selectedSubCat))
+            dispatch(deleteChat(appState.home.selectedSubCat));
           } else {
-            dispatch(leaveChat(appState.home.selectedSubCat))
+            dispatch(leaveChat(appState.home.selectedSubCat));
           }
         }
-       }
+      }
     },
   };
 
@@ -157,8 +158,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
     setOverlay({
       type: overlay.type,
       visible: false,
-    });
-    // navigation.closeDrawer()
+    }); 
   };
 
   return (
@@ -185,44 +185,11 @@ const CustomDrawerContent = ({ navigation }: any) => {
             onPress={() => selectHomeState("dms", null)}
           >
             {appState.home.selectedCat == "dms" && (
-              <View
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  bottom: 0,
-                  width: "5%",
-                  backgroundColor: theme.smoothGrey,
-                  borderBottomRightRadius: 15,
-                  borderTopRightRadius: 15,
-                }}
-              ></View>
-            )}
-            {appState.home.selectedCat == "home" && (
-              <View
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  bottom: 0,
-                  width: "5%",
-                  backgroundColor: theme.smoothGrey,
-                  borderBottomRightRadius: 15,
-                  borderTopRightRadius: 15,
-                }}
-              ></View>
+              <View style={styles.indicator}></View>
             )}
             <View
               style={[
-                {
-                  width: 60,
-                  height: 60,
-                  borderRadius: 30,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: theme.background,
-                  alignSelf: "center",
-                },
+                styles.icon,
                 appState.home.selectedCat == "dms" && {
                   borderWidth: 2,
                   borderColor: theme.black,
@@ -230,10 +197,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                 },
               ]}
             >
-              <Image
-                style={[{ width: 30, height: 30 }]}
-                source={config["dms"]}
-              ></Image>
+              <Image style={styles.iconImage} source={config["dms"]}></Image>
             </View>
           </TouchableOpacity>
 
@@ -246,31 +210,11 @@ const CustomDrawerContent = ({ navigation }: any) => {
               >
                 {appState.home.selectedCat == "chat" &&
                   appState.home.selectedSubCat == key && (
-                    <View
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        bottom: 0,
-                        width: "5%",
-                        backgroundColor: theme.smoothGrey,
-                        borderBottomRightRadius: 15,
-                        borderTopRightRadius: 15,
-                      }}
-                    ></View>
+                    <View style={styles.indicator}></View>
                   )}
                 <View
                   style={[
-                    {
-                      width: 60,
-                      height: 60,
-                      borderRadius: 30,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: theme.background,
-                      alignSelf: "center",
-                      overflow: "hidden",
-                    },
+                    styles.icon,
                     appState.home.selectedCat == "chat" &&
                       appState.home.selectedSubCat == key && {
                         borderWidth: 2,
@@ -291,7 +235,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                     ></ExpoImage>
                   ) : (
                     <Text style={{ fontWeight: "bold", color: "white" }}>
-                      {userState?.chats?.["chat"]?.[key]["name"][0]}
+                      {userState?.chats?.["chat"]?.[key]?.["name"]?.[0]}
                     </Text>
                   )}
                 </View>
@@ -303,21 +247,8 @@ const CustomDrawerContent = ({ navigation }: any) => {
               toggleOverlay("add");
             }}
           >
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: theme.background,
-                alignSelf: "center",
-              }}
-            >
-              <Image
-                style={[{ width: 30, height: 30 }]}
-                source={config["add"]}
-              ></Image>
+            <View style={styles.icon}>
+              <Image style={styles.iconImage} source={config["add"]}></Image>
             </View>
           </TouchableOpacity>
         </SafeAreaView>
@@ -352,17 +283,16 @@ const CustomDrawerContent = ({ navigation }: any) => {
                       ></Image>
                     </TouchableOpacity>
                   </View>
-                  {/* <DrawerItemList {...props} /> */}
                   <View style={{ padding: 8 }}>
                     <UserList
                       list={Object.keys(userState?.chats?.["dms"]).map(
                         (chatID) => {
                           return {
-                            ...appState.userProfiles[
+                            ...appState?.userProfiles?.[
                               userState?.chats?.["dms"][chatID]?.users.find(
-                                (userID: string) =>
+                                (userID: UID) =>
                                   userID !== auth.currentUser?.uid
-                              )
+                              ) as UID
                             ],
                             dmRef: chatID,
                           };
@@ -403,11 +333,12 @@ const CustomDrawerContent = ({ navigation }: any) => {
                       </Text>
                       <TouchableOpacity onPress={() => chatOptions()}>
                         <Image
-                          style={{
-                            width: 30,
-                            height: 30,
-                            transform: [{ rotateZ: "90deg" }],
-                          }}
+                          style={[
+                            styles.iconImage,
+                            {
+                              transform: [{ rotateZ: "90deg" }],
+                            },
+                          ]}
                           source={config["more"]}
                         ></Image>
                       </TouchableOpacity>
@@ -486,11 +417,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
         <>
           <Modal
             isVisible={overlay.visible}
-            style={{
-              margin: 0,
-              backgroundColor: "rgba(0,0,0,0.2)",
-              position: "relative",
-            }}
+            style={styles.modalContainer}
             presentationStyle="overFullScreen"
             onBackdropPress={() => {
               setOverlay({
@@ -520,11 +447,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
       )}
       <Modal
         isVisible={!!appState.openProfileModal}
-        style={{
-          margin: 0,
-          backgroundColor: "rgba(0,0,0,0.2)",
-          position: "relative",
-        }}
+        style={styles.modalContainer}
         presentationStyle="overFullScreen"
         onBackdropPress={() => {
           dispatch(
@@ -536,13 +459,14 @@ const CustomDrawerContent = ({ navigation }: any) => {
         animationIn="slideInUp"
       >
         <View
-          style={{
-            flex: 1,
-            backgroundColor: theme.background,
-            position: "absolute",
-            width: "100%",
-            bottom: 0,
-          }}
+          style={[
+            styles.safeAreaContainer,
+            {
+              position: "absolute",
+              width: "100%",
+              bottom: 0,
+            },
+          ]}
         >
           {!!appState.openProfileModal && (
             <ProfileOverview
@@ -581,4 +505,30 @@ const styles = StyleSheet.create({
   spinnerTextStyle: {
     color: "white",
   },
+  indicator: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    width: "5%",
+    backgroundColor: theme.smoothGrey,
+    borderBottomRightRadius: 15,
+    borderTopRightRadius: 15,
+  },
+  icon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.background,
+    alignSelf: "center",
+    overflow: "hidden",
+  },
+  iconImage: { width: 30, height: 30 },
+  modalContainer : {
+    margin: 0,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    position: "relative",
+  }
 });
