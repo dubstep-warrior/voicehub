@@ -416,7 +416,7 @@ export default function Default({ route, navigation }: any) {
                                   justifyContent: "space-between",
                                 }}
                               >
-                                {item?.images?.map(
+                                {(item?.images.length > 4 ? item?.images.slice(0,4) : item?.images)?.map(
                                   (image: any, index: number) => {
                                     return (
                                       <ExpoImage
@@ -430,6 +430,7 @@ export default function Default({ route, navigation }: any) {
                                             item?.images?.length > 1
                                               ? "49.5%"
                                               : "100%",
+                                          flexGrow: 1
                                         }}
                                         source={image.uri}
                                         cachePolicy={"memory-disk"}
