@@ -3,20 +3,21 @@ import theme from "../../config/theme.config.json";
 import config from "../../Images.config";
 import { styles as globalStyles } from "../../Styles.config";
 import { Image as ExpoImage } from "expo-image";
+import { UserListReferences, UserListUser, VHUser } from "../interfaces/VHUser";
 
 export interface IUserListProps {
-  list: any[];
+  list: UserListUser[];
   small?: boolean;
   selected?: string | null;
-  identifier: string;
+  identifier: keyof UserListReferences;
   onMore?: () => void;
-  onPress?: (user: any) => void;
+  onPress?: (user: UserListUser) => void;
 }
 
 export default function UserList({ list = [], ...props }: IUserListProps) {
   return (
     <>
-      {list.map((user, index) => {
+      {list.map((user , index) => {
         return (
           <TouchableOpacity
             key={props.identifier ? user?.[props.identifier] : index}

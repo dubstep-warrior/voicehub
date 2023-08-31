@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import theme from "./../../config/theme.config.json";
 import { RootStackParamList } from "../interfaces/RootStackParamList.interface";
 
-export default function Main({ route, navigation }: NavigationProps) {
+export default function Main({ route }: NavigationProps) {
   const Tab = createBottomTabNavigator(); 
 
   return (

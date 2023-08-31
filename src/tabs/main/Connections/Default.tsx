@@ -1,28 +1,14 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Animated,
-  Dimensions,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import theme from "../../../../config/theme.config.json";
-import { ScrollView } from "react-native-gesture-handler";
+import { TouchableOpacity, Image, Animated } from "react-native";
 import config from "../../../../Images.config";
-import { styles as globalStyles } from "../../../../Styles.config";
 import { useAppSelector } from "../../../store/hooks";
 import { selectUser } from "../../../store/slices/user.slice";
 import { NavigationProps } from "../../../interfaces/NavigationProps.interface";
-import UserList from "../../../shared/UserList";
-import { selectApp } from "../../../store/slices/app.slice";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import FriendsTab from "./DefaultTabs/Friends";
+import ConnectionsTab from "./DefaultTabs/ConnectionsTab";
 import { RootStackParamList } from "../../../interfaces/RootStackParamList.interface";
 import StandardTabPage from "../StandardTabPage";
 
-export default function Default({ route, navigation }: NavigationProps) {
+export default function Default({ navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
   const Tab = createMaterialTopTabNavigator();
 
@@ -53,7 +39,7 @@ export default function Default({ route, navigation }: NavigationProps) {
     >
       <Tab.Navigator
         initialRouteName="FriendsDefault"
-        style={{ minHeight: '100%'}}
+        style={{ minHeight: "100%" }}
         screenListeners={{
           focus: () => {
             Animated.timing(av, {
@@ -66,26 +52,17 @@ export default function Default({ route, navigation }: NavigationProps) {
       >
         <Tab.Screen
           name={"Friends" as keyof RootStackParamList}
-          component={FriendsTab}
+          component={ConnectionsTab}
         />
         <Tab.Screen
           name={"Requests" as keyof RootStackParamList}
-          component={FriendsTab}
+          component={ConnectionsTab}
         />
         <Tab.Screen
           name={"Pending" as keyof RootStackParamList}
-          component={FriendsTab}
+          component={ConnectionsTab}
         />
       </Tab.Navigator>
     </StandardTabPage>
   );
 }
-
-const styles = StyleSheet.create({
-  safeAreaContainer: {
-    backgroundColor: theme.background,
-    flex: 1,
-    flexDirection: "column",
-    position: "relative",
-  },
-});

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import theme from "../../../../../config/theme.config.json";
-import { ScrollView } from "react-native-gesture-handler"; 
+import { ScrollView } from "react-native-gesture-handler";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import {
   selectUser,
@@ -15,14 +15,20 @@ import {
 import { useRef } from "react";
 import ActionSheet from "react-native-actionsheet";
 import {
-  acceptRequest, 
+  acceptRequest,
   rejectRequest,
   removeFriend,
   removeRequest,
 } from "../../../../store/actions/user.actions";
-import { auth } from "../../../../../firebase"; 
+import { auth } from "../../../../../firebase";
+import {
+  Connection,
+  Connections,
+  UID,
+  VHUser,
+} from "../../../../interfaces/VHUser";
 
-export default function Friends({ route, navigation }: NavigationProps) {
+export default function ConnectionsTab({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
   const appState = useAppSelector(selectApp);
   const dispatch = useAppDispatch();
@@ -36,10 +42,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
         options: ["Send Message", "Remove Friend", "Cancel"],
         cancelButtonIndex: 2,
         onPress: async (index: number): Promise<void> => {
-           if ([0].includes(index) && selectedUser.current) {
-            // Send message
-            // ENABLE SEND MESSAGE OVERLAY HERE
-
+          if ([0].includes(index) && selectedUser.current) {
             const existingChatID = Object.keys(userState.chats.dms).find(
               (chatID) => {
                 return (userState.chats.dms[chatID]?.users ?? []).includes(
@@ -47,7 +50,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
                 );
               }
             );
-            if (existingChatID) { 
+            if (existingChatID) {
               dispatch(
                 updateApp({
                   home: {
@@ -67,7 +70,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
                   },
                 },
               });
-            } else { 
+            } else {
               const dms: any = {};
               dms[`temp-${selectedUser.current.uid}`] = {
                 users: [auth.currentUser!.uid, selectedUser.current.uid],
@@ -94,13 +97,13 @@ export default function Friends({ route, navigation }: NavigationProps) {
                 params: {
                   screen: "Chat",
                   drawerStatus: "closed",
-                  params: { 
+                  params: {
                     screen: "Default",
                   },
                 },
               });
             }
-          } else if ([1].includes(index)) { 
+          } else if ([1].includes(index)) {
             dispatch(removeFriend(selectedUser.current));
           }
         },
@@ -138,7 +141,7 @@ export default function Friends({ route, navigation }: NavigationProps) {
       },
     },
   };
-  const current = route.name.toLowerCase();
+  const current: keyof Connections = route.name.toLowerCase() as keyof Connections;
   const currentActionSheetProps =
     friendsConfig[current as keyof typeof friendsConfig].actionSheetProps;
 
@@ -147,22 +150,22 @@ export default function Friends({ route, navigation }: NavigationProps) {
     currentActionSheetProps.ref.current!.show();
   };
 
+  const users: Connection[] = userState[current] ?? [];
+
   return (
     <>
-      {Boolean(userState[current as keyof typeof userState]?.length) ? (
+      {!!users.length ? (
         <ScrollView
           style={{
             flex: 1,
-            backgroundColor: theme.smoothGrey 
+            backgroundColor: theme.smoothGrey,
           }}
         >
           <UserList
             identifier="uid"
-            list={
-              userState[current as keyof typeof userState].map((ref: any) => {
-                return { uid: ref.uid, ...appState.userProfiles[ref.uid] };
-              }) as any[]
-            }
+            list={users.map((ref: Connection) => {
+              return { uid: ref.uid, ...appState.userProfiles[ref.uid] };
+            })}
             onPress={(user) => tappedUser(user)}
           ></UserList>
         </ScrollView>

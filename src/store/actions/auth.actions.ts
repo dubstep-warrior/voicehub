@@ -38,6 +38,7 @@ import {
 } from "firebase/firestore";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { getChatSubscription } from "../../utils/Subscribers";
+import { Connection } from "../../interfaces/VHUser";
 
 export const resolveAccess = (data: any, current: string) => {
   return async (dispatch: any) => {
@@ -120,8 +121,8 @@ export const AuthOnRender = () => {
       dispatch(
         addFirebaseListener({
           listener: onSnapshot(requestQuery, async (snapshot) => {
-            const pending: any[] = [],
-              requests: any[] = [];
+            const pending: Connection[] = [],
+              requests: Connection[] = [];
             snapshot.forEach((doc) => {
               const request = doc.data();
               if (request.from == auth.currentUser!.uid)
@@ -147,13 +148,13 @@ export const AuthOnRender = () => {
       dispatch(
         addFirebaseListener({
           listener: onSnapshot(friendsQuery, async (snapshot) => {
-            const friends: any[] = [];
+            const friends: Connection[] = [];
             snapshot.forEach((doc) => {
               const friend = doc.data();
               const friendUID = friend.group.find(
                 (uid: string) => uid !== auth.currentUser!.uid
               );
-              friends.push({ uid: friendUID, friendshipRef: doc.id });
+              friends.push({ uid: friendUID, id: doc.id });
             });
 
             dispatch(

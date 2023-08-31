@@ -2,21 +2,51 @@
   "login": {
     "message": "No account? Sign up here!",
     "navigateTo": "Register",
+    "form-keys": [
+      {
+        "key": "email",
+        "name": "Email"
+      },
+      {
+        "key": "password",
+        "name": "Password",
+        "secureTextEntry": true
+      }
+    ],
     "form": {
       "email": "",
       "password": ""
-    }
+    },
+    "invalid-message": "User credentials are invalid"
   },
   "register": {
     "message": "Have an existing account? Login here!",
     "navigateTo": "Login",
+    "form-keys": [
+      {
+        "key": "email",
+        "name": "Email",
+        "secureTextEntry": false
+      },
+      {
+        "key": "password",
+        "name": "Password",
+        "secureTextEntry": true
+      },
+      {
+        "key": "confirmPassword",
+        "name": "Confirm Password",
+        "secureTextEntry": true
+      }
+    ],
     "form": {
       "email": "",
       "password": "",
       "confirmPassword": ""
-    }
+    },
+    "invalid-message": "You have entered an invalid email"
   },
-  "profile": {  
+  "profile": {
     "form": {
       "username": "",
       "displayedName": "",
@@ -26,7 +56,7 @@
     "sections": [
       {
         "heading": "Account Information",
-        "options" : [
+        "options": [
           {
             "name": "Username",
             "key": "username"
@@ -34,10 +64,12 @@
           {
             "name": "Display Name",
             "key": "displayedName"
-          },{
+          },
+          {
             "name": "Email",
             "key": "email"
-          },{
+          },
+          {
             "name": "Password",
             "key": "password"
           }
@@ -46,60 +78,66 @@
     ]
   },
   "updatefield": {
-    "username": {
-      "username": ""
+    "form": {
+      "username": {
+        "username": ""
+      },
+      "displayedName": {
+        "displayedName": ""
+      },
+      "email": {
+        "email": "",
+        "currentPassword": ""
+      },
+      "password": {
+        "currentPassword": "",
+        "newPassword": "",
+        "confirmNewPassword": ""
+      }
     },
-    "displayedName": {
-      "displayedName": ""
-    },
-    "email": {
-      "email": "",
-      "currentPassword": ""
-    },
-    "password": {
-      "currentPassword": "", 
-      "newPassword": "",
-      "confirmNewPassword": ""
-    },
-    "placeholders" : {
+    "placeholders": {
       "username": "Tap to add username",
       "displayedName": "Tap to change your displayed name",
-      "email": "Enter a new email", 
+      "email": "Enter a new email",
       "currentPassword": "Enter your current password",
       "newPassword": "Enter your new password",
       "confirmNewPassword": "Confirm your new password"
     }
   },
   "addfriend": {
-    "username": {
-      "username": ""
-    },
-    "placeholders" : {
+    "form": {
+      "username": {
+        "username": ""
+      }
+    }, 
+    "placeholders": {
       "username": "Find a user through their email"
     }
-  },
-  "createchat": {
-    "new": {
-      "heading": "Personalize your chat",
-      "subheading": "Add uniqueness to your chat with a name and icon, you can always change it later",
-      "inputLabel": "CHAT NAME",
-      "form": {
-        "name": "", 
-        "chat_img": null
-      }
+  }, 
+  "createchat-new": {
+    "message": "Personalize your chat",
+    "submessage": "Add uniqueness to your chat with a name and icon, you can always change it later",
+    "placeholders": {
+      "name": "Chat name"
     },
-    "existing" : {
-      "heading": "Join an existing chat",
-      "subheading": "You can join an existing chat if a member has shared the chat ID with you!",
-      "inputLabel": "CHAT ID",
-      "form": {
-        "chat_id": ""
-      }
+    "form": {
+      "name": "",
+      "chat_img": null
+    }
+  },
+  "createchat-existing": {
+    "message": "Join an existing chat",
+    "submessage": "You can join an existing chat if a member has shared the chat ID with you!",
+    "form": {
+      "chat_id": ""
+    },
+    "placeholders": {
+      "chat_id": "Chat ID"
     }
   },
   "message": {
     "form": {
-      "desc": "",  
+      "desc": "",
       "images": []
     }
   }

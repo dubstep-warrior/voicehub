@@ -8,12 +8,23 @@ import { DotIndicator } from "react-native-indicators";
 import { useAppSelector } from "../store/hooks";
 import { selectApp } from "../store/slices/app.slice";
 
-export default function Button({ theme = "purple", ...props }) {
-  const load = ["submit", "search"].includes(props.text.toLowerCase());
+interface DotIndicatorConfig {
+  [key: string]: number, 
+}
+
+interface IButtonProps {
+  theme?: keyof DotIndicatorConfig
+  text: string
+  onPress: () => void
+}
+
+
+export default function Button({ theme = "purple", ...props }: IButtonProps) {
+  const load = ["submit", "search", "logout"].includes(props.text.toLowerCase());
 
   const appState = useAppSelector(selectApp);
 
-  const dotIndicatorConfig = {
+  const dotIndicatorConfig: DotIndicatorConfig = {
     purple: 14.75,
     minimal: 8,
   };
@@ -25,7 +36,7 @@ export default function Button({ theme = "purple", ...props }) {
     >
       {appState.submitting && load ? (
         <DotIndicator
-          size={dotIndicatorConfig[theme as keyof typeof dotIndicatorConfig]}
+          size={dotIndicatorConfig[theme]}
           count={3}
           color={themeConfig.lightGrey}
         />

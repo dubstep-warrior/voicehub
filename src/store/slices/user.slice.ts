@@ -1,25 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../store";
-import { User, UserCredential } from "firebase/auth";
+import type { RootState } from "../store"; 
 import { UserStateChats } from "../../interfaces/Chat.interface";
+import { Connections, User } from "../../interfaces/VHUser";
 
-// Define a type for the slice state
- 
-
-interface UserState extends User {
-  profile_img: any;
-  username: string;
-  displayedName: string;
-  status?: string;
-  friends?: UserState[];
-  requests?: UserState[];
-  pending?: UserState[];
+// Define a type for the slice state 
+interface UserState extends User {   
   chats: UserStateChats;
 }
 
 // Define the initial state using that type
-const initialState: UserState = {
+const initialState: UserState & Connections = {
   profile_img: null,
   username: "",
   displayedName: "",
@@ -27,7 +18,7 @@ const initialState: UserState = {
     chat: {},
     dms: {},
   },
-} as UserState;
+} ;
 
 export const userSlice = createSlice({
   name: "user",
@@ -57,9 +48,7 @@ export const userSlice = createSlice({
           }
         });
         
-      }); 
-
-      
+      });  
     } 
   },
 });

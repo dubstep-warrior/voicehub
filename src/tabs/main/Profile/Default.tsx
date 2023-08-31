@@ -1,57 +1,46 @@
 import {
   StyleSheet,
   Text,
-  View,
-  TouchableOpacity,
+  View, 
   Image,
-  TouchableHighlight,
-  Pressable,
-  Platform,
+  TouchableHighlight, 
 } from "react-native";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { AuthRemove } from "../../../store/actions/auth.actions";
 import theme from "../../../../config/theme.config.json";
-import actionSheetConfig from "../../../../config/actionSheet-config.json";
-import { SafeAreaView } from "react-native-safe-area-context";
+ import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../../../../Images.config";
-import { useRef, useState, useEffect } from "react";
-import ActionSheet from "react-native-actionsheet";
-import { NavigationProps } from "../../../interfaces/NavigationProps.interface";
-import * as ImagePicker from "expo-image-picker";
-import { selectUser } from "../../../store/slices/user.slice";
-import routeConfig from "../../../../config/route-config.json";
-import Input from "../../../shared/Input";
-import { FormData } from "../../../shared/FormData";
-import { UserUpdate } from "../../../store/actions/user.actions";
-import { styles as globalStyles } from "../../../../Styles.config";
+ import { NavigationProps } from "../../../interfaces/NavigationProps.interface";
+ import { selectUser } from "../../../store/slices/user.slice";
+import routeConfiguration from "../../../../config/route-config.json";
 import { ScrollView } from "react-native-gesture-handler";
 import { auth } from "../../../../firebase";
-import ButtonBody from "../../../shared/Button";
-import { selectApp } from "../../../store/slices/app.slice";
-import { MaterialIndicator } from "react-native-indicators";
-import { Image as ExpoImage } from "expo-image";
+import ButtonBody from "../../../shared/Button"; 
 import ProfileOverview from "../../../shared/ProfileOverview";
+import { RouteConfig } from "../../../interfaces/RouteConfig.interface"; 
 
 export default function Default({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
-
   const dispatch = useAppDispatch();
+  const current = route.params?.current  
+  const routeConfig: RouteConfig = routeConfiguration as any
 
   const userRef = {
     ...auth.currentUser,
     ...Object(userState),
   };
-  const logout = async () => {
-    dispatch(AuthRemove());
-  };
 
-  const current = "profile";
+  const logout = () => {
+    dispatch(AuthRemove());
+  }; 
+   
   const updateField = (key: any) => {
     navigation.navigate("UpdateField", {
       ...key,
       heading: `Update ${key.name.toLowerCase()} here:`.toUpperCase(),
     });
   };
+
   return (
     userState && (
       <SafeAreaView style={styles.safeAreaContainer}>
@@ -62,14 +51,14 @@ export default function Default({ route, navigation }: NavigationProps) {
               readOnly={false}
             ></ProfileOverview>
 
-            {routeConfig[current].sections.map((section) => (
+            {routeConfig[current]?.sections?.map((section) => (
               <View
                 style={{ width: "100%", marginBottom: 8 }}
                 key={section.heading}
               >
                 <View style={{ margin: 12 }}>
                   <Text style={styles.text}>
-                    {section.heading.toUpperCase()}
+                    {section.heading?.toUpperCase()}
                   </Text>
                 </View>
                 <View style={styles.selectionContainer}>
@@ -180,8 +169,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     width: "100%",
     borderBottomWidth: 0.4,
-  },
-  // TODO FIX OVERLAY OPACITY ISSUE
+  }, 
   profilePicOverlay: {
     position: "absolute",
     backgroundColor: "rgba(255,255,255, 0.3)",

@@ -1,4 +1,4 @@
-import Friends from "../tabs/main/Friends/Friends";
+import Connections from "../tabs/main/Connections/Connections";
 import Home from "../tabs/main/Home/Home"; 
 import Profile from "../tabs/main/Profile/Profile";
 import config from "./../../Images.config"
@@ -19,10 +19,10 @@ const MainTab: TabConfig[] = [
       imageSelected: config['logo-wordless-white'],
     },
     {
-      name: "Friends",
-      component: Friends,
-      image: config['friends-grey'],
-      imageSelected: config['friends-white'],
+      name: "Connections",
+      component: Connections,
+      image: config['connections-grey'],
+      imageSelected: config['connections-white'],
     }, 
     {
       name: "Profile",

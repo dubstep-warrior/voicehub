@@ -2,8 +2,8 @@ export type RootStackParamList = {
     Register: undefined;
     Login: undefined;
     Main: any;
-    UpdateField: any;
+    UpdateField: {current: string};
     AddFriend: any;
-    Default: any;
+    Default: {current: string};
     Home: any;
   };

@@ -28,7 +28,7 @@ export default function SimpleForm({ route, navigation }: NavigationProps) {
   const userState = useAppSelector(selectUser);
   const [invalid, setFormInvalid] = useState("");
   const [formValues, handleFormValueChange, setFormValues, reset] = FormData(
-    messageLink[route.name.toLowerCase()][route.params!.key],
+    messageLink[route.name.toLowerCase()]['form'][route.params!.key],
     setFormInvalid,
     route.name.toLowerCase().includes("update")
       ? {
@@ -37,9 +37,9 @@ export default function SimpleForm({ route, navigation }: NavigationProps) {
       : {}
   );
 
-
+  console.log('printing in simpleform', route.name.toLowerCase(), route.params)
   const formKeys = Object.keys(
-    messageLink[route.name.toLowerCase()][route.params!.key]
+    messageLink[route.name.toLowerCase()]['form'][route.params!.key]
   );
   const dispatch = useAppDispatch();
 

@@ -28,6 +28,10 @@ export type TempChat = Partial<Chat> & {
   
 
 export type ChatCollection = {
+  [key: ChatID]: Chat  
+}
+
+export type DMCollection = {
   [key: ChatID]: Chat | TempChat 
 }
 
@@ -37,5 +41,5 @@ export type MessagesCollection = {
 
 export type UserStateChats = {
   chat: ChatCollection,
-  dms: ChatCollection
+  dms: DMCollection
 }

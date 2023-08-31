@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import { Unsubscribe } from "firebase/auth"; 
-import { ChatCollection, ChatID, MessagesCollection, UserStateChats } from "../../interfaces/Chat.interface";
+import { ChatID, MessagesCollection, UserStateChats } from "../../interfaces/Chat.interface";
 
 // Define a type for the slice state
-interface App {
+interface AppState {
   loading: boolean;
   submitting: boolean;
   users: any[];
@@ -21,7 +21,7 @@ interface App {
 }
 
 // Define the initial state using that type
-const initialState: App = {
+const initialState: AppState = {
   loading: false,
   submitting: false,
   users: [],
@@ -49,7 +49,7 @@ export const appSlice = createSlice({
     },
     update: (state, actions) => {
       Object.keys(actions.payload).forEach((key) => {
-        (state[key as keyof App] as any) = actions.payload[key];
+        (state[key as keyof AppState] as any) = actions.payload[key];
       });
      },
     updateAppMessages: (state, actions) => { 

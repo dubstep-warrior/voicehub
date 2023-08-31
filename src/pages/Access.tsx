@@ -18,10 +18,12 @@ import { FormData } from "../shared/FormData";
 import routeConfig from "../../config/route-config.json";
 import { useAppDispatch } from "./../store/hooks";
 import { resolveAccess } from "../store/actions/auth.actions";
-import theme from "./../../config/theme.config.json"; 
+import theme from "./../../config/theme.config.json";
 import Error from "../shared/Error";
 import ButtonBody from "../shared/Button";
 import { RouteConfiguration } from "../interfaces/RouteConfiguration.interface";
+import config from "../../Images.config"; 
+import { FormControl } from "../interfaces/RouteConfig.interface";
 
 export default function Access({ route, navigation }: NavigationProps) {
   const current = route.name.toLowerCase();
@@ -34,7 +36,6 @@ export default function Access({ route, navigation }: NavigationProps) {
   );
 
   const submitForm = async () => {
-
     if (Object.keys(formValues).some((key) => !Boolean(formValues[key]))) {
       setFormInvalid("Please fill up all fields");
       return;
@@ -49,42 +50,31 @@ export default function Access({ route, navigation }: NavigationProps) {
 
     const res = await dispatch(resolveAccess(formValues, current));
     if (res && !res.success) {
-      setFormInvalid((current == "login" ? "User credentials are invalid" : "Invalid email"));
+      setFormInvalid(messageLink[current]['invalid-message']);
     }
   };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <KeyboardAvoidingView behavior={Platform.select({ android: undefined, ios: "height" })} style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.select({ android: undefined, ios: "height" })}
+        style={styles.container}
+      >
         <View>
-          <Image
-            style={styles.logo}
-            source={require("./../../assets/logo-white.png")}
-          />
+          <Image style={styles.logo} source={config["logo"]} />
         </View>
         <View style={styles.row}>
-          <Input
-            name="Email"
-            formKey="email"
-            handleFormValueChange={handleFormValueChange}
-          ></Input>
-
-          <Input
-            name="Password"
-            formKey="password"
-            secureTextEntry={true}
-            handleFormValueChange={handleFormValueChange}
-          ></Input>
-          {route.name == "Register" && (
+          {messageLink[current]["form-keys"].map((formControl: FormControl) => (
             <Input
-              name="Confirm Password"
-              formKey="confirmPassword"
-              secureTextEntry={true}
+              key={formControl.key}
+              name={formControl.name}
+              formKey={formControl.key}
+              secureTextEntry={!!formControl.secureTextEntry}
               handleFormValueChange={handleFormValueChange}
             ></Input>
-          )}
+          ))}
         </View>
-        <View style={{width: '80%'}}> 
+        <View style={{ width: "80%" }}>
           <ButtonBody text={"Submit"} onPress={() => submitForm()}></ButtonBody>
           <TouchableOpacity
             onPress={() => navigation.navigate(messageLink[current].navigateTo)}
@@ -93,15 +83,15 @@ export default function Access({ route, navigation }: NavigationProps) {
               style={{
                 fontSize: 16,
                 textDecorationLine: "underline",
-                color: "white", 
-                textAlign: 'center'
+                color: "white",
+                textAlign: "center",
               }}
             >
               {messageLink[current].message}
             </Text>
           </TouchableOpacity>
         </View>
-        {Boolean(invalid) && <Error message={invalid}></Error>}
+        {!!invalid && <Error message={invalid}></Error>}
         <StatusBar style="auto" />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

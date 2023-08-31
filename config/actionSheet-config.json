@@ -7,8 +7,12 @@
         ]
     },
     "addfriend": {
-        "user": [
+        "new": [
             "Add Friend",
+            "Cancel"
+        ],
+        "existing": [
+            "Remove Friend",
             "Cancel"
         ]
     },

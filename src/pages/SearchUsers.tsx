@@ -11,46 +11,85 @@ import { Keyboard, Pressable, StyleSheet, View } from "react-native";
 import theme from "./../../config/theme.config.json";
 import { selectUser } from "../store/slices/user.slice";
 import ActionSheet from "react-native-actionsheet";
-import {useRef, useState} from "react"
+import { useEffect, useRef, useState } from "react";
 import actionSheetConfig from "../../config/actionSheet-config.json";
-import { addUser } from "../store/actions/user.actions";
-
+import { addUser, removeFriend } from "../store/actions/user.actions";
+import { UserListUser } from "../interfaces/VHUser";
+import { ActionSheetProps } from "../interfaces/ActionSheet.interface";
 
 export default function SearchUsers({ route, navigation }: NavigationProps) {
-  // TODO do retrieve of email on dispatch
-  const dispatch = useAppDispatch()
-  const appState = useAppSelector(selectApp); 
-  const selectedUser = useRef(null)
+  const dispatch = useAppDispatch();
+  const appState = useAppSelector(selectApp);
+  const userState = useAppSelector(selectUser); 
+  const selectedUser = useRef<UserListUser | null>(null);
   const actionSheetRef = useRef<ActionSheet>(null);
-  const options = (actionSheetConfig as any)[route.name.toLowerCase()]["user"] as (
-    | string
-    | React.ReactNode
-  )[]
-  const actionSheetProps = {
+
+  const [actionSheetProps, setActionSheetProps] = useState<ActionSheetProps>({
     ref: actionSheetRef,
-    options:  options,
-    cancelButtonIndex: options.length - 1,
-    onPress: async (index: number): Promise<void> => { 
-      if([0].includes(index)) {  
-        dispatch(addUser(selectedUser.current))
+    options: (actionSheetConfig as any)[route.name.toLowerCase()]["new"],
+    cancelButtonIndex:
+      (actionSheetConfig as any)[route.name.toLowerCase()]["new"].length - 1,
+    onPress: async (index: number): Promise<void> => {
+      if ([0].includes(index)) {
+        dispatch(addUser(selectedUser.current));
       }
     },
+  });
+
+  const userSelected = (user: UserListUser) => {
+    selectedUser.current = user;
+    if (userState.friends?.some((connection) => connection.uid == user.uid)) {
+      // FRIEND ALREADY EXIST
+      // TODO SET ONPRESS TO REMOVE FRIEND
+      setActionSheetProps({
+        ref: actionSheetRef,
+        options: (actionSheetConfig as any)[route.name.toLowerCase()][
+          "existing"
+        ],
+        cancelButtonIndex:
+          (actionSheetConfig as any)[route.name.toLowerCase()]["existing"]
+            .length - 1,
+        onPress: async (index: number): Promise<void> => {
+          if ([0].includes(index)) {
+            dispatch(removeFriend(selectedUser.current));
+          }
+        },
+      });
+    } else
+      setActionSheetProps({
+        ref: actionSheetRef,
+        options: (actionSheetConfig as any)[route.name.toLowerCase()]["new"],
+        cancelButtonIndex:
+          (actionSheetConfig as any)[route.name.toLowerCase()]["new"].length -
+          1,
+        onPress: async (index: number): Promise<void> => {
+          if ([0].includes(index)) {
+            dispatch(addUser(selectedUser.current));
+          }
+        },
+      }); 
+     
   };
 
-  const userSelected = (user: any) => {
-    selectedUser.current = user
-    actionSheetRef.current?.show()
-  }
+
+  useEffect(() => {
+    // TODO FIX PREVENT FIRST TIME RENDER LOGIC
+    actionSheetProps.ref?.current?.show();
+  }, [actionSheetProps])
+
+
   return (
     <Pressable style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
         <SimpleForm route={route} navigation={navigation}></SimpleForm>
-        {appState.users.length ? (
+        {!!appState.users.length && (
           <ScrollView style={{ flex: 1 }}>
-            <UserList identifier='uid' onPress={(user)=> userSelected(user)} list={appState.users}></UserList>
+            <UserList
+              identifier="uid"
+              onPress={(user) => userSelected(user)}
+              list={appState.users}
+            ></UserList>
           </ScrollView>
-        ) : (
-          <></>
         )}
       </View>
       <ActionSheet {...actionSheetProps}></ActionSheet>

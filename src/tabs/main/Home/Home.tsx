@@ -10,6 +10,7 @@ import {
 import theme from "../../../../config/theme.config.json";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
+  DrawerContentComponentProps,
   DrawerContentScrollView,
   DrawerItemList,
   createDrawerNavigator,
@@ -85,7 +86,7 @@ export default function Home({ route, navigation }: any) {
   );
 }
 
-const CustomDrawerContent = ({ navigation }: any) => {
+const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
   const userState = useAppSelector(selectUser);
   const appState = useAppSelector(selectApp);
   const current = "leftDrawer";
@@ -301,7 +302,7 @@ const CustomDrawerContent = ({ navigation }: any) => {
                       identifier="dmRef"
                       selected={appState?.home?.selectedSubCat}
                       small={true}
-                      onPress={(user) => selectHomeState("dms", user.dmRef)}
+                      onPress={(user) => selectHomeState("dms", user.dmRef ?? null)}
                     ></UserList>
                   </View>
                 </View>

@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Input from "../shared/Input";
 import { FormData } from "../shared/FormData";
-import routeConfig from "../../config/route-config.json";
+import routeConfiguration from "../../config/route-config.json";
 import theme from "../../config/theme.config.json";
 import { styles as globalStyles } from "../../Styles.config";
 import Error from "../shared/Error";
@@ -17,33 +17,58 @@ import { addChat, joinChat } from "../store/actions/user.actions";
 import { auth } from "../../firebase";
 import { selectApp } from "../store/slices/app.slice";
 import { DotIndicator } from "react-native-indicators";
-import { ActionSheetConfig } from "../interfaces/ActionSheet.interface";
+import { ActionSheetProps } from "../interfaces/ActionSheet.interface";
+import { DrawerNavigationHelpers } from "@react-navigation/drawer/lib/typescript/src/types";
 
-export default function ResolveChat(props: any) {
+interface ResolveChatProps {
+  onSubmit?: () => void;
+  navigation?: DrawerNavigationHelpers;
+}
+
+const resolveSettings = {
+  new: {
+    formKey: "name",
+    invalidKeyText: "your chat's name",
+    extraFormValues: {
+      owner: auth.currentUser?.uid,
+      users: [auth.currentUser?.uid],
+      type: "chat",
+    },
+    thunk: addChat,
+  },
+  existing: {
+    formKey: "chat_id",
+    invalidKeyText: "the chat ID",
+    extraFormValues: {},
+    thunk: joinChat,
+  },
+};
+
+export default function ResolveChat({ onSubmit }: ResolveChatProps) {
   const dispatch = useAppDispatch();
   const [chatType, setChatType] = useState<"new" | "existing">("new");
   const appState = useAppSelector(selectApp);
-  const current = "createchat";
+  const current = `createchat`;
   const dotIndicatorConfig = {
     purple: 14.75,
     minimal: 8,
   };
-  const messageLink: any = routeConfig;
+  const routeConfig = (routeConfiguration as any)[`${current}-${chatType}`];
   const [invalid, setFormInvalid] = useState<string | null>(null);
   const [formValues, handleFormValueChange, setFormValues, reset, replaceForm] =
-    FormData(messageLink[current][chatType].form, setFormInvalid);
+    FormData(routeConfig.form, setFormInvalid);
 
   useEffect(() => {
-    replaceForm(messageLink[current][chatType].form);
-  }, [chatType]); 
+    replaceForm(routeConfig.form);
+  }, [chatType]);
 
   const actionSheetRef = useRef<ActionSheet>(null);
-  const options = (actionSheetConfig as ActionSheetConfig)[current]['image'];
-  const actionSheetProps = {
+  const options = actionSheetConfig[current]["image"];
+  const actionSheetProps: ActionSheetProps = {
     ref: actionSheetRef,
     options: options,
     cancelButtonIndex: options.length - 1,
-    onPress: async (index: number): Promise<void> => {
+    onPress: async (index) => {
       if (![0, 1].includes(index)) return;
       const permissionResult =
         await ImagePicker.requestCameraPermissionsAsync();
@@ -55,7 +80,7 @@ export default function ResolveChat(props: any) {
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 0
+            quality: 0,
           })
         : ImagePicker.launchCameraAsync());
 
@@ -65,32 +90,23 @@ export default function ResolveChat(props: any) {
     },
   };
 
-  const submit = async () => {
-    if (chatType == "new") {
-      if (!formValues["name"]) {
-        setFormInvalid("Please fill in your chat's name");
-      } else {
-        await dispatch(
-          addChat({
-            ...formValues,
-            owner: auth.currentUser?.uid,
-            users: [auth.currentUser?.uid],
-            type: "chat",
-          })
-        );
-        if (props.onSubmit) {
-          props.onSubmit();
-        }
-      }
-    } else if (chatType == "existing") {
-      if (!formValues["chat_id"]) {
-        setFormInvalid("Please fill in the chat ID");
-      } else {
-        await dispatch(joinChat(formValues));
-        if (props.onSubmit) {
-          props.onSubmit();
-        }
-      }
+  const submit: () => Promise<void> = async () => {
+    if (!formValues[resolveSettings[chatType].formKey]) {
+      setFormInvalid(
+        `Please fill in ${resolveSettings[chatType].invalidKeyText}`
+      );
+      return;
+    }
+
+    await dispatch(
+      resolveSettings[chatType].thunk({
+        ...formValues,
+        ...resolveSettings[chatType].extraFormValues,
+      })
+    );
+
+    if (!!onSubmit) {
+      onSubmit();
     }
   };
 
@@ -98,7 +114,7 @@ export default function ResolveChat(props: any) {
     <SafeAreaView style={{ padding: 16, gap: 12 }}>
       <View style={{ alignItems: "center", gap: 8 }}>
         <Text style={[globalStyles.text, { fontSize: 24, fontWeight: "bold" }]}>
-          {routeConfig[current][chatType].heading}
+          {routeConfig.message}
         </Text>
         <Text
           style={[
@@ -110,7 +126,7 @@ export default function ResolveChat(props: any) {
             },
           ]}
         >
-          {routeConfig[current][chatType].subheading}
+          {routeConfig.submessage}
         </Text>
       </View>
       <View style={{ backgroundColor: theme.background, padding: 8 }}>
@@ -173,17 +189,20 @@ export default function ResolveChat(props: any) {
             </View>
           )}
           <View style={{ gap: 8 }}>
-            <Text style={{ color: theme.heading, fontWeight: "bold" }}>
-              {routeConfig[current][chatType].inputLabel}
-            </Text>
-            <Input
-              name="Chat name"
-              formKey={chatType == "new" ? "name" : "chat_id"}
-              handleFormValueChange={handleFormValueChange}
-              value={formValues[chatType == "new" ? "name" : "chat_id"]}
-              // style="minimal"
-              background="white"
-            ></Input>
+            {Object.keys(routeConfig.placeholders).map((key) => (
+              <>
+                <Text style={{ color: theme.heading, fontWeight: "bold" }}>
+                  {routeConfig.placeholders[key]?.toUpperCase()}
+                </Text>
+                <Input
+                  name={routeConfig.placeholders[key]}
+                  formKey={key}
+                  handleFormValueChange={handleFormValueChange}
+                  value={formValues[key]}
+                  background="white"
+                ></Input>
+              </>
+            ))}
           </View>
         </View>
         <TouchableOpacity style={globalStyles.button} onPress={submit}>

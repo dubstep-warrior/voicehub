@@ -4,8 +4,14 @@ import theme from "../../config/theme.config.json";
 import config from "../../Images.config";
 import * as Clipboard from "expo-clipboard";
 import { showMessage } from "react-native-flash-message";
+import { Chat } from "../interfaces/Chat.interface";
 
-export default function Invite(props: any) {
+interface IInviteProps {
+  chat: Chat,
+  onClose: () => void
+}
+
+export default function Invite({chat, onClose}: IInviteProps) {
   
   const copyString = async (string: string) => {
     await Clipboard.setStringAsync(string).then(() => {
@@ -20,8 +26,8 @@ export default function Invite(props: any) {
       <View style={[styles.flexRow, { padding: 16 }]}>
         <Text
           style={{ fontSize: 24, fontWeight: "bold", color: "white" }}
-        >{`Invite users to ${[props.chat.name]}`}</Text>
-        <TouchableOpacity style={{ padding: 8 }} onPress={props.onClose}>
+        >{`Invite users to ${[chat.name]}`}</Text>
+        <TouchableOpacity style={{ padding: 8 }} onPress={onClose}>
           <Image
             style={{ width: 15, height: 15 }}
             source={config["close"]}
@@ -44,7 +50,7 @@ export default function Invite(props: any) {
           ]}
         >
           <Text style={{ padding: 12, fontSize: 18, color: "black" }}>
-            {props.chat.id}
+            {chat.id}
           </Text>
           <TouchableOpacity
             style={{
@@ -54,7 +60,7 @@ export default function Invite(props: any) {
               borderRadius: 8,
             }}
             onPress={() => {
-              copyString(props.chat.id);
+              copyString(chat.id);
             }}
           >
             <Text style={{ fontWeight: "bold" }}>Copy</Text>
