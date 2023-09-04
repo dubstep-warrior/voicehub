@@ -1,12 +1,13 @@
+import { NavigationProps } from "../interfaces/NavigationProps.interface";
 import Connections from "../tabs/main/Connections/Connections";
 import Home from "../tabs/main/Home/Home"; 
 import Profile from "../tabs/main/Profile/Profile";
 import config from "./../../Images.config"
-import { Image, ImageSourcePropType } from "react-native";
+import { ImageSourcePropType } from "react-native";
 
 type TabConfig = {
   name: string,
-  component: ({ route, navigation }: any) => JSX.Element,
+  component: ({ route, navigation }: NavigationProps) => JSX.Element,
   image: ImageSourcePropType
   imageSelected: ImageSourcePropType
 }

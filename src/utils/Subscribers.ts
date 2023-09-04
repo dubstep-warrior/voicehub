@@ -7,13 +7,9 @@ import {
 } from "firebase/firestore";
 import {
   addFirebaseListener,
-  update as updateApp,
   updateAppMessages,
-  updateAppNotifications,
 } from "../store/slices/app.slice";
-import { auth, db } from "../../firebase";
-import { useAppSelector } from "../store/hooks";
-import { selectUser } from "../store/slices/user.slice"; 
+import { db } from "../../firebase"; 
 
 export const getChatSubscription = (id: string) => {
   return async (dispatch: any, getState: any) => {
@@ -25,34 +21,14 @@ export const getChatSubscription = (id: string) => {
     dispatch(
       addFirebaseListener({
         listener: onSnapshot(messageQuery, async (snapshot) => {
-          const messages: any[] = [];
-          const notifications: any[] = [];
+          const messages: any[] = []; 
           snapshot.forEach((messageDoc) => {
-            const message = messageDoc.data();
+            const message = messageDoc.data(); 
 
-            if (
-              message.by !== auth.currentUser?.uid && 
-              message.desc.includes("@")
-            ) {
-              const tags = message.desc
-                .split(" ")
-                .filter((word: string) => word.includes("@"));
-              if (
-                tags.some(
-                  (tag: string) => tag == `@${getState().user.displayedName}`
-                )
-              ) {
-                notifications.push({
-                  ...message,
-                  created: message.created.toDate(), 
-                  id: messageDoc.id,
-                });
-              }
-            }
-
+            console.log('added message.', message)
             messages.push({
               ...message,
-              created: message.created.toDate(),
+              created: message.created?.toDate(),
               images:
                 message?.images?.map((uri: string, index: number) => {
                   return {
@@ -64,14 +40,7 @@ export const getChatSubscription = (id: string) => {
                 }) ?? [],
               id: messageDoc.id,
             });
-          });
-          // TODO FIX THIS
-          // dispatch(
-          //   updateAppNotifications({
-          //     notifications: notifications,
-          //     chat_id: id,
-          //   })
-          // );
+          }); 
 
           dispatch(
             updateAppMessages({

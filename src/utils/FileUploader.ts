@@ -19,10 +19,8 @@ const uploadImage = async (image: any, path: string) => {
   const uriArray = image.uri.split("/");
   const storageRef = ref(storage, `${path}/${uriArray[uriArray.length - 1]}`);
   const res = await uploadBytes(storageRef, blob).then(async (snapshot) => {
-    return await getDownloadURL(snapshot.ref).then((downloadURL) => {
-      return downloadURL;
-    });
-  });
+    return await getDownloadURL(snapshot.ref)
+  }).catch(err => console.log('failed to upload bytes', err)); 
   return res;
 };
 

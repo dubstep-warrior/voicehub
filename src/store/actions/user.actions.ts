@@ -55,7 +55,7 @@ export const UserUpdate = (
         JSON.stringify(changes[key])
       )
         newChanges[key] = changes[key];
-    }); 
+    });
     if ("profile_img" in newChanges) {
       const imageURI = await uploadImage(
         newChanges["profile_img"],
@@ -85,7 +85,7 @@ export const UserUpdate = (
           error: error,
         };
       });
- 
+
     if (setEditMode) {
       setEditMode(false);
     }
@@ -117,7 +117,7 @@ export const SearchUsers = (changes: any, currentUser: any) => {
 
     // TODO use cloud functions
     // const currentUser = getState().user
-    if (changes.username) { 
+    if (changes.username) {
       const q = query(
         collection(db, "userProfiles"),
         where(documentId(), "!=", auth.currentUser?.uid)
@@ -125,7 +125,7 @@ export const SearchUsers = (changes: any, currentUser: any) => {
       const res = await getDocs(q);
       const users: any[] = [];
       if (res) {
-        res.forEach((doc) => { 
+        res.forEach((doc) => {
           const user = doc.data();
           // const filter = [...getState().user.friends,]
           if (
@@ -137,7 +137,7 @@ export const SearchUsers = (changes: any, currentUser: any) => {
             users.push({ ...doc.data(), uid: doc.id });
           }
         });
-      } 
+      }
       dispatch(
         updateApp({
           users: users,
@@ -155,13 +155,13 @@ export const SearchUsers = (changes: any, currentUser: any) => {
 };
 
 export const addUser = (to: any) => {
-  return async (dispatch: any) => { 
+  return async (dispatch: any) => {
     if (auth.currentUser) {
       addDoc(collection(db, "requests"), {
         from: auth.currentUser?.uid,
         to: to.uid,
       })
-        .then(() => { 
+        .then(() => {
           Alert.alert(
             `Successfully sent a request to ${to.username}`,
             undefined,
@@ -169,15 +169,15 @@ export const addUser = (to: any) => {
           );
         })
         .catch((err) => {
-          console.log("cant add user:", err); 
+          console.log("cant add user:", err);
         });
     }
   };
 };
 
 export const removeRequest = (to: any) => {
-  return async (dispatch: any) => { 
-    if (auth.currentUser) { 
+  return async (dispatch: any) => {
+    if (auth.currentUser) {
       const q = query(
         collection(db, "requests"),
         and(
@@ -188,21 +188,21 @@ export const removeRequest = (to: any) => {
       getDocs(q)
         .then((snapshot) => {
           snapshot.forEach((doc) => deleteDoc(doc.ref));
- 
+
           Alert.alert(`Successfully deleted request`, undefined, [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
         })
         .catch((err) => {
-          console.log("cant delete user:", err); 
+          console.log("cant delete user:", err);
         });
     }
   };
 };
 
 export const rejectRequest = (from: any) => {
-  return async (dispatch: any) => { 
-    if (auth.currentUser) { 
+  return async (dispatch: any) => {
+    if (auth.currentUser) {
       const q = query(
         collection(db, "requests"),
         and(
@@ -212,20 +212,20 @@ export const rejectRequest = (from: any) => {
       );
       getDocs(q)
         .then((snapshot) => {
-          snapshot.forEach((doc) => deleteDoc(doc.ref)); 
+          snapshot.forEach((doc) => deleteDoc(doc.ref));
           Alert.alert(`Successfully rejected request`, undefined, [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
         })
         .catch((err) => {
-          console.log("cant delete user:", err); 
+          console.log("cant delete user:", err);
         });
     }
   };
 };
 
 export const acceptRequest = (from: any) => {
-  return async (dispatch: any) => { 
+  return async (dispatch: any) => {
     if (auth.currentUser) {
       const q = query(
         collection(db, "requests"),
@@ -235,12 +235,12 @@ export const acceptRequest = (from: any) => {
         )
       );
       getDocs(q).then((snapshot) => {
-        snapshot.forEach(async (document) => { 
+        snapshot.forEach(async (document) => {
           setDoc(doc(db, "friends", document.id), {
             group: [from.uid, auth.currentUser?.uid],
           })
             .then(() => {
-              deleteDoc(document.ref); 
+              deleteDoc(document.ref);
               Alert.alert(`Successfully accepted request`, undefined, [
                 { text: "OK", onPress: () => console.log("OK Pressed") },
               ]);
@@ -254,26 +254,26 @@ export const acceptRequest = (from: any) => {
               );
             });
         });
- 
-      }); 
+
+      });
     }
   };
 };
 
 export const removeFriend = (friend: any) => {
   return async (dispatch: any) => {
-    if (auth.currentUser) { 
-      await deleteDoc(doc(db, "friends", friend.friendshipID))
+    if (auth.currentUser) {
+      await deleteDoc(doc(db, "friends", friend.id))
         .then(() => {
           Alert.alert(`Successfully deleted friend`, undefined, [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
         })
-        .catch((err) => { 
+        .catch((err) => {
           Alert.alert(`Request unsuccessful`, "Please try again later", [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
-        }); 
+        });
     }
   };
 };
@@ -287,7 +287,7 @@ export const addChat = (chatObject: any): any => {
         })
       );
 
-      const chat = chatObject; 
+      const chat = chatObject;
       if ("chat_img" in chat && chat["chat_img"]) {
         const imageURI = await uploadImage(chat["chat_img"], "chat-images");
         chat["chat_img"] = imageURI;
@@ -296,7 +296,7 @@ export const addChat = (chatObject: any): any => {
       const res = await addDoc(collection(db, "chats"), {
         ...chat,
       })
-        .then((docRef) => { 
+        .then((docRef) => {
           dispatch(getChatSubscription(docRef.id)).then(async () => {
             await dispatch(
               updateApp({
@@ -305,9 +305,9 @@ export const addChat = (chatObject: any): any => {
                   selectedSubCat: docRef.id,
                 },
               })
-            ); 
+            );
           });
- 
+
           if (chat.type == "chat") {
             Alert.alert(`Successfully added chat ${chat.name}`, undefined, [
               { text: "OK", onPress: () => console.log("OK Pressed") },
@@ -378,9 +378,9 @@ export const joinChat = (form: any) => {
                   selectedSubCat: form.chat_id,
                 },
               })
-            ); 
+            );
           });
- 
+
           Alert.alert(`Successfully joined chat!`, undefined, [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
@@ -409,35 +409,37 @@ export const addMessage = (form: any, chat_id: string) => {
       updateApp({
         submitting: true,
       })
-    ); 
+    );
 
-     
 
-    // SEND MESSAGE
-    console.log('sending message chat_id', chat_id)
-    const message = {
-      ...form,
-      chatID: chat_id,
-      by: auth.currentUser?.uid,
-      created: serverTimestamp(),
-    };
+
+    try {
+      // SEND MESSAGE 
+      const message = {
+        ...form,
+        chatID: chat_id,
+        by: auth.currentUser?.uid,
+        created: serverTimestamp(),
+      };
+
+      dispatch(addAppMessage({
+        chat_id: chat_id,
+        message: message
+      }))
  
-    dispatch(addAppMessage({
-      chat_id: chat_id,
-      message: message
-    }))
 
-    if ("images" in message && message["images"]?.length > 0) {
-      const imageURIs = await Promise.all(
-        message["images"].map((image: any) =>
-          uploadImage(image, "message-images")
+      const imageUploadRes = !!message["images"]?.length ? await Promise.all(
+        message["images"].map((image: any) => {
+          return uploadImage(image, "message-images")
+        }
         )
-      );
-      message["images"] = imageURIs;
+      ) : []
+ 
+      await addDoc(collection(doc(db, "chats", chat_id!), "messages"), {...message, images: imageUploadRes})
+    } catch (e) {
+      console.log('issue with sending message', e)
     }
 
-    await addDoc(collection(doc(db, "chats", chat_id!), "messages"), message)
-   
 
     dispatch(
       updateApp({
@@ -453,25 +455,25 @@ export const leaveChat = (chat_id: string) => {
     const ref = doc(db, "chats", chat_id);
     await updateDoc(ref, {
       users: arrayRemove(auth.currentUser!.uid),
-    }).then(() => { 
+    }).then(() => {
       Alert.alert(`Successfully left chat!`, undefined, [
         { text: "OK", onPress: () => console.log("OK Pressed") },
       ]);
-      dispatch( updateApp({
+      dispatch(updateApp({
         home: {
           selectedCat: 'dms',
-          selectedSubCat:( !!Object.keys(getState?.user?.chats?.dms ?? {}).length ? Object.keys(getState.user.chats.dms)[0] : null),
+          selectedSubCat: (!!Object.keys(getState?.user?.chats?.dms ?? {}).length ? Object.keys(getState.user.chats.dms)[0] : null),
         },
       }))
     })
-    .catch((err) => {
-      console.log("cant join chat:", err);
-      Alert.alert(
-        `Could not leave chat`,
-        "There was an issue with leaving the chat, please try again later",
-        [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-      );
-    });
+      .catch((err) => {
+        console.log("cant join chat:", err);
+        Alert.alert(
+          `Could not leave chat`,
+          "There was an issue with leaving the chat, please try again later",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+        );
+      });
   };
 };
 
@@ -479,24 +481,24 @@ export const leaveChat = (chat_id: string) => {
 export const deleteChat = (chat_id: string) => {
   return async (dispatch: any, getState: any) => {
     const ref = doc(db, "chats", chat_id);
-    await deleteDoc(ref).then(() => { 
+    await deleteDoc(ref).then(() => {
       Alert.alert(`Successfully deleted chat!`, undefined, [
         { text: "OK", onPress: () => console.log("OK Pressed") },
       ]);
-      dispatch( updateApp({
+      dispatch(updateApp({
         home: {
           selectedCat: 'dms',
-          selectedSubCat:( !!Object.keys(getState?.user?.chats?.dms ?? {}).length ? Object.keys(getState.user.chats.dms)[0] : null),
+          selectedSubCat: (!!Object.keys(getState?.user?.chats?.dms ?? {}).length ? Object.keys(getState.user.chats.dms)[0] : null),
         },
       }))
     })
-    .catch((err) => {
-      console.log("cant delete chat:", err);
-      Alert.alert(
-        `Could not delete chat`,
-        "There was an issue with deleting the chat, please try again later",
-        [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-      );
-    });
+      .catch((err) => {
+        console.log("cant delete chat:", err);
+        Alert.alert(
+          `Could not delete chat`,
+          "There was an issue with deleting the chat, please try again later",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+        );
+      });
   };
 };

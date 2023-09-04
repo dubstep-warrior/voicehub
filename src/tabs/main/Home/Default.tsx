@@ -3,22 +3,14 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Image,
-  Animated,
+  Image, 
   KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  Keyboard,
-  ImageProps,
+  Platform, 
+  Keyboard, 
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
 import config from "../../../../Images.config";
-
 import theme from "../../../../config/theme.config.json";
 import { styles as globalStyles } from "../../../../Styles.config";
-
-import { NavigationProps } from "../../../interfaces/NavigationProps.interface";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectUser } from "../../../store/slices/user.slice";
@@ -302,7 +294,7 @@ export default function Default({ route, navigation }: any) {
               >
                 <Image
                   style={{ width: 32, height: 24 }}
-                  source={config["friends-white"]}
+                  source={config["connections-white"]}
                 ></Image>
               </TouchableOpacity>
               <Text style={globalStyles.headerText}>

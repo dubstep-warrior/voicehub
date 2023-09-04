@@ -164,7 +164,7 @@ export default function ConnectionsTab({ route, navigation }: NavigationProps) {
           <UserList
             identifier="uid"
             list={users.map((ref: Connection) => {
-              return { uid: ref.uid, ...appState.userProfiles[ref.uid] };
+              return { ...ref, ...appState.userProfiles[ref.uid] };
             })}
             onPress={(user) => tappedUser(user)}
           ></UserList>

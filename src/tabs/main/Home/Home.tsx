@@ -49,9 +49,10 @@ import Spinner from "react-native-loading-spinner-overlay";
 import ProfileOverview from "../../../shared/ProfileOverview";
 import { deleteChat, leaveChat } from "../../../store/actions/user.actions";
 import { UID } from "../../../interfaces/VHUser";
+import { NavigationProps } from "../../../interfaces/NavigationProps.interface";
 // import Call from "../../../utils/Call";
 
-export default function Home({ route, navigation }: any) {
+export default function Home({ route, navigation }: NavigationProps) {
   const Drawer = createDrawerNavigator();
   const appState = useAppSelector(selectApp);
   return (
@@ -122,7 +123,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
   const owner =
     !!appState.home.selectedSubCat &&
     auth.currentUser?.uid ==
-      userState.chats.chat[appState.home.selectedSubCat]?.owner;
+    userState.chats.chat[appState.home.selectedSubCat]?.owner;
   const options = (actionSheetConfig as any)[current][
     owner ? "owner" : "norm"
   ] as (string | React.ReactNode)[];
@@ -149,7 +150,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
     },
   };
 
-  useEffect(() => {}, [appState.home.selectedSubCat]);
+  useEffect(() => { }, [appState.home.selectedSubCat]);
 
   const chatOptions = () => {
     actionSheetRef.current?.show();
@@ -159,15 +160,16 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
     setOverlay({
       type: overlay.type,
       visible: false,
-    }); 
+    });
   };
 
   return (
     <View style={{ flexDirection: "row", flexGrow: 1 }}>
       <ScrollView
         style={{
-          flex: 1,
+          maxWidth: 80,
           backgroundColor: theme.background2,
+          paddingVertical: 8
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -217,11 +219,11 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
                   style={[
                     styles.icon,
                     appState.home.selectedCat == "chat" &&
-                      appState.home.selectedSubCat == key && {
-                        borderWidth: 2,
-                        borderColor: theme.black,
-                        borderRadius: 20,
-                      },
+                    appState.home.selectedSubCat == key && {
+                      borderWidth: 2,
+                      borderColor: theme.black,
+                      borderRadius: 20,
+                    },
                   ]}
                 >
                   {!!userState?.chats?.["chat"]?.[key]?.["chat_img"] ? (
@@ -290,10 +292,10 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
                         (chatID) => {
                           return {
                             ...appState?.userProfiles?.[
-                              userState?.chats?.["dms"][chatID]?.users.find(
-                                (userID: UID) =>
-                                  userID !== auth.currentUser?.uid
-                              ) as UID
+                            userState?.chats?.["dms"][chatID]?.users.find(
+                              (userID: UID) =>
+                                userID !== auth.currentUser?.uid
+                            ) as UID
                             ],
                             dmRef: chatID,
                           };
@@ -376,9 +378,9 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
             Keyboard.isVisible()
               ? Keyboard.dismiss()
               : setOverlay({
-                  type: "",
-                  visible: false,
-                })
+                type: "",
+                visible: false,
+              })
           }
           backdropStyle={{ backgroundColor: "rgba(255,255,255,0.4)" }}
           overlayStyle={{ backgroundColor: theme.background, borderRadius: 15 }}
@@ -433,7 +435,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
             <Invite
               chat={
                 userState.chats.chat[
-                  appState.home.selectedSubCat as keyof typeof userState.chats
+                appState.home.selectedSubCat as keyof typeof userState.chats
                 ]
               }
               onClose={() => {
@@ -527,7 +529,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   iconImage: { width: 30, height: 30 },
-  modalContainer : {
+  modalContainer: {
     margin: 0,
     backgroundColor: "rgba(0,0,0,0.2)",
     position: "relative",
