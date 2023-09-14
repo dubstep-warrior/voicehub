@@ -83,7 +83,7 @@ VoiceHub is a React Native app that aims to provide a comprehensive chat experie
 
 ## 📂 Project Structure
 
-
+```bash
 repo 
 ├── assets 
 ├── src
@@ -159,6 +159,7 @@ repo
 ├── tsconfig.json 
 
 39 directories, 51 files
+```
 
 ---
 
