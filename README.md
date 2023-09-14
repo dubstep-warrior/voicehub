@@ -334,9 +334,9 @@ repo
 ### ✔️ Prerequisites
 
 Before you begin, ensure that you have the following prerequisites installed:
-> - `ℹ️ Requirement 1`
-> - `ℹ️ Requirement 2`
-> - `ℹ️ ...`
+> - `ℹ️ Node.js`
+> - `ℹ️ Node Package Manager`
+> - `ℹ️ Expo CLI`
 
 ### 📦 Installation
 
@@ -367,7 +367,7 @@ npm start
 ## 🗺 Roadmap
 
 > - [ ] `ℹ️  Task 1: Implement voice chatting features`
-> - [ ] `ℹ️  Task 2: Refactor Redux actions` 
+> - [ ] `ℹ️  Task 2: Refactor Redux actions to call asyncrhonous features with RTK Query` 
 
 
 ---
