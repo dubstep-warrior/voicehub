@@ -10,6 +10,7 @@
 <img src="https://img.shields.io/badge/Firebase-FFCA28.svg?style&logo=Firebase&logoColor=black" alt="Firebase" />
 <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style&logo=JavaScript&logoColor=black" alt="JavaScript" />
 <img src="https://img.shields.io/badge/React-61DAFB.svg?style&logo=React&logoColor=black" alt="React" />
+<img src="https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB" alt="React Native">
 <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style&logo=TypeScript&logoColor=white" alt="TypeScript" />
 <img src="https://img.shields.io/badge/Expo-000020.svg?style&logo=Expo&logoColor=white" alt="Expo" />
 <img src="https://img.shields.io/badge/Markdown-000000.svg?style&logo=Markdown&logoColor=white" alt="Markdown" />
@@ -83,7 +84,81 @@ VoiceHub is a React Native app that aims to provide a comprehensive chat experie
 ## 📂 Project Structure
 
 
+repo 
+├── assets 
+├── src
+│   ├── config
+│   │   ├── Main.config.ts 
+│   ├── definitions
+│   │   ├── actionsheet.definition.ts 
+│   ├── interfaces
+│   │   ├── ActionSheet.interface.ts
+│   │   ├── Chat.interface.ts
+│   │   ├── NavigationProps.interface.ts
+│   │   ├── Props.interface.ts
+│   │   ├── RootStackParamList.interface.ts
+│   │   ├── RouteConfig.interface.ts
+│   │   ├── RouteConfiguration.interface.ts
+│   │   ├── VHUser.ts
+│   ├── pages
+│   │   ├── Access.tsx
+│   │   ├── Invite.tsx
+│   │   ├── Main.tsx
+│   │   ├── ResolveChat.tsx
+│   │   ├── SearchUsers.tsx
+│   │   ├── UpdateField.tsx
+│   ├── shared
+│   │   ├── Button.tsx
+│   │   ├── Error.tsx
+│   │   ├── FormData.tsx
+│   │   ├── Input.tsx
+│   │   ├── MessageText.tsx
+│   │   ├── ProfileOverview.tsx
+│   │   ├── SimpleForm.tsx
+│   │   ├── UserList.tsx
+│   ├── store
+│   │   ├── actions
+│   │   |   ├── auth.actions.tsx
+│   │   |   ├── user.actions.tsx
+│   │   ├── slices
+│   │   |   ├── app.slice.tsx
+│   │   |   ├── user.slice.tsx
+│   │   ├── hooks.ts
+│   │   ├── store.ts
+│   ├── tabs
+│   │   ├── main
+│   │   |   ├── Connections
+│   │   |   |   ├── DefaultTabs
+│   │   |   |   |   ├── ConnectionsTab.tsx
+│   │   |   |   ├── Connections.tsx
+│   │   |   |   ├── Default.tsx 
+│   │   |   ├── Home
+│   │   |   |   ├── Chat.tsx
+│   │   |   |   ├── Default.tsx
+│   │   |   |   ├── Home.tsx
+│   │   |   ├── Profile
+│   │   |   |   ├── Default.tsx
+│   │   |   |   ├── Profile.tsx
+│   │   |   ├── StandardTabPage.tsx
+│   ├── utils
+│   │   |   ├── FileUploader.ts
+│   │   |   ├── StartChat.ts
+│   │   |   ├── Subscribers.ts
+│   ├── VoiceHub.tsx 
+├── .gitignore
+├── app.json
+├── App.tsx
+├── babel.config.js
+├── env.d.ts
+├── firebase.ts
+├── Images.config.ts
+├── package.json 
+├── package-lock.json
+├── README.md
+├── Styles.config.ts
+├── tsconfig.json 
 
+39 directories, 51 files
 
 ---
 
