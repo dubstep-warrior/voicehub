@@ -1,6 +1,6 @@
 <div align="center">
-<h1 align="center">
-<img src="./assets/icon.png" width="100" />
+<h1 align="center"> 
+![alt text](https://github.com/dubstep-warrior/voicehub/assets/icon.png?raw=true)
 <br>VoiceHub
 </h1>
 <h3>◦ Empowering voices. Building personalities and ever-lasting connections. </h3>
