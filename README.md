@@ -1,6 +1,6 @@
 <div align="center">
-![alt text](./assets/icon.png)
-<h1 align="center"> 
+<h1 align="center">
+<img src="/assets/icon.png" width="100" /> 
 <br>VoiceHub
 </h1>
 <h3>◦ Empowering voices. Building personalities and ever-lasting connections. </h3>
