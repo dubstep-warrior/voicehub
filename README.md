@@ -118,32 +118,32 @@ repo
 │   │   ├── UserList.tsx
 │   ├── store
 │   │   ├── actions
-│   │   |   ├── auth.actions.tsx
-│   │   |   ├── user.actions.tsx
+│   │   │   ├── auth.actions.tsx
+│   │   │   ├── user.actions.tsx
 │   │   ├── slices
-│   │   |   ├── app.slice.tsx
-│   │   |   ├── user.slice.tsx
+│   │   │   ├── app.slice.tsx
+│   │   │   ├── user.slice.tsx
 │   │   ├── hooks.ts
 │   │   ├── store.ts
 │   ├── tabs
 │   │   ├── main
-│   │   |   ├── Connections
-│   │   |   |   ├── DefaultTabs
-│   │   |   |   |   ├── ConnectionsTab.tsx
-│   │   |   |   ├── Connections.tsx
-│   │   |   |   ├── Default.tsx 
-│   │   |   ├── Home
-│   │   |   |   ├── Chat.tsx
-│   │   |   |   ├── Default.tsx
-│   │   |   |   ├── Home.tsx
-│   │   |   ├── Profile
-│   │   |   |   ├── Default.tsx
-│   │   |   |   ├── Profile.tsx
-│   │   |   ├── StandardTabPage.tsx
+│   │   │   ├── Connections
+│   │   │   │   ├── DefaultTabs
+│   │   │   │   │   ├── ConnectionsTab.tsx
+│   │   │   │   ├── Connections.tsx
+│   │   │   │   ├── Default.tsx 
+│   │   │   ├── Home
+│   │   │   │   ├── Chat.tsx
+│   │   │   │   ├── Default.tsx
+│   │   │   │   ├── Home.tsx
+│   │   │   ├── Profile
+│   │   │   │   ├── Default.tsx
+│   │   │   │   ├── Profile.tsx
+│   │   │   ├── StandardTabPage.tsx
 │   ├── utils
-│   │   |   ├── FileUploader.ts
-│   │   |   ├── StartChat.ts
-│   │   |   ├── Subscribers.ts
+│   │   │   ├── FileUploader.ts
+│   │   │   ├── StartChat.ts
+│   │   │   ├── Subscribers.ts
 │   ├── VoiceHub.tsx 
 ├── .gitignore
 ├── app.json
