@@ -1,9 +1,9 @@
 <div align="center">
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/ec559a9f6bfd399b82bb44393651661b08aaf7ba/icons/folder-markdown-open.svg" width="100" />
-<br>voicehub
+<img src="./assets/icon.png" width="100" />
+<br>VoiceHub
 </h1>
-<h3>◦ Empower voices. Unleash code.</h3>
+<h3>◦ Empowering voices. Building personalities and ever-lasting connections. </h3>
 <h3>◦ Developed with the software and tools listed below.</h3>
 
 <p align="center">
@@ -20,7 +20,6 @@
 <img src="https://img.shields.io/github/languages/top/dubstep-warrior/voicehub?style&color=5D6D7E" alt="GitHub top language" />
 <img src="https://img.shields.io/github/languages/code-size/dubstep-warrior/voicehub?style&color=5D6D7E" alt="GitHub code size in bytes" />
 <img src="https://img.shields.io/github/commit-activity/m/dubstep-warrior/voicehub?style&color=5D6D7E" alt="GitHub commit activity" />
-<img src="https://img.shields.io/github/license/dubstep-warrior/voicehub?style&color=5D6D7E" alt="GitHub license" />
 </div>
 
 ---
@@ -72,7 +71,7 @@ VoiceHub is a React Native app that aims to provide a comprehensive chat experie
 - Redux Hooks: hooks.ts provides custom hooks, useAppDispatch and useAppSelector, for using Redux's dispatch and selector functions in a React app. They have typings for AppDispatch and RootState.
 - State Management:
     - State management in this app revolves around Redux slices, hooks for easy access, and Firebase for real-time data synchronization and authentication. These components work together to ensure a consistent and responsive user experience.
-    - Asynchronous calls to firebase to resolve feature functionality is implemented in Redux thunks.
+    - Asynchronous calls to firebase to resolve feature functionality is implemented in Redux actions.
 - Utility Functions: 
     - Subscribers.ts retrieves chat data and updates the app state with messages and notifications from the Firestore database.
     - FileUploader.ts allows users to upload images to Firebase storage and retrieve download URLs. 
@@ -87,6 +86,7 @@ VoiceHub is a React Native app that aims to provide a comprehensive chat experie
 ```bash
 repo 
 ├── assets 
+│   ├── ...30 files
 ├── src
 │   ├── config
 │   │   ├── Main.config.ts 
@@ -358,22 +358,16 @@ npm install
 ### 🎮 Using voicehub
 
 ```sh
-npm run build && node dist/main.js
-```
-
-### 🧪 Running Tests
-```sh
-npm test
-```
+npm start
+``` 
 
 ---
 
 
 ## 🗺 Roadmap
 
-> - [X] `ℹ️  Task 1: Implement X`
-> - [ ] `ℹ️  Task 2: Refactor Y`
-> - [ ] `ℹ️ ...`
+> - [ ] `ℹ️  Task 1: Implement voice chatting features`
+> - [ ] `ℹ️  Task 2: Refactor Redux actions` 
 
 
 ---
@@ -399,16 +393,4 @@ git push origin new-feature-branch
 7. Create a new pull request to the original project repository. In the pull request, describe the changes you've made and why they're necessary.
 The project maintainers will review your changes and provide feedback or merge them into the main branch.
 
----
-
-## 📄 License
-
-This project is licensed under the `ℹ️  INSERT-LICENSE-TYPE` License. See the [LICENSE](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-license-to-a-repository) file for additional info.
-
----
-
-## 👏 Acknowledgments
-
-> - `ℹ️  List any resources, contributors, inspiration, etc.`
-
----
+--- 
