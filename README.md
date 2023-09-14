@@ -340,7 +340,7 @@ Before you begin, ensure that you have the following prerequisites installed:
 
 ### 📦 Installation
 
-1. Clone the voicehub repository:
+1. Clone the VoiceHub repository:
 ```sh
 git clone https://github.com/dubstep-warrior/voicehub
 ```
@@ -355,7 +355,7 @@ cd voicehub
 npm install
 ```
 
-### 🎮 Using voicehub
+### 🎮 Using VoiceHub
 
 ```sh
 npm start
