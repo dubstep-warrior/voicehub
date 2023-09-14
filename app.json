@@ -13,7 +13,6 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-       
     ],
     "splash": {
       "image": "./assets/splash.png",
@@ -49,6 +48,12 @@
       "eas": {
         "projectId": "1ea870eb-93f2-4e41-b8c2-1f0d1cda2679"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1ea870eb-93f2-4e41-b8c2-1f0d1cda2679"
     }
   }
 }
