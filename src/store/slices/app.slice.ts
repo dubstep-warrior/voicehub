@@ -65,7 +65,8 @@ export const appSlice = createSlice({
       state.firebaseListeners = [];
     }, 
     addAppMessage: (state, actions) => {
-      state.messages[actions.payload.chat_id].push(actions.payload.message)
+      if (!(actions.payload.chat_id in state.messages)) state.messages[actions.payload.chat_id] = [actions.payload.message] 
+      else state.messages[actions.payload.chat_id].push(actions.payload.message)
      },
     updateAppNotifications: (state, actions) => { 
       state.notifications[actions.payload.chat_id] = actions.payload.notifications;

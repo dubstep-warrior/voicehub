@@ -24,8 +24,7 @@ export const getChatSubscription = (id: string) => {
           const messages: any[] = []; 
           snapshot.forEach((messageDoc) => {
             const message = messageDoc.data(); 
-
-            console.log('added message.', message)
+ 
             messages.push({
               ...message,
               created: message.created?.toDate(),

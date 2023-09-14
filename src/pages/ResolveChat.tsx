@@ -25,29 +25,29 @@ interface ResolveChatProps {
   navigation?: DrawerNavigationHelpers;
 }
 
-const resolveSettings = {
-  new: {
-    formKey: "name",
-    invalidKeyText: "your chat's name",
-    extraFormValues: {
-      owner: auth.currentUser?.uid,
-      users: [auth.currentUser?.uid],
-      type: "chat",
-    },
-    thunk: addChat,
-  },
-  existing: {
-    formKey: "chat_id",
-    invalidKeyText: "the chat ID",
-    extraFormValues: {},
-    thunk: joinChat,
-  },
-};
-
 export default function ResolveChat({ onSubmit }: ResolveChatProps) {
+  const resolveSettings = {
+    new: {
+      formKey: "name",
+      invalidKeyText: "your chat's name",
+      extraFormValues: {
+        owner: auth.currentUser?.uid,
+        users: [auth.currentUser?.uid],
+        type: "chat",
+      },
+      thunk: addChat,
+    },
+    existing: {
+      formKey: "chat_id",
+      invalidKeyText: "the chat ID",
+      extraFormValues: {},
+      thunk: joinChat,
+    },
+  };
+
   const dispatch = useAppDispatch();
   const [chatType, setChatType] = useState<"new" | "existing">("new");
-  const appState = useAppSelector(selectApp);
+  const appState = useAppSelector<any>(selectApp);
   const current = `createchat`;
   const dotIndicatorConfig = {
     purple: 14.75,
@@ -97,7 +97,7 @@ export default function ResolveChat({ onSubmit }: ResolveChatProps) {
       );
       return;
     }
-
+    console.log('calling', chatType)
     await dispatch(
       resolveSettings[chatType].thunk({
         ...formValues,
@@ -190,7 +190,7 @@ export default function ResolveChat({ onSubmit }: ResolveChatProps) {
           )}
           <View style={{ gap: 8 }}>
             {Object.keys(routeConfig.placeholders).map((key) => (
-              <>
+              <View style={{flexDirection: 'column', gap: 4}} key={key}>
                 <Text style={{ color: theme.heading, fontWeight: "bold" }}>
                   {routeConfig.placeholders[key]?.toUpperCase()}
                 </Text>
@@ -201,7 +201,7 @@ export default function ResolveChat({ onSubmit }: ResolveChatProps) {
                   value={formValues[key]}
                   background="white"
                 ></Input>
-              </>
+              </View>
             ))}
           </View>
         </View>

@@ -40,6 +40,8 @@ export default function Input({ style = 'input' ,...props}: IInput) {
         multiline={props.multiline ?? false}
         numberOfLines={props.numberOfLines ?? 1}
         onChangeText={textChanged}
+        underlineColorAndroid={'transparent'}
+        spellCheck={false}
       />
     </View>
   );

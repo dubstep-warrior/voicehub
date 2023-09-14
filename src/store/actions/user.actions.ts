@@ -279,7 +279,7 @@ export const removeFriend = (friend: any) => {
 };
 
 export const addChat = (chatObject: any): any => {
-  return async (dispatch: any) => {
+  return async (dispatch: any) => { 
     if (auth.currentUser) {
       dispatch(
         updateApp({
@@ -433,8 +433,7 @@ export const addMessage = (form: any, chat_id: string) => {
           return uploadImage(image, "message-images")
         }
         )
-      ) : []
- 
+      ) : [] 
       await addDoc(collection(doc(db, "chats", chat_id!), "messages"), {...message, images: imageUploadRes})
     } catch (e) {
       console.log('issue with sending message', e)
