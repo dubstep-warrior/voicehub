@@ -40,7 +40,7 @@
 
 ## 📍 Overview
 
-The project is a mobile application that provides a voice chat platform with features like user authentication, friend management, notifications, and profile customization. It utilizes technologies such as Firebase for authentication and data management, React Native for building the app interface, and Redux for state management. The app aims to provide a seamless and efficient way for users to connect with friends, engage in voice chats, and personalize their profile, enhancing the overall communication experience.
+VoiceHub is a React Native app that aims to provide a comprehensive chat experience. It incorporates key features such as user authentication, real-time messaging, profile management, and friend connections. The project utilizes Firebase for its backend services, ensuring secure and reliable messaging. VoiceHub offers a customizable and user-friendly interface, supporting seamless communication and collaboration for individuals and groups.
 
 ---
 
