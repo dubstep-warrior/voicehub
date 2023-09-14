@@ -11,6 +11,7 @@
 <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style&logo=JavaScript&logoColor=black" alt="JavaScript" />
 <img src="https://img.shields.io/badge/React-61DAFB.svg?style&logo=React&logoColor=black" alt="React" />
 <img src="https://img.shields.io/badge/React_Native-%2320232a.svg?style&logo=React&logoColor=%2361DAFB" alt="React Native">
+<img src="https://img.shields.io/badge/Redux-%23593d88.svg?style&logo=redux&logoColor=white" alt="Redux">
 <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style&logo=TypeScript&logoColor=white" alt="TypeScript" />
 <img src="https://img.shields.io/badge/Expo-000020.svg?style&logo=Expo&logoColor=white" alt="Expo" />
 <img src="https://img.shields.io/badge/Markdown-000000.svg?style&logo=Markdown&logoColor=white" alt="Markdown" />
