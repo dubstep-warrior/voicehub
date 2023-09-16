@@ -13,10 +13,8 @@ interface AppState {
     selectedSubCat: ChatID | null;
   };
   messages: MessagesCollection;
-  userProfiles: any;
-  call: any;
-  firebaseListeners: Unsubscribe[];
-  notifications: any;
+  userProfiles: any; 
+  firebaseListeners: Unsubscribe[]; 
   openProfileModal: string;  
 }
 
@@ -30,10 +28,8 @@ const initialState: AppState = {
     selectedSubCat: null,
   },
   messages: {},
-  userProfiles: {},
-  call: null,
-  firebaseListeners: [],
-  notifications: {},
+  userProfiles: {}, 
+  firebaseListeners: [], 
   openProfileModal: '' ,  
 };
 
@@ -67,10 +63,7 @@ export const appSlice = createSlice({
     addAppMessage: (state, actions) => {
       if (!(actions.payload.chat_id in state.messages)) state.messages[actions.payload.chat_id] = [actions.payload.message] 
       else state.messages[actions.payload.chat_id].push(actions.payload.message)
-     },
-    updateAppNotifications: (state, actions) => { 
-      state.notifications[actions.payload.chat_id] = actions.payload.notifications;
-    } 
+     }, 
   },
 });
 
@@ -80,8 +73,7 @@ export const {
   updateAppMessages,
   addFirebaseListener,
   clearFirebase, 
-  addAppMessage,
-  updateAppNotifications, 
+  addAppMessage, 
 } = appSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
