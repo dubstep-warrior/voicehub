@@ -39,7 +39,7 @@
 
 ## 📍 Overview
 
-VoiceHub is a React Native app that aims to provide a comprehensive chat experience. It incorporates key features such as user authentication, real-time messaging, profile management, and friend connections. The project utilizes Firebase for its backend services, ensuring secure and reliable messaging. VoiceHub offers a customizable and user-friendly interface, supporting seamless communication and collaboration for individuals and groups.
+VoiceHub is a React Native app that aims to provide a comprehensive chat experience. Developed with Expo, the application incorporates key features such as user authentication, real-time messaging, profile management, and friend connections. The project utilizes Firebase for its backend services, ensuring secure and reliable messaging. VoiceHub offers a customizable and user-friendly interface, supporting seamless communication and collaboration for individuals and groups.
 
 ---
 
